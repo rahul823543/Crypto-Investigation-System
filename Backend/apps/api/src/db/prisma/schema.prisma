@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client"  
+  output   = "../../generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Case {
+  id           String   @id @default(cuid())
+  rootAddress  String
+  chainId      Int
+  mode         String
+  status       String   @default("created")
+  riskScore    Int?
+  riskLevel    String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

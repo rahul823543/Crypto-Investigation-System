@@ -1,0 +1,14 @@
+{
+  "case": {
+    "id": "case_demo_001",
+    "rootAddress": "0x1111111111111111111111111111111111aaaa",
+    "chainId": 80002,
+    "mode": "demo",
+    "status": "created",
+    "riskScore": null,
+    "riskLevel": null,
+    "errorMessage": null,
+    "createdAt": "2026-08-29T00:00:00.000Z",
+    "updatedAt": "2026-08-29T00:00:00.000Z"
+  }
+}
