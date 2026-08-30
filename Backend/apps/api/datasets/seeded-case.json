@@ -1,14 +1,350 @@
 {
+  "_comment": "Seeded demo case — suspect wallet fans out USDC to 3 wallets rapidly, then routes through QuickSwap DEX. Used by GET /demo/seeded-case and as the Python /v1/analyze fallback payload.",
+
   "case": {
-    "id": "case_demo_001",
-    "rootAddress": "0x1111111111111111111111111111111111aaaa",
+    "id": "case_seed_demo",
+    "rootAddress": "0x1234567890abcdef1234567890abcdef12345678",
     "chainId": 80002,
     "mode": "demo",
-    "status": "created",
-    "riskScore": null,
-    "riskLevel": null,
+    "status": "analyzed",
+    "riskScore": 78,
+    "riskLevel": "high",
     "errorMessage": null,
-    "createdAt": "2026-08-29T00:00:00.000Z",
-    "updatedAt": "2026-08-29T00:00:00.000Z"
+    "createdAt": "2026-08-21T10:00:00.000Z",
+    "updatedAt": "2026-08-21T10:30:00.000Z"
+  },
+
+  "transactions": [
+    {
+      "id": "tx_seed_001",
+      "caseId": "case_seed_demo",
+      "hash": "0xabc0000000000000000000000000000000000000000000000000000000000001",
+      "chainId": 80002,
+      "blockNumber": 8500001,
+      "from": "0x1234567890abcdef1234567890abcdef12345678",
+      "to": "0x2222222222222222222222222222222222222222",
+      "asset": "USDC",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "amount": "3000.00",
+      "amountUsd": 3000,
+      "timestamp": "2026-08-21T10:00:00.000Z",
+      "transferType": "erc20",
+      "method": "transfer"
+    },
+    {
+      "id": "tx_seed_002",
+      "caseId": "case_seed_demo",
+      "hash": "0xabc0000000000000000000000000000000000000000000000000000000000002",
+      "chainId": 80002,
+      "blockNumber": 8500091,
+      "from": "0x1234567890abcdef1234567890abcdef12345678",
+      "to": "0x3333333333333333333333333333333333333333",
+      "asset": "USDC",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "amount": "3000.00",
+      "amountUsd": 3000,
+      "timestamp": "2026-08-21T10:03:00.000Z",
+      "transferType": "erc20",
+      "method": "transfer"
+    },
+    {
+      "id": "tx_seed_003",
+      "caseId": "case_seed_demo",
+      "hash": "0xabc0000000000000000000000000000000000000000000000000000000000003",
+      "chainId": 80002,
+      "blockNumber": 8500151,
+      "from": "0x1234567890abcdef1234567890abcdef12345678",
+      "to": "0x4444444444444444444444444444444444444444",
+      "asset": "USDC",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "amount": "4000.00",
+      "amountUsd": 4000,
+      "timestamp": "2026-08-21T10:05:00.000Z",
+      "transferType": "erc20",
+      "method": "transfer"
+    },
+    {
+      "id": "tx_seed_004",
+      "caseId": "case_seed_demo",
+      "hash": "0xabc0000000000000000000000000000000000000000000000000000000000004",
+      "chainId": 80002,
+      "blockNumber": 8500211,
+      "from": "0x1234567890abcdef1234567890abcdef12345678",
+      "to": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "asset": "USDC",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "amount": "5000.00",
+      "amountUsd": 5000,
+      "timestamp": "2026-08-21T10:07:00.000Z",
+      "transferType": "erc20",
+      "method": "swapExactTokensForTokens"
+    },
+    {
+      "id": "tx_seed_005",
+      "caseId": "case_seed_demo",
+      "hash": "0xabc0000000000000000000000000000000000000000000000000000000000005",
+      "chainId": 80002,
+      "blockNumber": 8500751,
+      "from": "0x2222222222222222222222222222222222222222",
+      "to": "0x5555555555555555555555555555555555555555",
+      "asset": "USDC",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "amount": "2800.00",
+      "amountUsd": 2800,
+      "timestamp": "2026-08-21T10:25:00.000Z",
+      "transferType": "erc20",
+      "method": "transfer"
+    }
+  ],
+
+  "graph": {
+    "caseId": "case_seed_demo",
+    "nodes": [
+      {
+        "id": "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "address": "0x1234567890abcdef1234567890abcdef12345678",
+        "type": "wallet",
+        "labels": ["root"],
+        "riskLevel": "high",
+        "totalInUsd": 15000,
+        "totalOutUsd": 15000
+      },
+      {
+        "id": "wallet:0x2222222222222222222222222222222222222222",
+        "address": "0x2222222222222222222222222222222222222222",
+        "type": "wallet",
+        "labels": [],
+        "riskLevel": "low",
+        "totalInUsd": 3000,
+        "totalOutUsd": 2800
+      },
+      {
+        "id": "wallet:0x3333333333333333333333333333333333333333",
+        "address": "0x3333333333333333333333333333333333333333",
+        "type": "wallet",
+        "labels": [],
+        "riskLevel": "low",
+        "totalInUsd": 3000,
+        "totalOutUsd": 0
+      },
+      {
+        "id": "wallet:0x4444444444444444444444444444444444444444",
+        "address": "0x4444444444444444444444444444444444444444",
+        "type": "wallet",
+        "labels": [],
+        "riskLevel": "low",
+        "totalInUsd": 4000,
+        "totalOutUsd": 0
+      },
+      {
+        "id": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+        "address": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+        "type": "dex",
+        "labels": ["dex", "quickswap"],
+        "riskLevel": "low",
+        "totalInUsd": 5000,
+        "totalOutUsd": 0
+      },
+      {
+        "id": "wallet:0x5555555555555555555555555555555555555555",
+        "address": "0x5555555555555555555555555555555555555555",
+        "type": "wallet",
+        "labels": [],
+        "riskLevel": "low",
+        "totalInUsd": 2800,
+        "totalOutUsd": 0
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge:0xabc0000000000000000000000000000000000000000000000000000000000001:0",
+        "from": "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "to": "wallet:0x2222222222222222222222222222222222222222",
+        "transactionHash": "0xabc0000000000000000000000000000000000000000000000000000000000001",
+        "asset": "USDC",
+        "amount": "3000.00",
+        "amountUsd": 3000,
+        "timestamp": "2026-08-21T10:00:00.000Z",
+        "hopDepth": 1,
+        "riskLevel": "medium"
+      },
+      {
+        "id": "edge:0xabc0000000000000000000000000000000000000000000000000000000000002:0",
+        "from": "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "to": "wallet:0x3333333333333333333333333333333333333333",
+        "transactionHash": "0xabc0000000000000000000000000000000000000000000000000000000000002",
+        "asset": "USDC",
+        "amount": "3000.00",
+        "amountUsd": 3000,
+        "timestamp": "2026-08-21T10:03:00.000Z",
+        "hopDepth": 1,
+        "riskLevel": "medium"
+      },
+      {
+        "id": "edge:0xabc0000000000000000000000000000000000000000000000000000000000003:0",
+        "from": "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "to": "wallet:0x4444444444444444444444444444444444444444",
+        "transactionHash": "0xabc0000000000000000000000000000000000000000000000000000000000003",
+        "asset": "USDC",
+        "amount": "4000.00",
+        "amountUsd": 4000,
+        "timestamp": "2026-08-21T10:05:00.000Z",
+        "hopDepth": 1,
+        "riskLevel": "medium"
+      },
+      {
+        "id": "edge:0xabc0000000000000000000000000000000000000000000000000000000000004:0",
+        "from": "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "to": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+        "transactionHash": "0xabc0000000000000000000000000000000000000000000000000000000000004",
+        "asset": "USDC",
+        "amount": "5000.00",
+        "amountUsd": 5000,
+        "timestamp": "2026-08-21T10:07:00.000Z",
+        "hopDepth": 1,
+        "riskLevel": "high"
+      },
+      {
+        "id": "edge:0xabc0000000000000000000000000000000000000000000000000000000000005:0",
+        "from": "wallet:0x2222222222222222222222222222222222222222",
+        "to": "wallet:0x5555555555555555555555555555555555555555",
+        "transactionHash": "0xabc0000000000000000000000000000000000000000000000000000000000005",
+        "asset": "USDC",
+        "amount": "2800.00",
+        "amountUsd": 2800,
+        "timestamp": "2026-08-21T10:25:00.000Z",
+        "hopDepth": 2,
+        "riskLevel": "low"
+      }
+    ]
+  },
+
+  "basicFindings": [
+    {
+      "id": "finding_seed_001",
+      "caseId": "case_seed_demo",
+      "source": "basic-risk",
+      "type": "fan_out",
+      "severity": "high",
+      "confidence": 0.92,
+      "title": "Fan-out detected",
+      "description": "Root wallet sent funds to 4 unique addresses within 7 minutes, totalling $15,000 USDC.",
+      "relatedNodeIds": [
+        "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "wallet:0x2222222222222222222222222222222222222222",
+        "wallet:0x3333333333333333333333333333333333333333",
+        "wallet:0x4444444444444444444444444444444444444444",
+        "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"
+      ],
+      "relatedEdgeIds": [
+        "edge:0xabc0000000000000000000000000000000000000000000000000000000000001:0",
+        "edge:0xabc0000000000000000000000000000000000000000000000000000000000002:0",
+        "edge:0xabc0000000000000000000000000000000000000000000000000000000000003:0",
+        "edge:0xabc0000000000000000000000000000000000000000000000000000000000004:0"
+      ],
+      "signals": ["many_outputs", "short_time_window", "high_total_value"]
+    },
+    {
+      "id": "finding_seed_002",
+      "caseId": "case_seed_demo",
+      "source": "basic-risk",
+      "type": "dex_interaction",
+      "severity": "medium",
+      "confidence": 0.85,
+      "title": "DEX interaction detected",
+      "description": "Root wallet routed $5,000 USDC through QuickSwap V2 Router, potentially converting to another token to obscure the trail.",
+      "relatedNodeIds": [
+        "wallet:0x1234567890abcdef1234567890abcdef12345678",
+        "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"
+      ],
+      "relatedEdgeIds": [
+        "edge:0xabc0000000000000000000000000000000000000000000000000000000000004:0"
+      ],
+      "signals": ["dex_router", "swap_method", "value_above_threshold"]
+    }
+  ],
+
+  "analysisResult": {
+    "analysisId": "analysis_case_seed_demo_seed_req_001",
+    "caseId": "case_seed_demo",
+    "riskScore": 78,
+    "riskLevel": "high",
+    "findings": [
+      {
+        "id": "adv_finding_path_001",
+        "caseId": "case_seed_demo",
+        "source": "python-intelligence",
+        "type": "suspicious_path",
+        "severity": "high",
+        "confidence": 0.83,
+        "title": "Suspicious multi-hop path detected (rank 1)",
+        "description": "Path [wallet → wallet → wallet] flagged: rapid_movement, fan_out_relay. Funds moved from root through intermediary wallet to final destination within 25 minutes.",
+        "relatedNodeIds": [
+          "wallet:0x1234567890abcdef1234567890abcdef12345678",
+          "wallet:0x2222222222222222222222222222222222222222",
+          "wallet:0x5555555555555555555555555555555555555555"
+        ],
+        "relatedEdgeIds": [
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000001:0",
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000005:0"
+        ],
+        "signals": ["rapid_movement", "fan_out_relay", "high_value_flow"]
+      },
+      {
+        "id": "adv_finding_path_002",
+        "caseId": "case_seed_demo",
+        "source": "python-intelligence",
+        "type": "suspicious_path",
+        "severity": "medium",
+        "confidence": 0.40,
+        "title": "Suspicious path detected (rank 2)",
+        "description": "Path [wallet → dex] flagged: dex_touchpoint. Funds routed directly through DEX router.",
+        "relatedNodeIds": [
+          "wallet:0x1234567890abcdef1234567890abcdef12345678",
+          "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"
+        ],
+        "relatedEdgeIds": [
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000004:0"
+        ],
+        "signals": ["dex_touchpoint", "high_value_flow"]
+      }
+    ],
+    "suspiciousPaths": [
+      {
+        "id": "path_001",
+        "rank": 1,
+        "score": 83,
+        "nodeIds": [
+          "wallet:0x1234567890abcdef1234567890abcdef12345678",
+          "wallet:0x2222222222222222222222222222222222222222",
+          "wallet:0x5555555555555555555555555555555555555555"
+        ],
+        "edgeIds": [
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000001:0",
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000005:0"
+        ],
+        "reasonCodes": ["rapid_movement", "fan_out_relay", "high_value_flow"],
+        "summary": "Path [wallet → wallet → wallet] flagged: rapid_movement, fan_out_relay, high_value_flow."
+      },
+      {
+        "id": "path_002",
+        "rank": 2,
+        "score": 40,
+        "nodeIds": [
+          "wallet:0x1234567890abcdef1234567890abcdef12345678",
+          "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"
+        ],
+        "edgeIds": [
+          "edge:0xabc0000000000000000000000000000000000000000000000000000000000004:0"
+        ],
+        "reasonCodes": ["dex_touchpoint", "high_value_flow"],
+        "summary": "Path [wallet → dex] flagged: dex_touchpoint, high_value_flow."
+      }
+    ],
+    "circularFlows": [],
+    "analysisMetadata": {
+      "engineVersion": "0.1.0",
+      "runtimeMs": 187
+    }
   }
 }

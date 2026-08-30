@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "intelligence"
+version = "0.1.0"
+description = "On-Chain Forensic Triage Engine — Python Intelligence Service"
+authors = ["Role D Developer"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python         = "^3.11"
+fastapi        = "^0.111"
+uvicorn        = { extras = ["standard"], version = "^0.29" }
+pydantic       = "^2.7"
+pydantic-settings = "^2.3"
+networkx       = "^3.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest         = "^8.2"
+pytest-asyncio = "^0.23"
+httpx          = "^0.27"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths    = ["tests"]
+
+[build-system]
+requires      = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,140 @@
+[
+  {
+    "address": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+    "type": "dex",
+    "label": "QuickSwap V2 Router",
+    "chainId": 137
+  },
+  {
+    "address": "0xf5b509bb0909a69b1c207e495f687a596c168e12",
+    "type": "dex",
+    "label": "QuickSwap V3 Router",
+    "chainId": 137
+  },
+  {
+    "address": "0xe592427a0aece92de3edee1f18e0157c05861564",
+    "type": "dex",
+    "label": "Uniswap V3 SwapRouter",
+    "chainId": 1
+  },
+  {
+    "address": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+    "type": "dex",
+    "label": "Uniswap V3 SwapRouter02",
+    "chainId": 1
+  },
+  {
+    "address": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
+    "type": "dex",
+    "label": "SushiSwap Router",
+    "chainId": 1
+  },
+  {
+    "address": "0x1111111254eeb25477b68fb85ed929f73a960582",
+    "type": "dex",
+    "label": "1inch V5 AggregationRouter",
+    "chainId": 1
+  },
+  {
+    "address": "0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+    "type": "bridge",
+    "label": "Polygon PoS Bridge (ERC20 Predicate)",
+    "chainId": 1
+  },
+  {
+    "address": "0x8484ef722627bf18ca5ae6bcf031c23e6e922b30",
+    "type": "bridge",
+    "label": "Polygon PoS Bridge (EtherPredicate)",
+    "chainId": 1
+  },
+  {
+    "address": "0xa0c68c638235ee32657e8f720a23cec1bfc77c77",
+    "type": "bridge",
+    "label": "Polygon Bridge (PlasmaPortal)",
+    "chainId": 1
+  },
+  {
+    "address": "0x3666f603cc164936c1b87e207f36beba4ac5f18a",
+    "type": "bridge",
+    "label": "Hop Protocol ETH Bridge",
+    "chainId": 1
+  },
+  {
+    "address": "0x4aa42145aa6ebf72e164c9bbc74fbd3788045016",
+    "type": "bridge",
+    "label": "xDai Bridge",
+    "chainId": 1
+  },
+  {
+    "address": "0x12d66f87a04a9e220c9d0f580b4acbe395e01a7f",
+    "type": "mixer",
+    "label": "Tornado Cash ETH 0.1",
+    "chainId": 1
+  },
+  {
+    "address": "0x47ce0c6ed5b0ce3d3a51fdb1c52dc66a7c3c2936",
+    "type": "mixer",
+    "label": "Tornado Cash ETH 1",
+    "chainId": 1
+  },
+  {
+    "address": "0x910cbd523d972eb0a6f4cae4618ad62622b39dbf",
+    "type": "mixer",
+    "label": "Tornado Cash ETH 10",
+    "chainId": 1
+  },
+  {
+    "address": "0xa160cdab225685da1d56aa342ad8841c3b53f291",
+    "type": "mixer",
+    "label": "Tornado Cash ETH 100",
+    "chainId": 1
+  },
+  {
+    "address": "0xd4b88df4d29f5cedd6857912842cff3b20c8cfa3",
+    "type": "mixer",
+    "label": "Tornado Cash DAI 100",
+    "chainId": 1
+  },
+  {
+    "address": "0x7f367cc41522ce07553e823bf3be79a889debe1b",
+    "type": "ofac",
+    "label": "OFAC SDN — Lazarus Group",
+    "chainId": null
+  },
+  {
+    "address": "0xd882cfc20f52f2599d84b8e8d58c7fb62cfe344b",
+    "type": "ofac",
+    "label": "OFAC SDN — Lazarus Group",
+    "chainId": null
+  },
+  {
+    "address": "0x901bb9583b24d97e995513c6778dc6888ab6870e",
+    "type": "ofac",
+    "label": "OFAC SDN — Lazarus Group",
+    "chainId": null
+  },
+  {
+    "address": "0xa7e5d5a720f06526557c513402f2e6b5fa20b008",
+    "type": "ofac",
+    "label": "OFAC SDN — Sanctioned Address",
+    "chainId": null
+  },
+  {
+    "address": "0x8576acc5c05d6ce88f4e49bf65bdf0c62f91353c",
+    "type": "ofac",
+    "label": "OFAC SDN — Lazarus Group",
+    "chainId": null
+  },
+  {
+    "address": "0x1da5821544e25c636c1417ba96ade4cf6d2f9b5a",
+    "type": "risky",
+    "label": "Known Money Launderer",
+    "chainId": null
+  },
+  {
+    "address": "0x7db418b5d567a4e0e8c59ad71be1fce48f3e6107",
+    "type": "risky",
+    "label": "Flagged by Chainalysis",
+    "chainId": null
+  }
+]
