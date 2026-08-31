@@ -31,8 +31,6 @@ def create_app() -> FastAPI:
         ),
         version=settings.engine_version,
         docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_url="/openapi.json",
     )
 
     # ------------------------------------------------------------------

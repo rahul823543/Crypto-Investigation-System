@@ -11,6 +11,8 @@ loaded from tests/fixtures/*.json.
 """
 from __future__ import annotations
 
+import copy
+
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
@@ -105,5 +107,4 @@ MINIMAL_VALID_PAYLOAD: dict = {
 @pytest.fixture
 def minimal_valid_payload() -> dict:
     """A complete, structurally-valid POST /v1/analyze payload."""
-    import copy
     return copy.deepcopy(MINIMAL_VALID_PAYLOAD)

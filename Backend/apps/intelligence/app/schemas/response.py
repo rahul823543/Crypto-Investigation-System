@@ -22,8 +22,10 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-# Shared risk level enum (must match request.py definition)
+# RiskLevel is defined locally — Pydantic v2 + `from __future__ import annotations`
+# cannot resolve Literal aliases imported from another module at model build time.
 RiskLevel = Literal["low", "medium", "high", "critical"]
+
 
 
 # ---------------------------------------------------------------------------
