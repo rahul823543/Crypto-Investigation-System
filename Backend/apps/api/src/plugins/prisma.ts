@@ -1,7 +1,8 @@
 import fp from "fastify-plugin";
 import { FastifyInstance } from "fastify";
-import { PrismaClient } from "../generated/client";
+import { PrismaClient } from "../generated/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -10,9 +11,11 @@ declare module "fastify" {
 }
 
 export default fp(async (app: FastifyInstance) => {
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL!,
+  const pool = new pg.Pool({
+    connectionString: app.config.DATABASE_URL,
   });
+
+  const adapter = new PrismaPg(pool);
 
   const prisma = new PrismaClient({
     adapter,
@@ -20,7 +23,6 @@ export default fp(async (app: FastifyInstance) => {
 
   try {
     await prisma.$connect();
-
     app.log.info("Prisma connected to PostgreSQL");
   } catch (err) {
     app.log.error("Failed to connect to PostgreSQL");
@@ -31,5 +33,6 @@ export default fp(async (app: FastifyInstance) => {
 
   app.addHook("onClose", async (instance) => {
     await instance.prisma.$disconnect();
+    await pool.end();
   });
 });

@@ -260,6 +260,7 @@ export type CaseWhereInput = {
   errorMessage?: Prisma.StringNullableFilter<"Case"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Case"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Case"> | Date | string
+  transactions?: Prisma.TransactionListRelationFilter
 }
 
 export type CaseOrderByWithRelationInput = {
@@ -273,6 +274,7 @@ export type CaseOrderByWithRelationInput = {
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  transactions?: Prisma.TransactionOrderByRelationAggregateInput
 }
 
 export type CaseWhereUniqueInput = Prisma.AtLeast<{
@@ -289,6 +291,7 @@ export type CaseWhereUniqueInput = Prisma.AtLeast<{
   errorMessage?: Prisma.StringNullableFilter<"Case"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Case"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Case"> | Date | string
+  transactions?: Prisma.TransactionListRelationFilter
 }, "id">
 
 export type CaseOrderByWithAggregationInput = {
@@ -336,6 +339,7 @@ export type CaseCreateInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateInput = {
@@ -349,6 +353,7 @@ export type CaseUncheckedCreateInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUpdateInput = {
@@ -362,6 +367,7 @@ export type CaseUpdateInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateInput = {
@@ -375,6 +381,7 @@ export type CaseUncheckedUpdateInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateManyInput = {
@@ -465,6 +472,11 @@ export type CaseSumOrderByAggregateInput = {
   riskScore?: Prisma.SortOrder
 }
 
+export type CaseScalarRelationFilter = {
+  is?: Prisma.CaseWhereInput
+  isNot?: Prisma.CaseWhereInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -493,6 +505,117 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type CaseCreateNestedOneWithoutTransactionsInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutTransactionsInput, Prisma.CaseUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutTransactionsInput
+  connect?: Prisma.CaseWhereUniqueInput
+}
+
+export type CaseUpdateOneRequiredWithoutTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutTransactionsInput, Prisma.CaseUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutTransactionsInput
+  upsert?: Prisma.CaseUpsertWithoutTransactionsInput
+  connect?: Prisma.CaseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CaseUpdateToOneWithWhereWithoutTransactionsInput, Prisma.CaseUpdateWithoutTransactionsInput>, Prisma.CaseUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type CaseCreateWithoutTransactionsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CaseUncheckedCreateWithoutTransactionsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CaseCreateOrConnectWithoutTransactionsInput = {
+  where: Prisma.CaseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CaseCreateWithoutTransactionsInput, Prisma.CaseUncheckedCreateWithoutTransactionsInput>
+}
+
+export type CaseUpsertWithoutTransactionsInput = {
+  update: Prisma.XOR<Prisma.CaseUpdateWithoutTransactionsInput, Prisma.CaseUncheckedUpdateWithoutTransactionsInput>
+  create: Prisma.XOR<Prisma.CaseCreateWithoutTransactionsInput, Prisma.CaseUncheckedCreateWithoutTransactionsInput>
+  where?: Prisma.CaseWhereInput
+}
+
+export type CaseUpdateToOneWithWhereWithoutTransactionsInput = {
+  where?: Prisma.CaseWhereInput
+  data: Prisma.XOR<Prisma.CaseUpdateWithoutTransactionsInput, Prisma.CaseUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type CaseUpdateWithoutTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CaseUncheckedUpdateWithoutTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type CaseCountOutputType
+ */
+
+export type CaseCountOutputType = {
+  transactions: number
+}
+
+export type CaseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  transactions?: boolean | CaseCountOutputTypeCountTransactionsArgs
+}
+
+/**
+ * CaseCountOutputType without action
+ */
+export type CaseCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CaseCountOutputType
+   */
+  select?: Prisma.CaseCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CaseCountOutputType without action
+ */
+export type CaseCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransactionWhereInput
+}
 
 
 export type CaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -506,6 +629,8 @@ export type CaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  transactions?: boolean | Prisma.Case$transactionsArgs<ExtArgs>
+  _count?: boolean | Prisma.CaseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["case"]>
 
 export type CaseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -548,10 +673,18 @@ export type CaseSelectScalar = {
 }
 
 export type CaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "rootAddress" | "chainId" | "mode" | "status" | "riskScore" | "riskLevel" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["case"]>
+export type CaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  transactions?: boolean | Prisma.Case$transactionsArgs<ExtArgs>
+  _count?: boolean | Prisma.CaseCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type CaseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type CaseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $CasePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Case"
-  objects: {}
+  objects: {
+    transactions: Prisma.$TransactionPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     rootAddress: string
@@ -957,6 +1090,7 @@ readonly fields: CaseFieldRefs;
  */
 export interface Prisma__CaseClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  transactions<T extends Prisma.Case$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1013,6 +1147,10 @@ export type CaseFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * Filter, which Case to fetch.
    */
   where: Prisma.CaseWhereUniqueInput
@@ -1031,6 +1169,10 @@ export type CaseFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * Filter, which Case to fetch.
    */
   where: Prisma.CaseWhereUniqueInput
@@ -1048,6 +1190,10 @@ export type CaseFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Case
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
   /**
    * Filter, which Case to fetch.
    */
@@ -1097,6 +1243,10 @@ export type CaseFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * Filter, which Case to fetch.
    */
   where?: Prisma.CaseWhereInput
@@ -1144,6 +1294,10 @@ export type CaseFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Case
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
   /**
    * Filter, which Cases to fetch.
    */
@@ -1193,6 +1347,10 @@ export type CaseCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * The data needed to create a Case.
    */
   data: Prisma.XOR<Prisma.CaseCreateInput, Prisma.CaseUncheckedCreateInput>
@@ -1240,6 +1398,10 @@ export type CaseUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the Case
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
   /**
    * The data needed to update a Case.
    */
@@ -1307,6 +1469,10 @@ export type CaseUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * The filter to search for the Case to update in case it exists.
    */
   where: Prisma.CaseWhereUniqueInput
@@ -1333,6 +1499,10 @@ export type CaseDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
+  /**
    * Filter which Case to delete.
    */
   where: Prisma.CaseWhereUniqueInput
@@ -1353,6 +1523,30 @@ export type CaseDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * Case.transactions
+ */
+export type Case$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transaction
+   */
+  select?: Prisma.TransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transaction
+   */
+  omit?: Prisma.TransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransactionInclude<ExtArgs> | null
+  where?: Prisma.TransactionWhereInput
+  orderBy?: Prisma.TransactionOrderByWithRelationInput | Prisma.TransactionOrderByWithRelationInput[]
+  cursor?: Prisma.TransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
  * Case without action
  */
 export type CaseDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1364,4 +1558,8 @@ export type CaseDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Case
    */
   omit?: Prisma.CaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CaseInclude<ExtArgs> | null
 }

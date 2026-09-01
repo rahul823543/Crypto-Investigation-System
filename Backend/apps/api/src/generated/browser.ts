@@ -22,3 +22,13 @@ export * from './enums.js';
  * 
  */
 export type Case = Prisma.CaseModel
+/**
+ * Model Wallet
+ * 
+ */
+export type Wallet = Prisma.WalletModel
+/**
+ * Model Transaction
+ * 
+ */
+export type Transaction = Prisma.TransactionModel

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"  
+  provider = "prisma-client"
   output   = "../../generated"
 }
 
@@ -8,14 +8,51 @@ datasource db {
 }
 
 model Case {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   rootAddress  String
   chainId      Int
   mode         String
-  status       String   @default("created")
+  status       String        @default("created")
   riskScore    Int?
-  riskLevel    String?
+  riskLevel   String?
   errorMessage String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  transactions Transaction[]
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  address   String
+  chainId   Int
+  label     String?
+  type      String?
+  riskLevel String?
+  createdAt DateTime @default(now())
+
+  @@unique([address, chainId])
+}
+
+model Transaction {
+  id             String   @id @default(cuid())
+  caseId         String
+  hash           String
+  chainId        Int
+  blockNumber    Int
+  fromAddress    String
+  toAddress      String
+  asset          String
+  tokenAddress   String?
+  amount         String
+  amountUsd      Float?
+  timestamp      DateTime
+  transferType   String
+  method         String?
+  rawProviderRef String?
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@unique([caseId, hash, rawProviderRef])
 }

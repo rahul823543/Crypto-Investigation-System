@@ -9,4 +9,6 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Case.js'
+export type * from './models/Wallet.js'
+export type * from './models/Transaction.js'
 export type * from './commonInputTypes.js'

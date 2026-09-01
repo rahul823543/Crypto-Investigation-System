@@ -1,7 +1,7 @@
 {
   "case": {
     "id": "case_demo_001",
-    "rootAddress": "0x1111111111111111111111111111111111aaaa",
+    "rootAddress": "0x111111111111111111111111111111111111aaaa",
     "chainId": 80002,
     "mode": "demo",
     "status": "created",
@@ -10,5 +10,21 @@
     "errorMessage": null,
     "createdAt": "2026-08-29T00:00:00.000Z",
     "updatedAt": "2026-08-29T00:00:00.000Z"
-  }
+  },
+  "transactions": [
+    {
+      "hash": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "chainId": 80002,
+      "blockNumber": 1000000,
+      "from": "0x111111111111111111111111111111111111aaaa",
+      "to": "0x222222222222222222222222222222222222bbbb",
+      "asset": "USDC",
+      "tokenAddress": "0x333333333333333333333333333333333333cccc",
+      "amount": "250.00",
+      "amountUsd": null,
+      "timestamp": "2026-08-21T10:00:00.000Z",
+      "transferType": "erc20",
+      "method": "transfer"
+    }
+  ]
 }
