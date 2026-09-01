@@ -51,7 +51,9 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Case: 'Case'
+  Case: 'Case',
+  Wallet: 'Wallet',
+  Transaction: 'Transaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -84,6 +86,40 @@ export const CaseScalarFieldEnum = {
 } as const
 
 export type CaseScalarFieldEnum = (typeof CaseScalarFieldEnum)[keyof typeof CaseScalarFieldEnum]
+
+
+export const WalletScalarFieldEnum = {
+  id: 'id',
+  address: 'address',
+  chainId: 'chainId',
+  label: 'label',
+  type: 'type',
+  riskLevel: 'riskLevel',
+  createdAt: 'createdAt'
+} as const
+
+export type WalletScalarFieldEnum = (typeof WalletScalarFieldEnum)[keyof typeof WalletScalarFieldEnum]
+
+
+export const TransactionScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  hash: 'hash',
+  chainId: 'chainId',
+  blockNumber: 'blockNumber',
+  fromAddress: 'fromAddress',
+  toAddress: 'toAddress',
+  asset: 'asset',
+  tokenAddress: 'tokenAddress',
+  amount: 'amount',
+  amountUsd: 'amountUsd',
+  timestamp: 'timestamp',
+  transferType: 'transferType',
+  method: 'method',
+  rawProviderRef: 'rawProviderRef'
+} as const
+
+export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
 
 
 export const SortOrder = {

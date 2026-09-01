@@ -1,15 +1,18 @@
 {
-    "name": "cis-sih-backend",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ],
-    "scripts": {
-        "dev": "npm run dev --workspace=@sih/api"
-    },
-    "overrides": {
-        "deepmerge-ts": "^8.0.2"
-    }
+  "name": "cis-sih-backend",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@sih/api",
+    "dev:worker": "npm run dev:worker --workspace=@sih/api",
+    "build": "npm run build --workspace=@sih/api",
+    "start": "npm run start --workspace=@sih/api"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2"
+  }
 }
