@@ -26,6 +26,7 @@ import time
 from fastapi import APIRouter
 
 from app.config import settings
+from app.graph.builder import build_graph
 from app.schemas.request import AnalysisRequest
 from app.schemas.response import AnalysisMetadata, AnalysisResponse
 
@@ -71,20 +72,22 @@ def health_check() -> dict:
 def analyze(payload: AnalysisRequest) -> AnalysisResponse:
     """
     Phase 1 — deterministic mock.
-
-    All Pydantic validators on `AnalysisRequest` have already run by the time
-    this function body executes, meaning:
-      - rootAddress is a valid EVM address
-      - every edge references a node ID present in nodes[]
-      - maxDepth ∈ [1, 3]
-
-    The mock body will be replaced with real graph-algorithm calls in Phase 4.
+    Replaced in-place with real algorithm calls in Phase 4.
+    Validators on AnalysisRequest have already run before this body executes.
     """
     t0 = time.monotonic()
 
+    # Phase 2: parse payload into an in-memory graph.
+    # graph is currently unused in the response — Phase 4 passes it to
+    # traversal → detection → scoring → ranking.
+    graph = build_graph(payload)  # noqa: F841
+
     # ------------------------------------------------------------------
-    # MOCK RESPONSE (Phase 1)
-    # Replace everything between these markers in Phase 4.
+    # MOCK RESPONSE (Phases 1-3)
+    # Phase 4 replaces this block with real algorithm calls:
+    #   paths   = multi_hop.traverse(graph, payload.max_depth)
+    #   cycles  = circular_flows.detect(graph)
+    #   score   = risk_score.compute(payload.basic_findings, paths, cycles)
     # ------------------------------------------------------------------
 
     response = AnalysisResponse(
@@ -100,9 +103,5 @@ def analyze(payload: AnalysisRequest) -> AnalysisResponse:
             runtimeMs=int((time.monotonic() - t0) * 1000),
         ),
     )
-
-    # ------------------------------------------------------------------
-    # END MOCK RESPONSE
-    # ------------------------------------------------------------------
 
     return response

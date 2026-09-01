@@ -8,6 +8,8 @@ in isolation. Fast to run, catches contract drift before any HTTP tests.
 """
 from __future__ import annotations
 
+import copy
+
 import pytest
 from pydantic import ValidationError
 
@@ -92,7 +94,6 @@ class TestAnalysisRequestInvalid:
             AnalysisRequest.model_validate(payload)
 
     def test_edge_referencing_unknown_from_node(self):
-        import copy
         payload = copy.deepcopy(MINIMAL_VALID_PAYLOAD)
         payload["edges"][0]["from"] = "wallet:0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
         with pytest.raises(ValidationError) as exc_info:
@@ -100,7 +101,6 @@ class TestAnalysisRequestInvalid:
         assert "unknown from-node" in str(exc_info.value)
 
     def test_edge_referencing_unknown_to_node(self):
-        import copy
         payload = copy.deepcopy(MINIMAL_VALID_PAYLOAD)
         payload["edges"][0]["to"] = "wallet:0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
         with pytest.raises(ValidationError) as exc_info:
