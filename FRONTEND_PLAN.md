@@ -988,3 +988,52 @@ flowchart TD
 - Loading and empty states exist for every major async surface.
 - The frontend never talks directly to database, queue, Python, blockchain provider, or smart contract services.
 - The full demo can be completed without live blockchain APIs.
+
+---
+
+## 13. Implementation Decisions (Addendum)
+
+> **Note**: The sections above (1–12) are the original frontend plan and remain unchanged. The decisions below document deviations and choices made during implementation.
+
+### Folder Structure: Standard React (Not Monorepo)
+
+The original plan (Section 4) describes an `apps/web/` monorepo-style folder structure. During implementation, we chose to use the **standard flat React structure** instead:
+
+```text
+Frontend/
+  src/
+    app/
+    pages/
+    components/
+    api/
+    hooks/
+    store/
+    types/
+    data/
+    utils/
+    lib/
+```
+
+**Reason**: The frontend is a single standalone application. The backend already lives in a separate `Backend/` folder with its own monorepo. Adding an `apps/web/` wrapper inside `Frontend/` provides no benefit and only adds unnecessary nesting. The internal `src/` structure (pages, components, hooks, api, types, etc.) remains identical to what the plan describes.
+
+### Design Theme: Dark Cyberpunk / Forensics Command Center
+
+- Deep navy/charcoal base colors (`#0a0e1a`, `#111827`)
+- Neon cyan primary (`#00f0ff`), electric green accent (`#39ff14`)
+- Glowing borders, glassmorphism panels, subtle grid backgrounds
+- Inter (UI text) + JetBrains Mono (addresses, hashes, code) fonts
+- Micro-animations on hover, smooth route transitions
+
+### UI Component Library: Shadcn/ui + Tailwind CSS
+
+Using Shadcn/ui (copy-paste components built on Radix UI) with Tailwind CSS for styling. This gives full control over component appearance while providing accessible, well-tested primitives. Components are customized to match the cyberpunk theme.
+
+### Build Tool: Vite
+
+Using Vite + React + TypeScript. The backend CORS configuration already allows `http://localhost:5173` (Vite's default dev port), confirming alignment.
+
+### State Management
+
+- **Server state**: TanStack React Query (as recommended in Section 9)
+- **UI state**: Zustand (lightweight, as recommended in Section 9)
+- **Routing**: React Router v6

@@ -1,0 +1,83 @@
+{
+  "caseId": "case_demo_001",
+  "findings": [
+    {
+      "id": "finding_001",
+      "source": "basic-risk",
+      "type": "fan_out",
+      "severity": "high",
+      "confidence": 0.92,
+      "title": "Fan-Out Pattern Detected",
+      "description": "Root wallet 0x742d...bD18 distributed funds to 3 separate wallets within a 2-minute window, consistent with layering behavior used to obscure fund origin.",
+      "relatedNodeIds": [
+        "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+        "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+        "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+        "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2"
+      ],
+      "relatedEdgeIds": ["edge:0xabc001:0", "edge:0xabc002:0", "edge:0xabc003:0"],
+      "signals": ["many_outputs", "short_time_window", "similar_amounts"]
+    },
+    {
+      "id": "finding_002",
+      "source": "basic-risk",
+      "type": "dex_interaction",
+      "severity": "medium",
+      "confidence": 0.78,
+      "title": "DEX Swap Used for Token Obfuscation",
+      "description": "Intermediary wallet routed 15 ETH through Uniswap V2 Router, converting to USDT before forwarding. Token swaps through DEX routers can obscure the asset trail.",
+      "relatedNodeIds": [
+        "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+        "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+      ],
+      "relatedEdgeIds": ["edge:0xabc004:0", "edge:0xabc007:0"],
+      "signals": ["dex_router_interaction", "token_conversion", "large_swap"]
+    },
+    {
+      "id": "finding_003",
+      "source": "basic-risk",
+      "type": "bridge_interaction",
+      "severity": "high",
+      "confidence": 0.85,
+      "title": "Cross-Chain Bridge Transfer",
+      "description": "37,500 USDC was sent through the Wormhole Bridge, enabling cross-chain movement that complicates tracing. Bridge transfers are a common technique to break the on-chain audit trail.",
+      "relatedNodeIds": [
+        "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+        "bridge:0x3ee18B2214AFF97000D974cf647E7C347E8fa585"
+      ],
+      "relatedEdgeIds": ["edge:0xabc005:0", "edge:0xabc008:0"],
+      "signals": ["bridge_transfer", "large_amount", "cross_chain"]
+    },
+    {
+      "id": "finding_004",
+      "source": "basic-risk",
+      "type": "known_risky_address",
+      "severity": "critical",
+      "confidence": 0.97,
+      "title": "Interaction with Flagged Address",
+      "description": "Wallet 0xC3D4...c1D2 sent 10.8 ETH ($31,400) to address 0xE5F6...e3F4 which is flagged as mixer-associated. Direct transfers to known risky addresses indicate potential money laundering.",
+      "relatedNodeIds": [
+        "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+        "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4"
+      ],
+      "relatedEdgeIds": ["edge:0xabc006:0"],
+      "signals": ["known_risky_address", "mixer_associated", "large_transfer"]
+    },
+    {
+      "id": "finding_005",
+      "source": "basic-risk",
+      "type": "circular_flow",
+      "severity": "high",
+      "confidence": 0.88,
+      "title": "Circular Fund Flow Detected",
+      "description": "Funds flowed from the root wallet through intermediaries and returned via the flagged address 0xE5F6...e3F4, forming a circular pattern. Circular flows are a strong indicator of wash trading or layering.",
+      "relatedNodeIds": [
+        "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+        "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+        "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4"
+      ],
+      "relatedEdgeIds": ["edge:0xabc003:0", "edge:0xabc006:0", "edge:0xabc010:0"],
+      "signals": ["circular_flow", "return_to_origin", "layering"]
+    }
+  ]
+}

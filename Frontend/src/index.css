@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+/* ─── Cyberpunk Design Tokens ─────────────────────────────────────────────── */
+@theme {
+  --color-cyber-base: #0a0e1a;
+  --color-cyber-surface: #111827;
+  --color-cyber-surface-2: #1a2035;
+  --color-cyber-surface-3: #222b45;
+  --color-cyber-border: #1e293b;
+  --color-cyber-border-glow: #00f0ff33;
+  --color-cyber-cyan: #00f0ff;
+  --color-cyber-cyan-dim: #00f0ff99;
+  --color-cyber-green: #39ff14;
+  --color-cyber-green-dim: #39ff1499;
+  --color-cyber-amber: #ffb800;
+  --color-cyber-orange: #ff6b35;
+  --color-cyber-red: #ff0040;
+  --color-cyber-purple: #a855f7;
+  --color-cyber-text: #e2e8f0;
+  --color-cyber-text-dim: #94a3b8;
+  --color-cyber-text-muted: #64748b;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Base Reset ──────────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-cyber-surface-3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-cyber-surface-3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyber-cyan-dim);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cyber-base);
+  color: var(--color-cyber-text);
+}
+
+/* ─── Glassmorphism ───────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+}
+
+.glass-strong {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(30, 41, 59, 0.6);
+}
+
+/* ─── Grid Background ─────────────────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Glow Utilities ──────────────────────────────────────────────────────── */
+.glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), 0 0 30px rgba(0, 240, 255, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), 0 0 30px rgba(57, 255, 20, 0.1);
+}
+
+.glow-orange {
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.3), 0 0 30px rgba(255, 107, 53, 0.1);
+}
+
+.glow-red {
+  box-shadow: 0 0 10px rgba(255, 0, 64, 0.3), 0 0 30px rgba(255, 0, 64, 0.1);
+}
+
+.glow-amber {
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.3), 0 0 30px rgba(255, 184, 0, 0.1);
+}
+
+.border-glow-cyan {
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05), 0 0 8px rgba(0, 240, 255, 0.15);
+}
+
+/* ─── Keyframe Animations ─────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes border-pulse {
+  0%, 100% { border-color: rgba(0, 240, 255, 0.2); }
+  50% { border-color: rgba(0, 240, 255, 0.5); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-cyber-surface) 25%,
+    var(--color-cyber-surface-2) 50%,
+    var(--color-cyber-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-border-pulse {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+/* ─── Risk Score Ring ─────────────────────────────────────────────────────── */
+.risk-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-ring svg circle {
+  transition: stroke-dashoffset 0.8s ease-out;
+}
+
+/* ─── Selection Override ──────────────────────────────────────────────────── */
+::selection {
+  background: rgba(0, 240, 255, 0.25);
+  color: #fff;
+}

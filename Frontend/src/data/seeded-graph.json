@@ -1,0 +1,248 @@
+{
+  "caseId": "case_demo_001",
+  "nodes": [
+    {
+      "id": "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "type": "wallet",
+      "labels": ["root"],
+      "riskLevel": "high",
+      "totalInUsd": 150000,
+      "totalOutUsd": 148500,
+      "hopDepth": 0
+    },
+    {
+      "id": "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "address": "0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "type": "wallet",
+      "labels": ["intermediary"],
+      "riskLevel": "medium",
+      "totalInUsd": 45000,
+      "totalOutUsd": 44800,
+      "hopDepth": 1
+    },
+    {
+      "id": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+      "address": "0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+      "type": "wallet",
+      "labels": ["intermediary"],
+      "riskLevel": "medium",
+      "totalInUsd": 38000,
+      "totalOutUsd": 37500,
+      "hopDepth": 1
+    },
+    {
+      "id": "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+      "address": "0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+      "type": "wallet",
+      "labels": ["intermediary"],
+      "riskLevel": "low",
+      "totalInUsd": 32000,
+      "totalOutUsd": 31800,
+      "hopDepth": 1
+    },
+    {
+      "id": "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "type": "dex",
+      "labels": ["uniswap_v2_router"],
+      "riskLevel": "low",
+      "totalInUsd": 82000,
+      "totalOutUsd": 81500,
+      "hopDepth": 2
+    },
+    {
+      "id": "bridge:0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+      "address": "0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+      "type": "bridge",
+      "labels": ["wormhole_bridge"],
+      "riskLevel": "medium",
+      "totalInUsd": 37500,
+      "totalOutUsd": 37200,
+      "hopDepth": 2
+    },
+    {
+      "id": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+      "address": "0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+      "type": "wallet",
+      "labels": ["collector"],
+      "riskLevel": "high",
+      "totalInUsd": 75000,
+      "totalOutUsd": 200,
+      "hopDepth": 3
+    },
+    {
+      "id": "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+      "address": "0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+      "type": "risky_address",
+      "labels": ["flagged", "mixer_associated"],
+      "riskLevel": "critical",
+      "totalInUsd": 33000,
+      "totalOutUsd": 32800,
+      "hopDepth": 2
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:0xabc001:0",
+      "from": "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "to": "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "transactionHash": "0xabc001def456789012345678901234567890abcdef001",
+      "asset": "ETH",
+      "amount": "15.5",
+      "amountUsd": 45000,
+      "timestamp": "2026-08-21T10:05:00.000Z",
+      "transferType": "native",
+      "hopDepth": 1,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0xabc002:0",
+      "from": "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "to": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+      "transactionHash": "0xabc002def456789012345678901234567890abcdef002",
+      "asset": "USDC",
+      "amount": "38000",
+      "amountUsd": 38000,
+      "timestamp": "2026-08-21T10:06:00.000Z",
+      "transferType": "erc20",
+      "hopDepth": 1,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0xabc003:0",
+      "from": "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "to": "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+      "transactionHash": "0xabc003def456789012345678901234567890abcdef003",
+      "asset": "ETH",
+      "amount": "11.0",
+      "amountUsd": 32000,
+      "timestamp": "2026-08-21T10:07:00.000Z",
+      "transferType": "native",
+      "hopDepth": 1,
+      "riskLevel": "low"
+    },
+    {
+      "id": "edge:0xabc004:0",
+      "from": "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "to": "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "transactionHash": "0xabc004def456789012345678901234567890abcdef004",
+      "asset": "ETH",
+      "amount": "15.0",
+      "amountUsd": 43500,
+      "timestamp": "2026-08-21T10:15:00.000Z",
+      "transferType": "contract_call",
+      "hopDepth": 2,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0xabc005:0",
+      "from": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+      "to": "bridge:0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+      "transactionHash": "0xabc005def456789012345678901234567890abcdef005",
+      "asset": "USDC",
+      "amount": "37500",
+      "amountUsd": 37500,
+      "timestamp": "2026-08-21T10:20:00.000Z",
+      "transferType": "erc20",
+      "hopDepth": 2,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0xabc006:0",
+      "from": "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+      "to": "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+      "transactionHash": "0xabc006def456789012345678901234567890abcdef006",
+      "asset": "ETH",
+      "amount": "10.8",
+      "amountUsd": 31400,
+      "timestamp": "2026-08-21T10:25:00.000Z",
+      "transferType": "native",
+      "hopDepth": 2,
+      "riskLevel": "critical"
+    },
+    {
+      "id": "edge:0xabc007:0",
+      "from": "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "to": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+      "transactionHash": "0xabc007def456789012345678901234567890abcdef007",
+      "asset": "USDT",
+      "amount": "43000",
+      "amountUsd": 43000,
+      "timestamp": "2026-08-21T10:30:00.000Z",
+      "transferType": "erc20",
+      "hopDepth": 3,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0xabc008:0",
+      "from": "bridge:0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
+      "to": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+      "transactionHash": "0xabc008def456789012345678901234567890abcdef008",
+      "asset": "USDC",
+      "amount": "37200",
+      "amountUsd": 37200,
+      "timestamp": "2026-08-21T10:32:00.000Z",
+      "transferType": "erc20",
+      "hopDepth": 3,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0xabc009:0",
+      "from": "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "to": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+      "transactionHash": "0xabc009def456789012345678901234567890abcdef009",
+      "asset": "ETH",
+      "amount": "0.5",
+      "amountUsd": 1450,
+      "timestamp": "2026-08-21T10:12:00.000Z",
+      "transferType": "native",
+      "hopDepth": 1,
+      "riskLevel": "low"
+    },
+    {
+      "id": "edge:0xabc010:0",
+      "from": "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+      "to": "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "transactionHash": "0xabc010def456789012345678901234567890abcdef010",
+      "asset": "ETH",
+      "amount": "1.2",
+      "amountUsd": 3500,
+      "timestamp": "2026-08-21T10:35:00.000Z",
+      "transferType": "native",
+      "hopDepth": 2,
+      "riskLevel": "critical"
+    },
+    {
+      "id": "edge:0xabc011:0",
+      "from": "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
+      "to": "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "transactionHash": "0xabc011def456789012345678901234567890abcdef011",
+      "asset": "ETH",
+      "amount": "0.8",
+      "amountUsd": 2320,
+      "timestamp": "2026-08-21T10:28:00.000Z",
+      "transferType": "contract_call",
+      "hopDepth": 2,
+      "riskLevel": "low"
+    },
+    {
+      "id": "edge:0xabc012:0",
+      "from": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+      "to": "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+      "transactionHash": "0xabc012def456789012345678901234567890abcdef012",
+      "asset": "USDT",
+      "amount": "2000",
+      "amountUsd": 2000,
+      "timestamp": "2026-08-21T10:33:00.000Z",
+      "transferType": "erc20",
+      "hopDepth": 3,
+      "riskLevel": "high"
+    }
+  ],
+  "metadata": {
+    "nodeCount": 8,
+    "edgeCount": 12,
+    "maxHopDepth": 3
+  }
+}
