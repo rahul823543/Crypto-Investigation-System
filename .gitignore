@@ -4,3 +4,27 @@ BACKEND_PLAN.md
 FRONTEND_PLAN.md
 WORK_DONE.md
 pr review.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Node / TypeScript
+node_modules/
+dist/
+*.js.map
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
