@@ -1,18 +1,26 @@
 """
 app/graph/builder.py
 ────────────────────
-Phase 2: Parse an AnalysisRequest into an in-memory nx.DiGraph.
+Phase 2: Parse an AnalysisRequest into an in-memory nx.MultiDiGraph.
 
 Design decisions:
   - Node keys are the stable IDs from Role C ("wallet:0x...", "dex:0x...", etc.)
     so Phase 3-4 algorithms never need to re-derive them.
   - All GraphNode and GraphEdge fields are stored as node/edge attributes so
-    algorithms can read them with G.nodes[node_id] and G.edges[u, v] without
+    algorithms can read them with G.nodes[node_id] and G[u][v][key] without
     touching the original request object.
   - Graph-level metadata (caseId, rootAddress, maxDepth) is stored in
     G.graph so it travels with the graph through every pipeline step.
   - An empty AnalysisRequest (no nodes, no edges) produces a valid empty
-    DiGraph — no special-casing needed downstream.
+    MultiDiGraph — no special-casing needed downstream.
+
+Why MultiDiGraph, not DiGraph?
+  A standard DiGraph only stores one directed edge per (u, v) pair.
+  When multiple transactions exist between the same two addresses (e.g. the
+  root wallet rapidly fans out USDC to the same destination twice), each
+  subsequent add_edge() call silently overwrites the previous edge attributes.
+  MultiDiGraph assigns every edge a unique integer key so parallel transfers
+  each retain their own id, amount, timestamp, and hop_depth.
 
 Phase 3 will add helper queries on top of this graph.
 Phase 4 will pass the graph to multi-hop traversal and cycle detection.
@@ -24,26 +32,26 @@ import networkx as nx
 from app.schemas.request import AnalysisRequest
 
 
-def build_graph(request: AnalysisRequest) -> nx.DiGraph:
+def build_graph(request: AnalysisRequest) -> nx.MultiDiGraph:
     """
-    Convert an AnalysisRequest into a directed graph.
+    Convert an AnalysisRequest into a directed multigraph.
 
     Nodes:
         G.nodes[node_id] contains:
             address, type, labels, risk_level, total_in_usd, total_out_usd
 
-    Edges:
-        G.edges[from_id, to_id] contains:
-            id, transaction_hash, asset, amount, amount_usd,
-            timestamp, hop_depth, risk_level
+    Edges (accessed via G[from_id][to_id][key]):
+        id, transaction_hash, asset, amount, amount_usd,
+        timestamp, hop_depth, risk_level
 
     Graph-level metadata:
         G.graph["case_id"], G.graph["root_address"], G.graph["max_depth"]
 
     Returns:
-        nx.DiGraph — may be empty if request.nodes and request.edges are empty.
+        nx.MultiDiGraph — may be empty if request.nodes and request.edges
+        are both empty.
     """
-    G: nx.DiGraph = nx.DiGraph()
+    G: nx.MultiDiGraph = nx.MultiDiGraph()
 
     # Store request-level metadata on the graph object itself so it is
     # available to every downstream algorithm without re-passing the request.
@@ -79,7 +87,7 @@ def build_graph(request: AnalysisRequest) -> nx.DiGraph:
     return G
 
 
-def get_root_node_id(G: nx.DiGraph) -> str | None:
+def get_root_node_id(G: nx.MultiDiGraph) -> str | None:
     """
     Return the node ID whose ``address`` attribute matches the graph's
     ``root_address`` metadata (case-insensitive).

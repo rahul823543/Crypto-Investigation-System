@@ -39,3 +39,16 @@ export interface CreateCaseRequest {
 export interface CreateCaseResponse {
   case: Case;
 }
+
+/**
+ * Full payload returned by GET /demo/seeded-case.
+ * Contains all sub-documents from seeded-case.json — more than just the Case
+ * record, so it cannot be typed as CreateCaseResponse.
+ */
+export interface SeededCaseData {
+  case: Case;
+  transactions: import("./transaction").NormalizedTransaction[];
+  graph: import("./graph").GraphResponse;
+  basicFindings: import("./graph").RiskFinding[];
+  analysisResult: import("./transaction").AnalysisResponse;
+}

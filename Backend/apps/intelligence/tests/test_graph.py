@@ -167,31 +167,32 @@ class TestBuildGraphAttributes:
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
         edge = req.edges[0]
-        assert G.edges[edge.from_node, edge.to_node]["id"] == edge.id
+        # MultiDiGraph: G[u][v][key] — key 0 is the first (and only) edge
+        assert G[edge.from_node][edge.to_node][0]["id"] == edge.id
 
     def test_edge_transaction_hash_preserved(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
         edge = req.edges[0]
-        assert G.edges[edge.from_node, edge.to_node]["transaction_hash"] == edge.transaction_hash
+        assert G[edge.from_node][edge.to_node][0]["transaction_hash"] == edge.transaction_hash
 
     def test_edge_asset_preserved(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
         edge = req.edges[0]
-        assert G.edges[edge.from_node, edge.to_node]["asset"] == edge.asset
+        assert G[edge.from_node][edge.to_node][0]["asset"] == edge.asset
 
     def test_edge_amount_usd_preserved(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
         edge = req.edges[0]
-        assert G.edges[edge.from_node, edge.to_node]["amount_usd"] == edge.amount_usd
+        assert G[edge.from_node][edge.to_node][0]["amount_usd"] == edge.amount_usd
 
     def test_edge_hop_depth_preserved(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
         edge = req.edges[0]
-        assert G.edges[edge.from_node, edge.to_node]["hop_depth"] == edge.hop_depth
+        assert G[edge.from_node][edge.to_node][0]["hop_depth"] == edge.hop_depth
 
 
 # ---------------------------------------------------------------------------
@@ -287,7 +288,7 @@ class TestBuildGraphSeededCase:
         from_id = "wallet:0x2222222222222222222222222222222222222222"
         to_id   = "wallet:0x5555555555555555555555555555555555555555"
         assert G.has_edge(from_id, to_id)
-        assert G.edges[from_id, to_id]["hop_depth"] == 2
+        assert G[from_id][to_id][0]["hop_depth"] == 2
 
     def test_seeded_graph_case_id_metadata(self, seeded_graph):
         G, _ = seeded_graph
