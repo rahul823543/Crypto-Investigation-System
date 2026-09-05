@@ -1,4 +1,4 @@
-import { Worker, Job } from "bullmq";
+import { Worker, Job, Queue } from "bullmq";
 import { Redis } from "ioredis";
 import pg from "pg";
 
@@ -21,9 +21,14 @@ interface IngestJobData {
   mode: "demo" | "live";
 }
 
+/** Seeded JSON transactions may omit `rawProviderRef`; all other fields match NormalizedTransactionInput. */
+type SeededTransaction = Omit<NormalizedTransactionInput, "rawProviderRef"> & {
+  rawProviderRef?: string | null;
+};
+
 interface SeededCaseFile {
-  case: unknown;
-  transactions?: NormalizedTransactionInput[];
+  case?: { rootAddress?: string };
+  transactions?: SeededTransaction[];
 }
 
 async function persistTransactions(
@@ -74,6 +79,10 @@ export function createIngestWorker(
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
 
+  const buildGraphQueue = new Queue("build-case-graph", {
+    connection,
+  });
+
   const worker = new Worker<IngestJobData>(
     "ingest-case-transactions",
     async (job: Job<IngestJobData>) => {
@@ -105,16 +114,46 @@ export function createIngestWorker(
           where: { id: caseId },
           data: { status: "ingested" },
         });
+
+        await buildGraphQueue.add(
+          "build-case-graph",
+          { caseId },
+          {
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 5000,
+            },
+          }
+        );
       } catch (err) {
         if (mode === "demo") {
-          const seededTransactions = (
-            (seededCase as SeededCaseFile).transactions ?? []
-          ).map((tx) => ({ ...tx, chainId }));
+          // The seeded JSON has a hardcoded root address. Detect it from the
+          // first transaction that originates from the seeded root node, then
+          // substitute the real rootAddress throughout so the demo graph is
+          // anchored to the wallet the investigator actually queried.
+          const seededTransactions = (seededCase as SeededCaseFile).transactions ?? [];
+          const seededRootAddress: string =
+            (seededCase as SeededCaseFile).case?.rootAddress ?? "";
+
+          const remapped: NormalizedTransactionInput[] = seededTransactions.map((tx) => ({
+            ...tx,
+            chainId,
+            rawProviderRef: tx.rawProviderRef ?? null,
+            from:
+              seededRootAddress && tx.from === seededRootAddress
+                ? rootAddress
+                : tx.from,
+            to:
+              seededRootAddress && tx.to === seededRootAddress
+                ? rootAddress
+                : tx.to,
+          }));
 
           await persistTransactions(
             prisma,
             caseId,
-            seededTransactions
+            remapped
           );
 
           await prisma.case.update({
@@ -123,6 +162,18 @@ export function createIngestWorker(
               status: "demo_fallback_used",
             },
           });
+
+          await buildGraphQueue.add(
+            "build-case-graph",
+            { caseId },
+            {
+              attempts: 3,
+              backoff: {
+                type: "exponential",
+                delay: 5000,
+              },
+            }
+          );
 
           return;
         }
@@ -175,7 +226,7 @@ export function createIngestWorker(
     isShuttingDown = true;
 
     try {
-      await worker.close();
+      await Promise.allSettled([worker.close(), buildGraphQueue.close()]);
     } finally {
       try {
         await prisma.$disconnect();

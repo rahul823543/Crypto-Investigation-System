@@ -1,34 +1,63 @@
-export type NodeType = "wallet" | "contract" | "dex" | "bridge" | "mixer" | "unknown";
-export type RiskLevel = "low" | "medium" | "high" | "critical";
+import type { RiskLevel } from "./case.js";
+import type { NormalizedTransaction } from "./transaction.js";
+
+export type NodeType = "wallet" | "contract" | "exchange" | "dex" | "bridge" | "mixer" | "unknown";
+export type AddressLabelType = "dex" | "bridge" | "mixer" | "risky" | "ofac";
 
 // ─── Graph Node ─────────────────────────────────────────────────────────────
 
 export interface GraphNode {
-  /** Stable ID: "wallet:0x..." | "dex:0x..." | "bridge:0x..." */
   id: string;
+  caseId: string;
   address: string;
   type: NodeType;
-  /** Role C classification labels e.g. ["root", "dex"] */
   labels: string[];
-  riskLevel: RiskLevel;
-  totalInUsd: number;
-  totalOutUsd: number;
+  riskLevel: RiskLevel | null;
+  totalInUsd: number | null;
+  totalOutUsd: number | null;
+  createdAt: string; // ISO date string
 }
 
 // ─── Graph Edge ──────────────────────────────────────────────────────────────
 
 export interface GraphEdge {
-  /** Stable ID: "edge:0x{txHash}:{index}" */
   id: string;
-  from: string;   // GraphNode.id
-  to: string;     // GraphNode.id
+  caseId: string;
+  fromNodeId: string;
+  toNodeId: string;
+  from?: string; // backwards-compatible alias for fromNodeId
+  to?: string;   // backwards-compatible alias for toNodeId
   transactionHash: string;
   asset: string;
   amount: string;
-  amountUsd: number;
-  timestamp: string; // ISO-8601
+  amountUsd: number | null;
+  timestamp: string; // ISO date string
   hopDepth: number;
-  riskLevel: RiskLevel;
+  riskLevel: RiskLevel | null;
+  createdAt: string; // ISO date string
+}
+
+// ─── Address Label ────────────────────────────────────────────────────────────
+
+export interface AddressLabel {
+  address: string;
+  label: string;
+  type: NodeType | AddressLabelType;
+  chainId?: number | null;
+}
+
+// ─── Graph Build IO ──────────────────────────────────────────────────────────
+
+export interface GraphBuildInput {
+  caseId: string;
+  rootAddress: string;
+  transactions: NormalizedTransaction[];
+  addressLabels?: AddressLabel[];
+}
+
+export interface GraphBuildOutput {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
 }
 
 // ─── Graph Response ──────────────────────────────────────────────────────────
@@ -37,42 +66,4 @@ export interface GraphResponse {
   caseId: string;
   nodes: GraphNode[];
   edges: GraphEdge[];
-}
-
-// ─── Risk Finding ─────────────────────────────────────────────────────────────
-
-export type FindingSource = "basic-risk" | "python-intelligence";
-export type FindingType =
-  | "fan_out"
-  | "dex_interaction"
-  | "bridge_interaction"
-  | "known_risky_address"
-  | "suspicious_path"
-  | "circular_flow"
-  | "multi_hop_laundering";
-
-export interface RiskFinding {
-  id: string;
-  caseId: string;
-  source: FindingSource;
-  type: FindingType;
-  severity: RiskLevel;
-  confidence: number; // 0.0 – 1.0
-  title: string;
-  description: string;
-  relatedNodeIds: string[];
-  relatedEdgeIds: string[];
-  signals: string[];
-}
-
-// ─── Address Label ────────────────────────────────────────────────────────────
-
-export type AddressLabelType = "dex" | "bridge" | "mixer" | "risky" | "ofac";
-
-export interface AddressLabel {
-  address: string;
-  type: AddressLabelType;
-  label: string;
-  /** null means applies across all chains */
-  chainId: number | null;
 }

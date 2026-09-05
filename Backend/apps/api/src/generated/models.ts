@@ -11,4 +11,7 @@
 export type * from './models/Case.js'
 export type * from './models/Wallet.js'
 export type * from './models/Transaction.js'
+export type * from './models/GraphNode.js'
+export type * from './models/GraphEdge.js'
+export type * from './models/RiskFinding.js'
 export type * from './commonInputTypes.js'

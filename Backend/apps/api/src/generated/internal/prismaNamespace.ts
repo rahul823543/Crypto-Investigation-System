@@ -399,7 +399,10 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Case: 'Case',
   Wallet: 'Wallet',
-  Transaction: 'Transaction'
+  Transaction: 'Transaction',
+  GraphNode: 'GraphNode',
+  GraphEdge: 'GraphEdge',
+  RiskFinding: 'RiskFinding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "case" | "wallet" | "transaction"
+    modelProps: "case" | "wallet" | "transaction" | "graphNode" | "graphEdge" | "riskFinding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -641,6 +644,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GraphNode: {
+      payload: Prisma.$GraphNodePayload<ExtArgs>
+      fields: Prisma.GraphNodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GraphNodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GraphNodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        findFirst: {
+          args: Prisma.GraphNodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GraphNodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        findMany: {
+          args: Prisma.GraphNodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>[]
+        }
+        create: {
+          args: Prisma.GraphNodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        createMany: {
+          args: Prisma.GraphNodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GraphNodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>[]
+        }
+        delete: {
+          args: Prisma.GraphNodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        update: {
+          args: Prisma.GraphNodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        deleteMany: {
+          args: Prisma.GraphNodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GraphNodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GraphNodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>[]
+        }
+        upsert: {
+          args: Prisma.GraphNodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphNodePayload>
+        }
+        aggregate: {
+          args: Prisma.GraphNodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGraphNode>
+        }
+        groupBy: {
+          args: Prisma.GraphNodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphNodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GraphNodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphNodeCountAggregateOutputType> | number
+        }
+      }
+    }
+    GraphEdge: {
+      payload: Prisma.$GraphEdgePayload<ExtArgs>
+      fields: Prisma.GraphEdgeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GraphEdgeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GraphEdgeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        findFirst: {
+          args: Prisma.GraphEdgeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GraphEdgeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        findMany: {
+          args: Prisma.GraphEdgeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>[]
+        }
+        create: {
+          args: Prisma.GraphEdgeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        createMany: {
+          args: Prisma.GraphEdgeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GraphEdgeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>[]
+        }
+        delete: {
+          args: Prisma.GraphEdgeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        update: {
+          args: Prisma.GraphEdgeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        deleteMany: {
+          args: Prisma.GraphEdgeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GraphEdgeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GraphEdgeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>[]
+        }
+        upsert: {
+          args: Prisma.GraphEdgeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphEdgePayload>
+        }
+        aggregate: {
+          args: Prisma.GraphEdgeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGraphEdge>
+        }
+        groupBy: {
+          args: Prisma.GraphEdgeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphEdgeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GraphEdgeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphEdgeCountAggregateOutputType> | number
+        }
+      }
+    }
+    RiskFinding: {
+      payload: Prisma.$RiskFindingPayload<ExtArgs>
+      fields: Prisma.RiskFindingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RiskFindingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RiskFindingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        findFirst: {
+          args: Prisma.RiskFindingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RiskFindingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        findMany: {
+          args: Prisma.RiskFindingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>[]
+        }
+        create: {
+          args: Prisma.RiskFindingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        createMany: {
+          args: Prisma.RiskFindingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RiskFindingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>[]
+        }
+        delete: {
+          args: Prisma.RiskFindingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        update: {
+          args: Prisma.RiskFindingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        deleteMany: {
+          args: Prisma.RiskFindingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RiskFindingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RiskFindingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>[]
+        }
+        upsert: {
+          args: Prisma.RiskFindingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RiskFindingPayload>
+        }
+        aggregate: {
+          args: Prisma.RiskFindingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRiskFinding>
+        }
+        groupBy: {
+          args: Prisma.RiskFindingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskFindingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RiskFindingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RiskFindingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -728,6 +953,57 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const GraphNodeScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  address: 'address',
+  type: 'type',
+  labelsJson: 'labelsJson',
+  riskLevel: 'riskLevel',
+  totalInUsd: 'totalInUsd',
+  totalOutUsd: 'totalOutUsd',
+  createdAt: 'createdAt'
+} as const
+
+export type GraphNodeScalarFieldEnum = (typeof GraphNodeScalarFieldEnum)[keyof typeof GraphNodeScalarFieldEnum]
+
+
+export const GraphEdgeScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  fromNodeId: 'fromNodeId',
+  toNodeId: 'toNodeId',
+  transactionHash: 'transactionHash',
+  asset: 'asset',
+  amount: 'amount',
+  amountUsd: 'amountUsd',
+  timestamp: 'timestamp',
+  hopDepth: 'hopDepth',
+  riskLevel: 'riskLevel',
+  createdAt: 'createdAt'
+} as const
+
+export type GraphEdgeScalarFieldEnum = (typeof GraphEdgeScalarFieldEnum)[keyof typeof GraphEdgeScalarFieldEnum]
+
+
+export const RiskFindingScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  source: 'source',
+  type: 'type',
+  severity: 'severity',
+  confidence: 'confidence',
+  title: 'title',
+  description: 'description',
+  relatedNodeIdsJson: 'relatedNodeIdsJson',
+  relatedEdgeIdsJson: 'relatedEdgeIdsJson',
+  signalsJson: 'signalsJson',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskFindingScalarFieldEnum = (typeof RiskFindingScalarFieldEnum)[keyof typeof RiskFindingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -969,6 +1245,9 @@ export type GlobalOmitConfig = {
   case?: Prisma.CaseOmit
   wallet?: Prisma.WalletOmit
   transaction?: Prisma.TransactionOmit
+  graphNode?: Prisma.GraphNodeOmit
+  graphEdge?: Prisma.GraphEdgeOmit
+  riskFinding?: Prisma.RiskFindingOmit
 }
 
 /* Types for Logging */
