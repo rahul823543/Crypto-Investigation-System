@@ -1203,3 +1203,7 @@ The backend is complete when:
 - [ ] Critical backend, graph, Python, and contract tests pass.
 - [ ] Full seeded pipeline works end-to-end for the demo.
 - [ ] README includes backend setup, env vars, commands, fallback mode, and demo flow.
+
+
+Do not change the above plan at all. This is the original reference.
+Any changes in the backend plan during implementation/future idea must be mentioned below it.

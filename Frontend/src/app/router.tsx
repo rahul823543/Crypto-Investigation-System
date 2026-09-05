@@ -1,10 +1,24 @@
 import { Routes, Route } from 'react-router-dom';
+import { AppShell } from '@/components/layout/AppShell';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { CreateCasePage } from '@/pages/CreateCasePage';
+import { CaseInvestigationPage } from '@/pages/CaseInvestigationPage';
+import { EvidenceVerificationPage } from '@/pages/EvidenceVerificationPage';
+import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function AppRouter() {
   return (
-    <Routes>
-      <Route path="/" element={<main className="p-8"><h1>Crypto Investigation System</h1></main>} />
-      <Route path="*" element={<main className="p-8"><p>Page not found</p></main>} />
-    </Routes>
+    <AppShell>
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/create" element={<CreateCasePage />} />
+        <Route path="/cases/:caseId" element={<CaseInvestigationPage />} />
+        <Route path="/cases/:caseId/graph" element={<CaseInvestigationPage />} />
+        <Route path="/cases/:caseId/findings" element={<CaseInvestigationPage />} />
+        <Route path="/evidence" element={<EvidenceVerificationPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </AppShell>
   );
 }
+
