@@ -10,7 +10,7 @@ export const Header: React.FC = () => {
   const { toggleSidebar, searchQuery, setSearchQuery } = useUiStore();
 
   const getPageTitle = () => {
-    if (location.pathname === '/') return 'Forensic Triage Dashboard';
+    if (location.pathname === '/') return 'Forensic Triage Engine';
     if (location.pathname === '/create') return 'Create Case Investigation';
     if (location.pathname === '/evidence') return 'Cryptographic Proof & Notary';
     if (location.pathname.startsWith('/cases/')) return 'Case Forensic Workspace';

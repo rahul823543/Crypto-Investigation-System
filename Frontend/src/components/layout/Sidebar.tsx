@@ -48,22 +48,24 @@ export const Sidebar: React.FC = () => {
     >
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-        <NavLink to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#4F46E5] via-[#7E22CE] to-[#F43F5E] flex items-center justify-center p-0.5 shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform shrink-0">
-            <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-              <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-[#4F46E5] to-[#7E22CE]" />
-            </div>
+        <NavLink to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-indigo-500/15 border border-slate-200/80 group-hover:scale-105 transition-transform shrink-0 bg-white">
+            <img
+              src="/blockchain.jpg"
+              alt="Forensic Triage Engine Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           {!sidebarCollapsed && (
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-display font-extrabold text-base tracking-tight text-[#0F172A]">
-                  antigravity
+                <span className="font-display font-extrabold text-[15px] tracking-tight text-[#0F172A] leading-tight">
+                  Forensic Triage
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4F46E5] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4F46E5] animate-pulse shrink-0" />
               </div>
-              <span className="text-[10px] text-[#526077] font-mono tracking-wider uppercase font-semibold">
-                Forensic Triage
+              <span className="text-[11px] text-[#4F46E5] font-mono tracking-wider uppercase font-bold">
+                Engine
               </span>
             </div>
           )}
