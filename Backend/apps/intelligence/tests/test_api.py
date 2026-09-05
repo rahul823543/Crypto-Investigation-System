@@ -118,12 +118,37 @@ class TestAnalyzeEndpointValid:
         assert r.status_code == 200
 
     async def test_deterministic_response(self, client, minimal_valid_payload):
-        """Same input must produce same riskScore and riskLevel (Phase 1 mock is hardcoded)."""
+        """Same input must produce same riskScore and riskLevel deterministically."""
         r1 = await client.post("/v1/analyze", json=minimal_valid_payload)
         r2 = await client.post("/v1/analyze", json=minimal_valid_payload)
         b1, b2 = r1.json(), r2.json()
         assert b1["riskScore"] == b2["riskScore"]
         assert b1["riskLevel"] == b2["riskLevel"]
+
+    async def test_analyze_seeded_case_payload(self, client):
+        """End-to-end integration test with canonical seeded demo case fixture."""
+        from tests.test_graph import _load_seeded_request
+
+        req = _load_seeded_request()
+        r = await client.post("/v1/analyze", json=req.model_dump(by_alias=True, mode="json"))
+        assert r.status_code == 200
+        body = r.json()
+        assert body["caseId"] == req.case_id
+        assert body["riskLevel"] == "high"
+        assert body["riskScore"] >= 50
+        assert len(body["suspiciousPaths"]) == 2
+        assert len(body["findings"]) == 2
+
+        node_ids_in_graph = {n.id for n in req.nodes}
+        edge_ids_in_graph = {e.id for e in req.edges}
+        for finding in body["findings"]:
+            assert finding["source"] == "python-intelligence"
+            assert finding["severity"] in {"low", "medium", "high", "critical"}
+            assert 0.70 <= finding["confidence"] <= 1.0
+            for nid in finding["relatedNodeIds"]:
+                assert nid in node_ids_in_graph
+            for eid in finding["relatedEdgeIds"]:
+                assert eid in edge_ids_in_graph
 
     async def test_max_depth_1_accepted(self, client, minimal_valid_payload):
         payload = {**minimal_valid_payload, "maxDepth": 1}
