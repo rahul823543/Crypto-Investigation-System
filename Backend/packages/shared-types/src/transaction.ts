@@ -16,12 +16,21 @@ export interface NormalizedTransaction {
   tokenAddress: string | null;
   /** Raw amount string */
   amount: string;
-  amountUsd: number;
+  /** USD equivalent at time of transfer; null when price data is unavailable */
+  amountUsd: number | null;
   timestamp: string; // ISO-8601
   transferType: TransferType;
   /** ABI-decoded method name e.g. "transfer", "swapExactTokensForTokens" */
   method: string | null;
+  /** Opaque deduplication key supplied by the data provider (e.g. Alchemy uniqueId) */
+  rawProviderRef: string | null;
 }
+
+/**
+ * Write-only shape produced by the normalizer before a DB record exists.
+ * Omits `id` and `caseId` which are assigned at persist time.
+ */
+export type NormalizedTransactionInput = Omit<NormalizedTransaction, "id" | "caseId">;
 
 // ─── Python Intelligence Contract ─────────────────────────────────────────────
 
@@ -34,7 +43,7 @@ export interface AnalysisRequest {
   nodes: import("./graph").GraphNode[];
   edges: import("./graph").GraphEdge[];
   transactions: NormalizedTransaction[];
-  basicFindings: import("./graph").RiskFinding[];
+  basicFindings: import("./finding").RiskFinding[];
 }
 
 export interface SuspiciousPath {
@@ -64,8 +73,8 @@ export interface AnalysisResponse {
   analysisId: string;
   caseId: string;
   riskScore: number; // 0–100
-  riskLevel: import("./graph").RiskLevel;
-  findings: import("./graph").RiskFinding[];
+  riskLevel: import("./case").RiskLevel;
+  findings: import("./finding").RiskFinding[];
   suspiciousPaths: SuspiciousPath[];
   circularFlows: CircularFlow[];
   analysisMetadata: AnalysisMetadata;

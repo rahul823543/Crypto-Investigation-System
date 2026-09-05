@@ -32,3 +32,18 @@ export type Wallet = Prisma.WalletModel
  * 
  */
 export type Transaction = Prisma.TransactionModel
+/**
+ * Model GraphNode
+ * 
+ */
+export type GraphNode = Prisma.GraphNodeModel
+/**
+ * Model GraphEdge
+ * 
+ */
+export type GraphEdge = Prisma.GraphEdgeModel
+/**
+ * Model RiskFinding
+ * 
+ */
+export type RiskFinding = Prisma.RiskFindingModel

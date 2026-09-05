@@ -53,7 +53,10 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Case: 'Case',
   Wallet: 'Wallet',
-  Transaction: 'Transaction'
+  Transaction: 'Transaction',
+  GraphNode: 'GraphNode',
+  GraphEdge: 'GraphEdge',
+  RiskFinding: 'RiskFinding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -120,6 +123,57 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const GraphNodeScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  address: 'address',
+  type: 'type',
+  labelsJson: 'labelsJson',
+  riskLevel: 'riskLevel',
+  totalInUsd: 'totalInUsd',
+  totalOutUsd: 'totalOutUsd',
+  createdAt: 'createdAt'
+} as const
+
+export type GraphNodeScalarFieldEnum = (typeof GraphNodeScalarFieldEnum)[keyof typeof GraphNodeScalarFieldEnum]
+
+
+export const GraphEdgeScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  fromNodeId: 'fromNodeId',
+  toNodeId: 'toNodeId',
+  transactionHash: 'transactionHash',
+  asset: 'asset',
+  amount: 'amount',
+  amountUsd: 'amountUsd',
+  timestamp: 'timestamp',
+  hopDepth: 'hopDepth',
+  riskLevel: 'riskLevel',
+  createdAt: 'createdAt'
+} as const
+
+export type GraphEdgeScalarFieldEnum = (typeof GraphEdgeScalarFieldEnum)[keyof typeof GraphEdgeScalarFieldEnum]
+
+
+export const RiskFindingScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  source: 'source',
+  type: 'type',
+  severity: 'severity',
+  confidence: 'confidence',
+  title: 'title',
+  description: 'description',
+  relatedNodeIdsJson: 'relatedNodeIdsJson',
+  relatedEdgeIdsJson: 'relatedEdgeIdsJson',
+  signalsJson: 'signalsJson',
+  createdAt: 'createdAt'
+} as const
+
+export type RiskFindingScalarFieldEnum = (typeof RiskFindingScalarFieldEnum)[keyof typeof RiskFindingScalarFieldEnum]
 
 
 export const SortOrder = {

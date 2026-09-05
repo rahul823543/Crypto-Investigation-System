@@ -24,13 +24,13 @@ import * as fs from "fs";
 import * as path from "path";
 
 import type { NormalizedTransaction, AnalysisResponse } from "../src/transaction";
+import type { RiskLevel } from "../src/case";
+import type { RiskFinding } from "../src/finding";
 import type {
   GraphNode,
   GraphEdge,
-  RiskFinding,
   AddressLabel,
   NodeType,
-  RiskLevel,
   AddressLabelType,
 } from "../src/graph";
 
@@ -48,7 +48,7 @@ const addressLabels: AddressLabel[] = JSON.parse(
 // Allowed value sets (mirrors the shared-types Literal unions)
 // ---------------------------------------------------------------------------
 
-const VALID_NODE_TYPES    = new Set<NodeType>(["wallet","contract","dex","bridge","mixer","unknown"]);
+const VALID_NODE_TYPES    = new Set<string>(["wallet","contract","dex","bridge","mixer","unknown"]);
 const VALID_RISK_LEVELS   = new Set<RiskLevel>(["low","medium","high","critical"]);
 const VALID_LABEL_TYPES   = new Set<AddressLabelType>(["dex","bridge","mixer","risky","ofac"]);
 const VALID_FINDING_SRC   = new Set(["basic-risk","python-intelligence"]);
@@ -119,8 +119,8 @@ const edgeIds = new Set(edges.map((e: GraphEdge) => e.id));
 
 for (const edge of edges) {
   if (!edge.id?.startsWith("edge:"))               fail(`${edge.id}: id must start with 'edge:'`);
-  if (!nodeIds.has(edge.from))                     fail(`${edge.id}: from '${edge.from}' not in nodes`);
-  if (!nodeIds.has(edge.to))                       fail(`${edge.id}: to '${edge.to}' not in nodes`);
+  if (!nodeIds.has(edge.from!))                     fail(`${edge.id}: from '${edge.from}' not in nodes`);
+  if (!nodeIds.has(edge.to!))                       fail(`${edge.id}: to '${edge.to}' not in nodes`);
   if (!edge.transactionHash?.startsWith("0x"))     fail(`${edge.id}: transactionHash must be 0x`);
   if (!edge.asset)                                 fail(`${edge.id}: missing asset`);
   if (!edge.amount)                                fail(`${edge.id}: missing amount`);

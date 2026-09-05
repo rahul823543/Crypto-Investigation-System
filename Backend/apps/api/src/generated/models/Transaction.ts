@@ -328,7 +328,7 @@ export type TransactionOrderByWithRelationInput = {
 
 export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  caseId_hash_chainId_fromAddress_toAddress_asset?: Prisma.TransactionCaseIdHashChainIdFromAddressToAddressAssetCompoundUniqueInput
+  caseId_hash_rawProviderRef?: Prisma.TransactionCaseIdHashRawProviderRefCompoundUniqueInput
   AND?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   OR?: Prisma.TransactionWhereInput[]
   NOT?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
@@ -347,7 +347,7 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   method?: Prisma.StringNullableFilter<"Transaction"> | string | null
   rawProviderRef?: Prisma.StringNullableFilter<"Transaction"> | string | null
   case?: Prisma.XOR<Prisma.CaseScalarRelationFilter, Prisma.CaseWhereInput>
-}, "id" | "caseId_hash_chainId_fromAddress_toAddress_asset">
+}, "id" | "caseId_hash_rawProviderRef">
 
 export type TransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -528,13 +528,10 @@ export type TransactionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type TransactionCaseIdHashChainIdFromAddressToAddressAssetCompoundUniqueInput = {
+export type TransactionCaseIdHashRawProviderRefCompoundUniqueInput = {
   caseId: string
   hash: string
-  chainId: number
-  fromAddress: string
-  toAddress: string
-  asset: string
+  rawProviderRef: string
 }
 
 export type TransactionCountOrderByAggregateInput = {

@@ -5,6 +5,8 @@ import prismaPlugin from "./plugins/prisma.js";
 import redisPlugin from "./plugins/redis.js";
 import queuesPlugin from "./plugins/queues.js";
 import { casesRoutes } from "./modules/cases/cases.routes.js";
+import { graphRoutes } from "./modules/graph/graph.routes.js";
+import { riskRoutes } from "./modules/risk/risk.routes.js";
 import healthRoutes from "./modules/health/health.routes.js";
 import demoRoutes from "./demo/demo.routes.js";
 
@@ -23,6 +25,8 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(redisPlugin);
   await app.register(queuesPlugin);
   await app.register(casesRoutes);
+  await app.register(graphRoutes);
+  await app.register(riskRoutes);
   await app.register(healthRoutes);
   await app.register(demoRoutes);
 

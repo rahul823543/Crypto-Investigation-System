@@ -20,6 +20,9 @@ model Case {
   updatedAt   DateTime      @updatedAt
 
   transactions Transaction[]
+  graphNodes   GraphNode[]
+  graphEdges   GraphEdge[]
+  riskFindings RiskFinding[]
 }
 
 model Wallet {
@@ -55,4 +58,63 @@ model Transaction {
 
   @@index([caseId])
   @@unique([caseId, hash, rawProviderRef])
+}
+
+model GraphNode {
+  id          String      @id @default(cuid())
+  caseId      String
+  address     String
+  type        String
+  labelsJson  String
+  riskLevel   String?
+  totalInUsd  Float?
+  totalOutUsd Float?
+  createdAt   DateTime    @default(now())
+
+  case          Case        @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  outgoingEdges GraphEdge[] @relation("OutgoingEdges")
+  incomingEdges GraphEdge[] @relation("IncomingEdges")
+
+  @@unique([caseId, address])
+}
+
+model GraphEdge {
+  id              String    @id @default(cuid())
+  caseId          String
+  fromNodeId      String
+  toNodeId        String
+  transactionHash String
+  asset           String
+  amount          String
+  amountUsd       Float?
+  timestamp       DateTime
+  hopDepth        Int       @default(1)
+  riskLevel       String?
+  createdAt       DateTime  @default(now())
+
+  case     Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  fromNode GraphNode @relation("OutgoingEdges", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode   GraphNode @relation("IncomingEdges", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@unique([caseId, transactionHash, fromNodeId, toNodeId])
+}
+
+model RiskFinding {
+  id                 String   @id @default(cuid())
+  caseId             String
+  source             String
+  type               String
+  severity           String
+  confidence         Float
+  title              String
+  description        String
+  relatedNodeIdsJson String
+  relatedEdgeIdsJson String
+  signalsJson        String
+  createdAt          DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
 }
