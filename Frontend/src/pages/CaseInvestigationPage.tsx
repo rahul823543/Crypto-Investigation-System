@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Network,
-  Cpu,
   AlertTriangle,
   ArrowRight,
   FileCheck2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { RiskBadge } from '@/components/ui/Badge';
 import { Tabs } from '@/components/ui/Tabs';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CaseStatusTimeline } from '@/components/case/CaseStatusTimeline';
@@ -18,22 +15,39 @@ import { CaseMetricsGrid } from '@/components/case/CaseMetricsGrid';
 import { RiskMatrixBreakdown } from '@/components/case/RiskMatrixBreakdown';
 import { TransactionFeedTable } from '@/components/case/TransactionFeedTable';
 import { CaseActionBar } from '@/components/case/CaseActionBar';
+import { TransactionGraph } from '@/components/graph/TransactionGraph';
+import { GraphInspectorPanel } from '@/components/graph/GraphInspectorPanel';
+import { RiskFindingsPanel } from '@/components/graph/RiskFindingsPanel';
 import { useCasePolling } from '@/hooks/useCasePolling';
+import { useCaseGraph } from '@/hooks/useCaseGraph';
+import { useCaseFindings } from '@/hooks/useCaseFindings';
+import { useInvestigationStore } from '@/store/investigationStore';
+import type { GraphFinding } from '@/types';
 
 export const CaseInvestigationPage: React.FC = () => {
   const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
-  const { data: caseDetail, isLoading, isError } = useCasePolling(caseId);
-  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('overview');
+
+  const { data: caseDetail, isLoading: caseLoading, isError: caseError } = useCasePolling(caseId);
+  const { data: graphData, isLoading: graphLoading } = useCaseGraph(caseId);
+  const { data: findingsData, isLoading: findingsLoading } = useCaseFindings(caseId);
+
+  const { selectFinding } = useInvestigationStore();
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('graph');
 
   const workspaceTabs = [
+    { id: 'graph', label: 'Topology Graph' },
     { id: 'overview', label: 'Case Overview' },
-    { id: 'graph', label: 'Topology Graph (Phase 3)' },
     { id: 'findings', label: 'Risk Findings & Vectors' },
     { id: 'evidence', label: 'Evidence Attestation' },
   ];
 
-  if (isLoading) {
+  const handleHighlightFinding = (finding: GraphFinding) => {
+    const allRelated = [...finding.relatedNodeIds, ...finding.relatedEdgeIds];
+    selectFinding(finding.id, allRelated);
+  };
+
+  if (caseLoading || graphLoading || findingsLoading) {
     return (
       <div className="space-y-6 py-6 max-w-7xl mx-auto">
         <Skeleton className="h-28 w-full rounded-3xl" />
@@ -45,7 +59,7 @@ export const CaseInvestigationPage: React.FC = () => {
     );
   }
 
-  if (isError || !caseDetail) {
+  if (caseError || !caseDetail || !graphData) {
     return (
       <div className="p-12 text-center rounded-3xl bg-red-50/60 border border-red-100 max-w-lg mx-auto my-12">
         <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-3" />
@@ -87,14 +101,19 @@ export const CaseInvestigationPage: React.FC = () => {
         </div>
         <div className="lg:col-span-8 flex flex-col justify-between gap-6">
           <CaseStatusTimeline steps={caseDetail.steps} />
-          <CaseMetricsGrid />
+          <CaseMetricsGrid
+            nodeCount={graphData.metadata.nodeCount}
+            edgeCount={graphData.metadata.edgeCount}
+            maxHopDepth={graphData.metadata.maxHopDepth}
+            findingCount={findingsData?.length || 2}
+          />
         </div>
       </div>
 
       {/* Quick Actions Bar */}
       <CaseActionBar caseId={caseDetail.caseId} />
 
-      {/* Workspace Tabs Section */}
+      {/* Workspace Tabs Navigation */}
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <Tabs
@@ -104,7 +123,28 @@ export const CaseInvestigationPage: React.FC = () => {
           />
         </div>
 
-        {/* Tab 1: Overview (Subject Matrix + Transaction Feed) */}
+        {/* Tab 1: Interactive Cytoscape Topology Graph */}
+        {activeWorkspaceTab === 'graph' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Cytoscape Canvas */}
+            <div className="lg:col-span-8">
+              <TransactionGraph graph={graphData} />
+            </div>
+
+            {/* Dynamic Inspector Panel */}
+            <div className="lg:col-span-4">
+              <GraphInspectorPanel
+                nodes={graphData.nodes}
+                edges={graphData.edges}
+                findings={findingsData || []}
+                onHighlightFinding={handleHighlightFinding}
+                className="sticky top-20"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Overview (Subject Matrix + Transaction Feed) */}
         {activeWorkspaceTab === 'overview' && (
           <div className="space-y-6">
             <RiskMatrixBreakdown />
@@ -112,61 +152,17 @@ export const CaseInvestigationPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Graph Explorer Placeholder for Phase 3 */}
-        {activeWorkspaceTab === 'graph' && (
-          <div className="p-16 text-center rounded-3xl bg-white border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-[#4F46E5] flex items-center justify-center mx-auto shadow-sm">
-              <Network className="h-7 w-7" />
-            </div>
-            <h4 className="font-display font-bold text-lg text-slate-900">
-              Interactive Multi-Hop Cytoscape Topology
-            </h4>
-            <p className="text-xs sm:text-sm text-[#526077] max-w-md mx-auto leading-relaxed">
-              In Phase 3, this canvas will render an interactive graph of all 6 nodes and 5 directed edges with real-time risk color coding, edge weighting, and inspector panels.
-            </p>
-            <div className="pt-2">
-              <span className="text-[11px] font-mono font-semibold px-3 py-1 rounded-full bg-purple-50 text-[#7E22CE] border border-purple-100">
-                Scheduled for Phase 3 Implementation
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Tab 3: Risk Findings & Vectors */}
         {activeWorkspaceTab === 'findings' && (
           <div className="space-y-6">
+            <RiskFindingsPanel
+              findings={findingsData || []}
+              onHighlightFinding={(f) => {
+                handleHighlightFinding(f);
+                setActiveWorkspaceTab('graph');
+              }}
+            />
             <RiskMatrixBreakdown />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-5 rounded-2xl bg-red-50/60 border border-red-200/70 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                    <span className="font-bold text-sm text-red-900">
-                      Rapid Fan-Out Velocity
-                    </span>
-                  </div>
-                  <RiskBadge riskLevel="high" size="sm" />
-                </div>
-                <p className="text-xs text-red-800 leading-relaxed">
-                  Root address disbursed $10,000 USDC across 3 distinct addresses within 300 seconds, consistent with initial layering tactics.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/70 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Cpu className="h-4 w-4 text-amber-600" />
-                    <span className="font-bold text-sm text-amber-900">
-                      Decentralized Exchange Liquidity Swap
-                    </span>
-                  </div>
-                  <RiskBadge riskLevel="medium" size="sm" />
-                </div>
-                <p className="text-xs text-amber-800 leading-relaxed">
-                  5,000 USDC swapped to intermediary tokens through QuickSwap V2 to obscure direct ledger trail.
-                </p>
-              </div>
-            </div>
           </div>
         )}
 
