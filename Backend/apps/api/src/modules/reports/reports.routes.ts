@@ -21,7 +21,10 @@ export async function reportsRoutes(app: FastifyInstance) {
         });
 
         if (!caseRecord) {
-          return reply.status(404).send({ error: "Case not found" });
+          return reply.status(404).send({
+            error: "Case not found",
+            statusCode: 404,
+          });
         }
 
         // Generate PDF Buffer
@@ -73,7 +76,8 @@ export async function reportsRoutes(app: FastifyInstance) {
         app.log.error(err, `Failed to generate report for case ${caseId}`);
         return reply.status(500).send({
           error: "Failed to generate report",
-          details: err instanceof Error ? err.message : String(err),
+          message: err instanceof Error ? err.message : String(err),
+          statusCode: 500,
         });
       }
     }
@@ -97,7 +101,10 @@ export async function reportsRoutes(app: FastifyInstance) {
         return reply.send({ reports });
       } catch (err) {
         app.log.error(err, `Failed to fetch reports for case ${caseId}`);
-        return reply.status(500).send({ error: "Failed to fetch reports" });
+        return reply.status(500).send({
+          error: "Failed to fetch reports",
+          statusCode: 500,
+        });
       }
     }
   );

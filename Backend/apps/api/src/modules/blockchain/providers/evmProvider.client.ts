@@ -15,47 +15,74 @@ interface FetchTransfersParams {
   alchemyApiUrl: string;
 }
 
+const MAX_TRANSFERS_PER_DIRECTION = 5000;
+const FETCH_TIMEOUT_MS = 15_000;
+
 async function fetchTransfers(
   params: FetchTransfersParams,
   direction: "fromAddress" | "toAddress"
 ): Promise<RawTransfer[]> {
-  const response = await fetch(params.alchemyApiUrl, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: "2.0",
-      method: "alchemy_getAssetTransfers",
-      params: [
-        {
-          [direction]: params.address,
-          category: ["external", "erc20"],
-          withMetadata: true,
-          excludeZeroValue: true,
-        },
-      ],
-    }),
-  });
+  const allTransfers: RawTransfer[] = [];
+  let pageKey: string | undefined = undefined;
 
-  if (!response.ok) {
-    throw new Error(
-      `Alchemy request failed: ${response.status} ${response.statusText}`
-    );
-  }
+  do {
+    const payloadParams: Record<string, any> = {
+      [direction]: params.address,
+      category: ["external", "erc20"],
+      withMetadata: true,
+      excludeZeroValue: true,
+      maxCount: "0x3e8", // 1000 per page
+    };
 
-  const json = (await response.json()) as JsonRpcResponse<{
-    transfers: RawTransfer[];
-  }>;
+    if (pageKey) {
+      payloadParams.pageKey = pageKey;
+    }
 
-  if (json.error) {
-    throw new Error(
-      `Alchemy RPC error: ${json.error.message ?? "unknown error"}`
-    );
-  }
+    const response = await fetch(params.alchemyApiUrl, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: "2.0",
+        method: "alchemy_getAssetTransfers",
+        params: [payloadParams],
+      }),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
 
-  return json.result?.transfers ?? [];
+    if (!response.ok) {
+      throw new Error(
+        `Alchemy request failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const json = (await response.json()) as JsonRpcResponse<{
+      transfers: RawTransfer[];
+      pageKey?: string;
+    }>;
+
+    if (json.error) {
+      throw new Error(
+        `Alchemy RPC error: ${json.error.message ?? "unknown error"}`
+      );
+    }
+
+    const transfers = json.result?.transfers ?? [];
+    allTransfers.push(...transfers);
+
+    pageKey = json.result?.pageKey;
+
+    if (allTransfers.length >= MAX_TRANSFERS_PER_DIRECTION) {
+      console.warn(
+        `Alchemy transfer pagination capped at ${MAX_TRANSFERS_PER_DIRECTION} for ${direction} on ${params.address}`
+      );
+      break;
+    }
+  } while (pageKey);
+
+  return allTransfers;
 }
 
 export async function fetchWalletTransfers(

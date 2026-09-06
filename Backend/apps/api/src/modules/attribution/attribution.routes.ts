@@ -18,7 +18,10 @@ export const attributionRoutes: FastifyPluginAsync = async (app) => {
     });
 
     if (!caseRecord) {
-      return reply.status(404).send({ error: "Case not found" });
+      return reply.status(404).send({
+        error: "Case not found",
+        statusCode: 404,
+      });
     }
 
     const latestAnalysis = await app.prisma.analysisResult.findFirst({

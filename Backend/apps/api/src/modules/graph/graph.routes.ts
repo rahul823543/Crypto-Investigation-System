@@ -23,8 +23,9 @@ export async function graphRoutes(app: FastifyInstance) {
         });
 
         if (!caseRecord) {
-          return reply.code(404).send({
-            message: "Case not found",
+          return reply.status(404).send({
+            error: "Case not found",
+            statusCode: 404,
           });
         }
 
@@ -85,7 +86,10 @@ export async function graphRoutes(app: FastifyInstance) {
         });
       } catch (err) {
         app.log.error(err, "Failed to fetch graph");
-        return reply.status(500).send({ error: "Failed to fetch graph" });
+        return reply.status(500).send({
+          error: "Failed to fetch graph",
+          statusCode: 500,
+        });
       }
     }
   );

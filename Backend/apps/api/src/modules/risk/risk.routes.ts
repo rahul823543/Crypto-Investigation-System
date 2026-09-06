@@ -1,9 +1,14 @@
 import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 import type {
   RiskFinding,
   FindingSeverity,
   FindingSource,
 } from "@sih/shared-types";
+
+const listFindingsQuerySchema = z.object({
+  source: z.string().optional(),
+});
 
 export async function riskRoutes(app: FastifyInstance) {
   /**
@@ -15,17 +20,33 @@ export async function riskRoutes(app: FastifyInstance) {
     Params: { caseId: string };
     Querystring: { source?: string };
   }>("/cases/:caseId/findings", async (request, reply) => {
+    const queryResult = listFindingsQuerySchema.safeParse(request.query);
+
+    if (!queryResult.success) {
+      const fieldErrors = queryResult.error.flatten().fieldErrors;
+      const message =
+        Object.entries(fieldErrors)
+          .map(([field, errs]) => `${field}: ${errs?.join(", ")}`)
+          .join("; ") || "Invalid query parameters";
+      return reply.status(400).send({
+        error: "Invalid query parameters",
+        message,
+        statusCode: 400,
+      });
+    }
+
     try {
       const { caseId } = request.params;
-      const { source } = request.query;
+      const { source } = queryResult.data;
 
       const caseRecord = await app.prisma.case.findUnique({
         where: { id: caseId },
       });
 
       if (!caseRecord) {
-        return reply.code(404).send({
-          message: "Case not found",
+        return reply.status(404).send({
+          error: "Case not found",
+          statusCode: 404,
         });
       }
 
@@ -81,7 +102,10 @@ export async function riskRoutes(app: FastifyInstance) {
       });
     } catch (err) {
       app.log.error(err, "Failed to fetch risk findings");
-      return reply.status(500).send({ error: "Failed to fetch risk findings" });
+      return reply.status(500).send({
+        error: "Failed to fetch risk findings",
+        statusCode: 500,
+      });
     }
   });
 }

@@ -130,8 +130,8 @@ export async function generateReportPdf(
     doc.text(`• Network Chain ID: ${caseRecord.chainId}`);
     doc.text(`• Investigation Mode: ${caseRecord.mode.toUpperCase()}`);
     doc.text(`• Status: ${caseRecord.status}`);
-    doc.text(`• Created At: ${caseRecord.createdAt.toISOString()}`);
-    doc.text(`• Updated At: ${caseRecord.updatedAt.toISOString()}`);
+    doc.text(`• Created At: ${caseRecord.createdAt ? new Date(caseRecord.createdAt).toISOString() : new Date().toISOString()}`);
+    doc.text(`• Updated At: ${caseRecord.updatedAt ? new Date(caseRecord.updatedAt).toISOString() : new Date().toISOString()}`);
 
     doc
       .text("• Risk Assessment: ", { continued: true })

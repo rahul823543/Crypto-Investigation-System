@@ -6,6 +6,7 @@ import { ethers } from "ethers";
  */
 export const EVIDENCE_ABI = [
   "function storeEvidence(string caseId, bytes32 reportHash)",
+  "function getEvidence(string caseId) view returns (bytes32)",
 ];
 
 export interface EvidenceClientConfig {
@@ -55,3 +56,38 @@ export async function storeEvidenceOnChain(
   const tx = await contract.storeEvidence(caseId, reportHash);
   return { transactionHash: tx.hash };
 }
+
+/**
+ * Reads report hash on-chain for a given case.
+ * Throws a descriptive error if contract address or RPC URL are not configured.
+ */
+export async function getEvidenceOnChain(
+  caseId: string,
+  config?: EvidenceClientConfig
+): Promise<string | null> {
+  const contractAddress =
+    config?.contractAddress ?? process.env.EVIDENCE_CONTRACT_ADDRESS;
+  const rpcUrl =
+    config?.rpcUrl ?? process.env.EVIDENCE_RPC_URL;
+  const chainId =
+    config?.chainId ??
+    (process.env.EVIDENCE_CHAIN_ID
+      ? Number(process.env.EVIDENCE_CHAIN_ID)
+      : undefined);
+
+  if (!contractAddress || !rpcUrl) {
+    throw new Error(
+      "Evidence integration not configured: EVIDENCE_CONTRACT_ADDRESS and EVIDENCE_RPC_URL are required"
+    );
+  }
+
+  const provider = new ethers.JsonRpcProvider(rpcUrl, chainId);
+  const contract = new ethers.Contract(contractAddress, EVIDENCE_ABI, provider);
+
+  const reportHash: string = await contract.getEvidence(caseId);
+  if (!reportHash || reportHash === ethers.ZeroHash) {
+    return null;
+  }
+  return reportHash;
+}
+

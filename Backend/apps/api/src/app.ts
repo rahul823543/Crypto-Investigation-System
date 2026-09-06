@@ -38,5 +38,24 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(attributionRoutes);
   await app.register(evidenceRoutes);
 
+  app.setErrorHandler((error: any, request, reply) => {
+    const statusCode =
+      error.statusCode && error.statusCode >= 400 ? error.statusCode : 500;
+    app.log.error(error);
+    reply.status(statusCode).send({
+      error: error.name || "Internal Server Error",
+      message: error.message,
+      statusCode,
+    });
+  });
+
+  app.setNotFoundHandler((request, reply) => {
+    reply.status(404).send({
+      error: "Not Found",
+      message: `Route ${request.method}:${request.url} not found`,
+      statusCode: 404,
+    });
+  });
+
   return app;
 }

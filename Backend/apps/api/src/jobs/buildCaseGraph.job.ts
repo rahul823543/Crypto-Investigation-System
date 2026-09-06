@@ -103,97 +103,107 @@ export function createBuildGraphWorker(
 
         const { riskScore, riskLevel } = calculateRiskScore(findings);
 
-        await prisma.$transaction(async (tx) => {
-          if (nodes.length > 0) {
-            await tx.graphNode.createMany({
-              data: nodes.map((node) => ({
-                id: node.id,
-                caseId,
-                address: node.address,
-                type: node.type,
-                labelsJson: JSON.stringify(node.labels),
-                riskLevel: node.riskLevel,
-                totalInUsd: node.totalInUsd,
-                totalOutUsd: node.totalOutUsd,
-                isTraceableDeadEnd: node.isTraceableDeadEnd,
-                outDegree: node.outDegree,
-              })),
-              skipDuplicates: true,
-            });
-          }
+        await prisma.$transaction(
+          async (tx) => {
+            if (nodes.length > 0) {
+              await tx.graphNode.createMany({
+                data: nodes.map((node) => ({
+                  id: node.id,
+                  caseId,
+                  address: node.address,
+                  type: node.type,
+                  labelsJson: JSON.stringify(node.labels),
+                  riskLevel: node.riskLevel,
+                  totalInUsd: node.totalInUsd,
+                  totalOutUsd: node.totalOutUsd,
+                  isTraceableDeadEnd: node.isTraceableDeadEnd,
+                  outDegree: node.outDegree,
+                })),
+                skipDuplicates: true,
+              });
+            }
 
-          if (edges.length > 0) {
-            await tx.graphEdge.createMany({
-              data: edges.map((edge) => ({
-                id: edge.id,
-                caseId,
-                fromNodeId: edge.fromNodeId,
-                toNodeId: edge.toNodeId,
-                transactionHash: edge.transactionHash,
-                asset: edge.asset,
-                amount: edge.amount,
-                amountUsd: edge.amountUsd,
-                timestamp: new Date(edge.timestamp),
-                hopDepth: edge.hopDepth,
-                riskLevel: edge.riskLevel,
-              })),
-              skipDuplicates: true,
-            });
-          }
+            if (edges.length > 0) {
+              const EDGE_CHUNK_SIZE = 500;
+              for (let i = 0; i < edges.length; i += EDGE_CHUNK_SIZE) {
+                const chunk = edges.slice(i, i + EDGE_CHUNK_SIZE);
+                await tx.graphEdge.createMany({
+                  data: chunk.map((edge) => ({
+                    id: edge.id,
+                    caseId,
+                    fromNodeId: edge.fromNodeId,
+                    toNodeId: edge.toNodeId,
+                    transactionHash: edge.transactionHash,
+                    asset: edge.asset,
+                    amount: edge.amount,
+                    amountUsd: edge.amountUsd,
+                    timestamp: new Date(edge.timestamp),
+                    hopDepth: edge.hopDepth,
+                    riskLevel: edge.riskLevel,
+                  })),
+                  skipDuplicates: true,
+                });
+              }
+            }
 
-          if (findings.length > 0) {
-            await tx.riskFinding.createMany({
-              data: findings.map((f) => ({
-                id: f.id,
-                caseId,
-                source: f.source,
-                type: f.type,
-                severity: f.severity,
-                confidence: f.confidence,
-                title: f.title,
-                description: f.description,
-                relatedNodeIdsJson: JSON.stringify(f.relatedNodeIds),
-                relatedEdgeIdsJson: JSON.stringify(f.relatedEdgeIds),
-                signalsJson: JSON.stringify(f.signals),
-              })),
-              skipDuplicates: true,
-            });
-          }
+            if (findings.length > 0) {
+              await tx.riskFinding.createMany({
+                data: findings.map((f) => ({
+                  id: f.id,
+                  caseId,
+                  source: f.source,
+                  type: f.type,
+                  severity: f.severity,
+                  confidence: f.confidence,
+                  title: f.title,
+                  description: f.description,
+                  relatedNodeIdsJson: JSON.stringify(f.relatedNodeIds),
+                  relatedEdgeIdsJson: JSON.stringify(f.relatedEdgeIds),
+                  signalsJson: JSON.stringify(f.signals),
+                })),
+                skipDuplicates: true,
+              });
+            }
 
-          // Step 8: Upsert unique addresses into Wallet table
-          for (const node of nodes) {
-            const labelStr = node.labels.length > 0 ? node.labels.join(", ") : null;
-            await tx.wallet.upsert({
-              where: {
-                address_chainId: {
+            // Step 8: Upsert unique addresses into Wallet table
+            for (const node of nodes) {
+              const labelStr = node.labels.length > 0 ? node.labels.join(", ") : null;
+              await tx.wallet.upsert({
+                where: {
+                  address_chainId: {
+                    address: node.address,
+                    chainId: caseRecord.chainId,
+                  },
+                },
+                create: {
                   address: node.address,
                   chainId: caseRecord.chainId,
+                  label: labelStr,
+                  type: node.type,
+                  riskLevel: node.riskLevel,
                 },
-              },
-              create: {
-                address: node.address,
-                chainId: caseRecord.chainId,
-                label: labelStr,
-                type: node.type,
-                riskLevel: node.riskLevel,
-              },
-              update: {
-                label: labelStr,
-                type: node.type,
-                riskLevel: node.riskLevel,
+                update: {
+                  label: labelStr,
+                  type: node.type,
+                  riskLevel: node.riskLevel,
+                },
+              });
+            }
+
+            await tx.case.update({
+              where: { id: caseId },
+              data: {
+                status: "graph_ready",
+                riskScore,
+                riskLevel,
               },
             });
+          },
+          {
+            maxWait: 30000,
+            timeout: 60000,
           }
-
-          await tx.case.update({
-            where: { id: caseId },
-            data: {
-              status: "graph_ready",
-              riskScore,
-              riskLevel,
-            },
-          });
-        });
+        );
       } catch (err) {
         const isLastAttempt =
           job.attemptsMade + 1 >= (job.opts.attempts ?? 1);

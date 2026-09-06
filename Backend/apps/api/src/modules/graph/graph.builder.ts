@@ -82,7 +82,7 @@ export async function buildGraph(
       if (!labels.includes(cleanLabel)) labels.push(cleanLabel);
     }
 
-    const nodeId = `${type}:${addr}`;
+    const nodeId = `${caseId}:${type}:${addr}`;
 
     nodeMap.set(addr, {
       id: nodeId,
@@ -168,7 +168,7 @@ export async function buildGraph(
     const index = txCountMap.get(txHash) ?? 0;
     txCountMap.set(txHash, index + 1);
 
-    const edgeId = `edge:${txHash}:${index}`;
+    const edgeId = `${caseId}:edge:${txHash}:${index}`;
 
     const fromDepth = hopDepthMap.get(fromAddr) ?? 0;
     const hopDepth = fromDepth + 1;

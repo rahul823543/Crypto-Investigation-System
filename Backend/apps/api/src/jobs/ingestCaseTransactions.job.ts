@@ -38,25 +38,29 @@ async function persistTransactions(
 ) {
   if (transactions.length === 0) return;
 
-  await prisma.transaction.createMany({
-    data: transactions.map((tx) => ({
-      caseId,
-      hash: tx.hash,
-      chainId: tx.chainId,
-      blockNumber: tx.blockNumber,
-      fromAddress: tx.from,
-      toAddress: tx.to,
-      asset: tx.asset,
-      tokenAddress: tx.tokenAddress,
-      amount: tx.amount,
-      amountUsd: tx.amountUsd,
-      timestamp: new Date(tx.timestamp),
-      transferType: tx.transferType,
-      method: tx.method,
-      rawProviderRef: tx.rawProviderRef ?? null,
-    })),
-    skipDuplicates: true,
-  });
+  const BATCH_SIZE = 500;
+  for (let i = 0; i < transactions.length; i += BATCH_SIZE) {
+    const chunk = transactions.slice(i, i + BATCH_SIZE);
+    await prisma.transaction.createMany({
+      data: chunk.map((tx) => ({
+        caseId,
+        hash: tx.hash,
+        chainId: tx.chainId,
+        blockNumber: tx.blockNumber,
+        fromAddress: tx.from,
+        toAddress: tx.to,
+        asset: tx.asset,
+        tokenAddress: tx.tokenAddress,
+        amount: tx.amount,
+        amountUsd: tx.amountUsd,
+        timestamp: new Date(tx.timestamp),
+        transferType: tx.transferType,
+        method: tx.method,
+        rawProviderRef: tx.rawProviderRef ?? null,
+      })),
+      skipDuplicates: true,
+    });
+  }
 }
 
 export function createIngestWorker(

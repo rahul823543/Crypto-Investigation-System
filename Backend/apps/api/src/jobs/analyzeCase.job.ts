@@ -88,7 +88,7 @@ export function createAnalyzeWorker(
           address: n.address,
           type: n.type as any,
           labels: JSON.parse(n.labelsJson || "[]"),
-          riskLevel: n.riskLevel as RiskLevel | null,
+          riskLevel: (n.riskLevel as RiskLevel) ?? "low",
           totalInUsd: n.totalInUsd,
           totalOutUsd: n.totalOutUsd,
           isTraceableDeadEnd: n.isTraceableDeadEnd,
@@ -101,13 +101,15 @@ export function createAnalyzeWorker(
           caseId: e.caseId,
           fromNodeId: e.fromNodeId,
           toNodeId: e.toNodeId,
+          from: e.fromNodeId,
+          to: e.toNodeId,
           transactionHash: e.transactionHash,
           asset: e.asset,
           amount: e.amount,
-          amountUsd: e.amountUsd,
+          amountUsd: e.amountUsd ?? 0.0,
           timestamp: e.timestamp.toISOString(),
           hopDepth: e.hopDepth,
-          riskLevel: e.riskLevel as RiskLevel | null,
+          riskLevel: (e.riskLevel as RiskLevel) ?? "low",
           createdAt: e.createdAt.toISOString(),
         }));
 
@@ -122,7 +124,7 @@ export function createAnalyzeWorker(
           asset: tx.asset,
           tokenAddress: tx.tokenAddress,
           amount: tx.amount,
-          amountUsd: tx.amountUsd,
+          amountUsd: tx.amountUsd ?? 0.0,
           timestamp: tx.timestamp.toISOString(),
           transferType: tx.transferType as TransferType,
           method: tx.method,
@@ -159,7 +161,20 @@ export function createAnalyzeWorker(
 
         const validatedPayload = validatePreAnalysisRequest(rawPayload);
 
-        const rawResponse = await analyzeCase(validatedPayload, intelligenceApiUrl);
+        // Translation at the Python request boundary: send `from`/`to` instead of `fromNodeId`/`toNodeId`
+        const outgoingPayload = {
+          ...validatedPayload,
+          edges: validatedPayload.edges.map((e) => {
+            const { fromNodeId, toNodeId, ...rest } = e;
+            return {
+              ...rest,
+              from: e.from ?? fromNodeId,
+              to: e.to ?? toNodeId,
+            };
+          }),
+        };
+
+        const rawResponse = await analyzeCase(outgoingPayload as any, intelligenceApiUrl);
 
         // Validate response referential integrity before persisting anything
         const sentGraph = {

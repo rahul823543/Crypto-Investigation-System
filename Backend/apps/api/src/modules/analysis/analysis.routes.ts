@@ -20,9 +20,14 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
     const bodyResult = triggerAnalysisSchema.safeParse(request.body ?? {});
 
     if (!bodyResult.success) {
+      const fieldErrors = bodyResult.error.flatten().fieldErrors;
+      const message = Object.entries(fieldErrors)
+        .map(([field, errs]) => `${field}: ${errs?.join(", ")}`)
+        .join("; ") || "Validation failed";
       return reply.status(400).send({
         error: "Invalid request payload",
-        details: bodyResult.error.flatten().fieldErrors,
+        message,
+        statusCode: 400,
       });
     }
 
@@ -33,12 +38,16 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
     });
 
     if (!caseRecord) {
-      return reply.status(404).send({ error: "Case not found" });
+      return reply.status(404).send({
+        error: "Case not found",
+        statusCode: 404,
+      });
     }
 
     if (caseRecord.status !== "graph_ready" && caseRecord.status !== "analyzed") {
       return reply.status(409).send({
         error: `Case must be in 'graph_ready' or 'analyzed' state to analyze (current: ${caseRecord.status})`,
+        statusCode: 409,
       });
     }
 
@@ -73,7 +82,10 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
     });
 
     if (!caseRecord) {
-      return reply.status(404).send({ error: "Case not found" });
+      return reply.status(404).send({
+        error: "Case not found",
+        statusCode: 404,
+      });
     }
 
     const latestAnalysis = await app.prisma.analysisResult.findFirst({
@@ -82,12 +94,14 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
     });
 
     if (!latestAnalysis) {
-      return reply.status(404).send({
-        error: "No analysis results found for this case",
+      return reply.status(200).send({
+        status: "pending",
+        analysis: null,
+        message: "Analysis has not been run yet",
       });
     }
 
-    return reply.status(200).send({
+    const analysis = {
       analysisId: latestAnalysis.id,
       caseId: latestAnalysis.caseId,
       analysisRequestId: latestAnalysis.analysisRequestId,
@@ -100,6 +114,12 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
         : null,
       metadata: JSON.parse(latestAnalysis.metadataJson || "{}"),
       createdAt: latestAnalysis.createdAt.toISOString(),
+    };
+
+    return reply.status(200).send({
+      status: "complete",
+      analysis,
+      ...analysis,
     });
   });
 };
