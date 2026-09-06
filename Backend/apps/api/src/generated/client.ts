@@ -71,3 +71,8 @@ export type GraphEdge = Prisma.GraphEdgeModel
  * 
  */
 export type RiskFinding = Prisma.RiskFindingModel
+/**
+ * Model Report
+ * 
+ */
+export type Report = Prisma.ReportModel

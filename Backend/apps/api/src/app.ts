@@ -9,6 +9,7 @@ import { graphRoutes } from "./modules/graph/graph.routes.js";
 import { riskRoutes } from "./modules/risk/risk.routes.js";
 import healthRoutes from "./modules/health/health.routes.js";
 import demoRoutes from "./demo/demo.routes.js";
+import { reportsRoutes } from "./modules/reports/reports.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const env = loadEnv();
@@ -29,6 +30,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(riskRoutes);
   await app.register(healthRoutes);
   await app.register(demoRoutes);
+  await app.register(reportsRoutes);
 
   return app;
 }

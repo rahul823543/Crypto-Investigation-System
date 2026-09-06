@@ -56,7 +56,8 @@ export const ModelName = {
   Transaction: 'Transaction',
   GraphNode: 'GraphNode',
   GraphEdge: 'GraphEdge',
-  RiskFinding: 'RiskFinding'
+  RiskFinding: 'RiskFinding',
+  Report: 'Report'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -174,6 +175,19 @@ export const RiskFindingScalarFieldEnum = {
 } as const
 
 export type RiskFindingScalarFieldEnum = (typeof RiskFindingScalarFieldEnum)[keyof typeof RiskFindingScalarFieldEnum]
+
+
+export const ReportScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  status: 'status',
+  filePath: 'filePath',
+  sha256Hash: 'sha256Hash',
+  generatedAt: 'generatedAt',
+  version: 'version'
+} as const
+
+export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
 
 
 export const SortOrder = {

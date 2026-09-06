@@ -23,6 +23,7 @@ model Case {
   graphNodes   GraphNode[]
   graphEdges   GraphEdge[]
   riskFindings RiskFinding[]
+  reports      Report[]
 }
 
 model Wallet {
@@ -113,6 +114,20 @@ model RiskFinding {
   relatedEdgeIdsJson String
   signalsJson        String
   createdAt          DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+}
+
+model Report {
+  id          String    @id @default(cuid())
+  caseId      String
+  status      String    @default("generated")
+  filePath    String?
+  sha256Hash  String
+  generatedAt DateTime  @default(now())
+  version     Int       @default(1)
 
   case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
