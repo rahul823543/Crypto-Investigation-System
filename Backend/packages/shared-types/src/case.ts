@@ -14,7 +14,7 @@ export type CaseStatus =
   | "completed"
   | "failed"
   | "demo_fallback_used";
-import type { RiskLevel } from "./graph";
+export type RiskLevel = "low" | "medium" | "high" | "critical";
 
 export interface Case {
   id: string;

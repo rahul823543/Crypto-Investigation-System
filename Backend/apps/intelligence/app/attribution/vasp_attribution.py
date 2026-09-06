@@ -1,4 +1,4 @@
-﻿"""
+"""
 app/attribution/vasp_attribution.py
 -------------------------------------
 v3 Phase 4: Nearest-VASP attribution per BACKEND_PLAN_v3 §7.
@@ -76,6 +76,10 @@ def _vasp_name_for_node(G: nx.MultiDiGraph, node_id: str) -> str:
     name = node_data.get("vaspName") or node_data.get("name")
     if name:
         return str(name)
+    # Check labels for specific exchange name (e.g. "binance", "coinbase", "kraken")
+    labels = [l for l in node_data.get("labels", []) if l.lower() not in VASP_LABELS]
+    if labels:
+        return labels[0].capitalize()
     # Fallback: derive from the node ID address prefix
     address = node_data.get("address", node_id)
     return f"Unknown VASP ({address[:8]}...)"

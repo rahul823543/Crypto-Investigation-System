@@ -1,0 +1,197 @@
+{
+  "caseId": "case_fixture_dex_bridge",
+  "analysisRequestId": "req_fixture_dex_bridge_001",
+  "rootAddress": "0xaaaa333344445555666677778888999900001111",
+  "minConfidence": 0.15,
+  "decayFactor": 0.65,
+  "hardCeilingDepth": 10,
+  "hubThreshold": 500,
+  "nodes": [
+    {
+      "id": "wallet:0xaaaa333344445555666677778888999900001111",
+      "address": "0xaaaa333344445555666677778888999900001111",
+      "type": "wallet",
+      "labels": ["root"],
+      "riskLevel": "high",
+      "totalInUsd": 12000.0,
+      "totalOutUsd": 12000.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "address": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "type": "dex",
+      "labels": ["dex", "quickswap"],
+      "riskLevel": "low",
+      "totalInUsd": 12000.0,
+      "totalOutUsd": 11950.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "bridge:0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "address": "0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "type": "bridge",
+      "labels": ["bridge", "polygon-pos"],
+      "riskLevel": "low",
+      "totalInUsd": 11950.0,
+      "totalOutUsd": 11950.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "wallet:0xdddd111111111111111111111111111111111111",
+      "address": "0xdddd111111111111111111111111111111111111",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 11950.0,
+      "totalOutUsd": 11900.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "vasp:0x28c6c06298d514db089934071355e5743bf21d60",
+      "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+      "type": "vasp",
+      "labels": ["vasp", "binance"],
+      "riskLevel": "low",
+      "totalInUsd": 11900.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": true,
+      "outDegree": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:0x3333000000000000000000000000000000000000000000000000000000000001:0",
+      "from": "wallet:0xaaaa333344445555666677778888999900001111",
+      "to": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "transactionHash": "0x3333000000000000000000000000000000000000000000000000000000000001",
+      "asset": "USDC",
+      "amount": "12000.00",
+      "amountUsd": 12000.0,
+      "timestamp": "2026-08-25T12:00:00.000Z",
+      "hopDepth": 1,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0x3333000000000000000000000000000000000000000000000000000000000002:0",
+      "from": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "to": "bridge:0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "transactionHash": "0x3333000000000000000000000000000000000000000000000000000000000002",
+      "asset": "USDC",
+      "amount": "11950.00",
+      "amountUsd": 11950.0,
+      "timestamp": "2026-08-25T12:05:00.000Z",
+      "hopDepth": 2,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0x3333000000000000000000000000000000000000000000000000000000000003:0",
+      "from": "bridge:0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "to": "wallet:0xdddd111111111111111111111111111111111111",
+      "transactionHash": "0x3333000000000000000000000000000000000000000000000000000000000003",
+      "asset": "USDC",
+      "amount": "11950.00",
+      "amountUsd": 11950.0,
+      "timestamp": "2026-08-25T12:15:00.000Z",
+      "hopDepth": 3,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0x3333000000000000000000000000000000000000000000000000000000000004:0",
+      "from": "wallet:0xdddd111111111111111111111111111111111111",
+      "to": "vasp:0x28c6c06298d514db089934071355e5743bf21d60",
+      "transactionHash": "0x3333000000000000000000000000000000000000000000000000000000000004",
+      "asset": "USDC",
+      "amount": "11900.00",
+      "amountUsd": 11900.0,
+      "timestamp": "2026-08-25T12:20:00.000Z",
+      "hopDepth": 4,
+      "riskLevel": "high"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_hop_001",
+      "caseId": "case_fixture_dex_bridge",
+      "hash": "0x3333000000000000000000000000000000000000000000000000000000000001",
+      "chainId": 80002,
+      "blockNumber": 8800001,
+      "from": "0xaaaa333344445555666677778888999900001111",
+      "to": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "asset": "USDC",
+      "amount": "12000.00",
+      "amountUsd": 12000.0,
+      "timestamp": "2026-08-25T12:00:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_hop_002",
+      "caseId": "case_fixture_dex_bridge",
+      "hash": "0x3333000000000000000000000000000000000000000000000000000000000002",
+      "chainId": 80002,
+      "blockNumber": 8800010,
+      "from": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "to": "0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "asset": "USDC",
+      "amount": "11950.00",
+      "amountUsd": 11950.0,
+      "timestamp": "2026-08-25T12:05:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_hop_003",
+      "caseId": "case_fixture_dex_bridge",
+      "hash": "0x3333000000000000000000000000000000000000000000000000000000000003",
+      "chainId": 80002,
+      "blockNumber": 8800020,
+      "from": "0x40ec5b33f54e0e8a33a975908c5ba1c14e5bbbdf",
+      "to": "0xdddd111111111111111111111111111111111111",
+      "asset": "USDC",
+      "amount": "11950.00",
+      "amountUsd": 11950.0,
+      "timestamp": "2026-08-25T12:15:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_hop_004",
+      "caseId": "case_fixture_dex_bridge",
+      "hash": "0x3333000000000000000000000000000000000000000000000000000000000004",
+      "chainId": 80002,
+      "blockNumber": 8800030,
+      "from": "0xdddd111111111111111111111111111111111111",
+      "to": "0x28c6c06298d514db089934071355e5743bf21d60",
+      "asset": "USDC",
+      "amount": "11900.00",
+      "amountUsd": 11900.0,
+      "timestamp": "2026-08-25T12:20:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    }
+  ],
+  "basicFindings": [
+    {
+      "id": "finding_hop_001",
+      "caseId": "case_fixture_dex_bridge",
+      "source": "basic-risk",
+      "type": "vasp_direct_touch",
+      "severity": "medium",
+      "confidence": 0.85,
+      "title": "VASP Deposit Detected Along Path",
+      "description": "Funds routed through DEX and Bridge reached Binance deposit address.",
+      "relatedNodeIds": [
+        "vasp:0x28c6c06298d514db089934071355e5743bf21d60"
+      ],
+      "relatedEdgeIds": [
+        "edge:0x3333000000000000000000000000000000000000000000000000000000000004:0"
+      ],
+      "signals": ["vasp_touch", "off_ramp"]
+    }
+  ]
+}
