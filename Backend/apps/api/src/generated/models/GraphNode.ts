@@ -29,11 +29,13 @@ export type AggregateGraphNode = {
 export type GraphNodeAvgAggregateOutputType = {
   totalInUsd: number | null
   totalOutUsd: number | null
+  outDegree: number | null
 }
 
 export type GraphNodeSumAggregateOutputType = {
   totalInUsd: number | null
   totalOutUsd: number | null
+  outDegree: number | null
 }
 
 export type GraphNodeMinAggregateOutputType = {
@@ -45,6 +47,8 @@ export type GraphNodeMinAggregateOutputType = {
   riskLevel: string | null
   totalInUsd: number | null
   totalOutUsd: number | null
+  isTraceableDeadEnd: boolean | null
+  outDegree: number | null
   createdAt: Date | null
 }
 
@@ -57,6 +61,8 @@ export type GraphNodeMaxAggregateOutputType = {
   riskLevel: string | null
   totalInUsd: number | null
   totalOutUsd: number | null
+  isTraceableDeadEnd: boolean | null
+  outDegree: number | null
   createdAt: Date | null
 }
 
@@ -69,6 +75,8 @@ export type GraphNodeCountAggregateOutputType = {
   riskLevel: number
   totalInUsd: number
   totalOutUsd: number
+  isTraceableDeadEnd: number
+  outDegree: number
   createdAt: number
   _all: number
 }
@@ -77,11 +85,13 @@ export type GraphNodeCountAggregateOutputType = {
 export type GraphNodeAvgAggregateInputType = {
   totalInUsd?: true
   totalOutUsd?: true
+  outDegree?: true
 }
 
 export type GraphNodeSumAggregateInputType = {
   totalInUsd?: true
   totalOutUsd?: true
+  outDegree?: true
 }
 
 export type GraphNodeMinAggregateInputType = {
@@ -93,6 +103,8 @@ export type GraphNodeMinAggregateInputType = {
   riskLevel?: true
   totalInUsd?: true
   totalOutUsd?: true
+  isTraceableDeadEnd?: true
+  outDegree?: true
   createdAt?: true
 }
 
@@ -105,6 +117,8 @@ export type GraphNodeMaxAggregateInputType = {
   riskLevel?: true
   totalInUsd?: true
   totalOutUsd?: true
+  isTraceableDeadEnd?: true
+  outDegree?: true
   createdAt?: true
 }
 
@@ -117,6 +131,8 @@ export type GraphNodeCountAggregateInputType = {
   riskLevel?: true
   totalInUsd?: true
   totalOutUsd?: true
+  isTraceableDeadEnd?: true
+  outDegree?: true
   createdAt?: true
   _all?: true
 }
@@ -216,6 +232,8 @@ export type GraphNodeGroupByOutputType = {
   riskLevel: string | null
   totalInUsd: number | null
   totalOutUsd: number | null
+  isTraceableDeadEnd: boolean
+  outDegree: number
   createdAt: Date
   _count: GraphNodeCountAggregateOutputType | null
   _avg: GraphNodeAvgAggregateOutputType | null
@@ -251,6 +269,8 @@ export type GraphNodeWhereInput = {
   riskLevel?: Prisma.StringNullableFilter<"GraphNode"> | string | null
   totalInUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
   totalOutUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
+  isTraceableDeadEnd?: Prisma.BoolFilter<"GraphNode"> | boolean
+  outDegree?: Prisma.IntFilter<"GraphNode"> | number
   createdAt?: Prisma.DateTimeFilter<"GraphNode"> | Date | string
   case?: Prisma.XOR<Prisma.CaseScalarRelationFilter, Prisma.CaseWhereInput>
   outgoingEdges?: Prisma.GraphEdgeListRelationFilter
@@ -266,6 +286,8 @@ export type GraphNodeOrderByWithRelationInput = {
   riskLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   totalInUsd?: Prisma.SortOrderInput | Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  isTraceableDeadEnd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   case?: Prisma.CaseOrderByWithRelationInput
   outgoingEdges?: Prisma.GraphEdgeOrderByRelationAggregateInput
@@ -285,6 +307,8 @@ export type GraphNodeWhereUniqueInput = Prisma.AtLeast<{
   riskLevel?: Prisma.StringNullableFilter<"GraphNode"> | string | null
   totalInUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
   totalOutUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
+  isTraceableDeadEnd?: Prisma.BoolFilter<"GraphNode"> | boolean
+  outDegree?: Prisma.IntFilter<"GraphNode"> | number
   createdAt?: Prisma.DateTimeFilter<"GraphNode"> | Date | string
   case?: Prisma.XOR<Prisma.CaseScalarRelationFilter, Prisma.CaseWhereInput>
   outgoingEdges?: Prisma.GraphEdgeListRelationFilter
@@ -300,6 +324,8 @@ export type GraphNodeOrderByWithAggregationInput = {
   riskLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   totalInUsd?: Prisma.SortOrderInput | Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrderInput | Prisma.SortOrder
+  isTraceableDeadEnd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.GraphNodeCountOrderByAggregateInput
   _avg?: Prisma.GraphNodeAvgOrderByAggregateInput
@@ -320,6 +346,8 @@ export type GraphNodeScalarWhereWithAggregatesInput = {
   riskLevel?: Prisma.StringNullableWithAggregatesFilter<"GraphNode"> | string | null
   totalInUsd?: Prisma.FloatNullableWithAggregatesFilter<"GraphNode"> | number | null
   totalOutUsd?: Prisma.FloatNullableWithAggregatesFilter<"GraphNode"> | number | null
+  isTraceableDeadEnd?: Prisma.BoolWithAggregatesFilter<"GraphNode"> | boolean
+  outDegree?: Prisma.IntWithAggregatesFilter<"GraphNode"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"GraphNode"> | Date | string
 }
 
@@ -331,6 +359,8 @@ export type GraphNodeCreateInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   case: Prisma.CaseCreateNestedOneWithoutGraphNodesInput
   outgoingEdges?: Prisma.GraphEdgeCreateNestedManyWithoutFromNodeInput
@@ -346,6 +376,8 @@ export type GraphNodeUncheckedCreateInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutFromNodeInput
   incomingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutToNodeInput
@@ -359,6 +391,8 @@ export type GraphNodeUpdateInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   case?: Prisma.CaseUpdateOneRequiredWithoutGraphNodesNestedInput
   outgoingEdges?: Prisma.GraphEdgeUpdateManyWithoutFromNodeNestedInput
@@ -374,6 +408,8 @@ export type GraphNodeUncheckedUpdateInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutFromNodeNestedInput
   incomingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutToNodeNestedInput
@@ -388,6 +424,8 @@ export type GraphNodeCreateManyInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
 }
 
@@ -399,6 +437,8 @@ export type GraphNodeUpdateManyMutationInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -411,6 +451,8 @@ export type GraphNodeUncheckedUpdateManyInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -438,12 +480,15 @@ export type GraphNodeCountOrderByAggregateInput = {
   riskLevel?: Prisma.SortOrder
   totalInUsd?: Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrder
+  isTraceableDeadEnd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type GraphNodeAvgOrderByAggregateInput = {
   totalInUsd?: Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
 }
 
 export type GraphNodeMaxOrderByAggregateInput = {
@@ -455,6 +500,8 @@ export type GraphNodeMaxOrderByAggregateInput = {
   riskLevel?: Prisma.SortOrder
   totalInUsd?: Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrder
+  isTraceableDeadEnd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -467,12 +514,15 @@ export type GraphNodeMinOrderByAggregateInput = {
   riskLevel?: Prisma.SortOrder
   totalInUsd?: Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrder
+  isTraceableDeadEnd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type GraphNodeSumOrderByAggregateInput = {
   totalInUsd?: Prisma.SortOrder
   totalOutUsd?: Prisma.SortOrder
+  outDegree?: Prisma.SortOrder
 }
 
 export type GraphNodeScalarRelationFilter = {
@@ -522,6 +572,10 @@ export type GraphNodeUncheckedUpdateManyWithoutCaseNestedInput = {
   deleteMany?: Prisma.GraphNodeScalarWhereInput | Prisma.GraphNodeScalarWhereInput[]
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type GraphNodeCreateNestedOneWithoutOutgoingEdgesInput = {
   create?: Prisma.XOR<Prisma.GraphNodeCreateWithoutOutgoingEdgesInput, Prisma.GraphNodeUncheckedCreateWithoutOutgoingEdgesInput>
   connectOrCreate?: Prisma.GraphNodeCreateOrConnectWithoutOutgoingEdgesInput
@@ -558,6 +612,8 @@ export type GraphNodeCreateWithoutCaseInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   outgoingEdges?: Prisma.GraphEdgeCreateNestedManyWithoutFromNodeInput
   incomingEdges?: Prisma.GraphEdgeCreateNestedManyWithoutToNodeInput
@@ -571,6 +627,8 @@ export type GraphNodeUncheckedCreateWithoutCaseInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutFromNodeInput
   incomingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutToNodeInput
@@ -614,6 +672,8 @@ export type GraphNodeScalarWhereInput = {
   riskLevel?: Prisma.StringNullableFilter<"GraphNode"> | string | null
   totalInUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
   totalOutUsd?: Prisma.FloatNullableFilter<"GraphNode"> | number | null
+  isTraceableDeadEnd?: Prisma.BoolFilter<"GraphNode"> | boolean
+  outDegree?: Prisma.IntFilter<"GraphNode"> | number
   createdAt?: Prisma.DateTimeFilter<"GraphNode"> | Date | string
 }
 
@@ -625,6 +685,8 @@ export type GraphNodeCreateWithoutOutgoingEdgesInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   case: Prisma.CaseCreateNestedOneWithoutGraphNodesInput
   incomingEdges?: Prisma.GraphEdgeCreateNestedManyWithoutToNodeInput
@@ -639,6 +701,8 @@ export type GraphNodeUncheckedCreateWithoutOutgoingEdgesInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   incomingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutToNodeInput
 }
@@ -656,6 +720,8 @@ export type GraphNodeCreateWithoutIncomingEdgesInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   case: Prisma.CaseCreateNestedOneWithoutGraphNodesInput
   outgoingEdges?: Prisma.GraphEdgeCreateNestedManyWithoutFromNodeInput
@@ -670,6 +736,8 @@ export type GraphNodeUncheckedCreateWithoutIncomingEdgesInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutFromNodeInput
 }
@@ -698,6 +766,8 @@ export type GraphNodeUpdateWithoutOutgoingEdgesInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   case?: Prisma.CaseUpdateOneRequiredWithoutGraphNodesNestedInput
   incomingEdges?: Prisma.GraphEdgeUpdateManyWithoutToNodeNestedInput
@@ -712,6 +782,8 @@ export type GraphNodeUncheckedUpdateWithoutOutgoingEdgesInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   incomingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutToNodeNestedInput
 }
@@ -735,6 +807,8 @@ export type GraphNodeUpdateWithoutIncomingEdgesInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   case?: Prisma.CaseUpdateOneRequiredWithoutGraphNodesNestedInput
   outgoingEdges?: Prisma.GraphEdgeUpdateManyWithoutFromNodeNestedInput
@@ -749,6 +823,8 @@ export type GraphNodeUncheckedUpdateWithoutIncomingEdgesInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutFromNodeNestedInput
 }
@@ -761,6 +837,8 @@ export type GraphNodeCreateManyCaseInput = {
   riskLevel?: string | null
   totalInUsd?: number | null
   totalOutUsd?: number | null
+  isTraceableDeadEnd?: boolean
+  outDegree?: number
   createdAt?: Date | string
 }
 
@@ -772,6 +850,8 @@ export type GraphNodeUpdateWithoutCaseInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   outgoingEdges?: Prisma.GraphEdgeUpdateManyWithoutFromNodeNestedInput
   incomingEdges?: Prisma.GraphEdgeUpdateManyWithoutToNodeNestedInput
@@ -785,6 +865,8 @@ export type GraphNodeUncheckedUpdateWithoutCaseInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   outgoingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutFromNodeNestedInput
   incomingEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutToNodeNestedInput
@@ -798,6 +880,8 @@ export type GraphNodeUncheckedUpdateManyWithoutCaseInput = {
   riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totalInUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   totalOutUsd?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isTraceableDeadEnd?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  outDegree?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -850,6 +934,8 @@ export type GraphNodeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   riskLevel?: boolean
   totalInUsd?: boolean
   totalOutUsd?: boolean
+  isTraceableDeadEnd?: boolean
+  outDegree?: boolean
   createdAt?: boolean
   case?: boolean | Prisma.CaseDefaultArgs<ExtArgs>
   outgoingEdges?: boolean | Prisma.GraphNode$outgoingEdgesArgs<ExtArgs>
@@ -866,6 +952,8 @@ export type GraphNodeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   riskLevel?: boolean
   totalInUsd?: boolean
   totalOutUsd?: boolean
+  isTraceableDeadEnd?: boolean
+  outDegree?: boolean
   createdAt?: boolean
   case?: boolean | Prisma.CaseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["graphNode"]>
@@ -879,6 +967,8 @@ export type GraphNodeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   riskLevel?: boolean
   totalInUsd?: boolean
   totalOutUsd?: boolean
+  isTraceableDeadEnd?: boolean
+  outDegree?: boolean
   createdAt?: boolean
   case?: boolean | Prisma.CaseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["graphNode"]>
@@ -892,10 +982,12 @@ export type GraphNodeSelectScalar = {
   riskLevel?: boolean
   totalInUsd?: boolean
   totalOutUsd?: boolean
+  isTraceableDeadEnd?: boolean
+  outDegree?: boolean
   createdAt?: boolean
 }
 
-export type GraphNodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "caseId" | "address" | "type" | "labelsJson" | "riskLevel" | "totalInUsd" | "totalOutUsd" | "createdAt", ExtArgs["result"]["graphNode"]>
+export type GraphNodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "caseId" | "address" | "type" | "labelsJson" | "riskLevel" | "totalInUsd" | "totalOutUsd" | "isTraceableDeadEnd" | "outDegree" | "createdAt", ExtArgs["result"]["graphNode"]>
 export type GraphNodeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   case?: boolean | Prisma.CaseDefaultArgs<ExtArgs>
   outgoingEdges?: boolean | Prisma.GraphNode$outgoingEdgesArgs<ExtArgs>
@@ -925,6 +1017,8 @@ export type $GraphNodePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     riskLevel: string | null
     totalInUsd: number | null
     totalOutUsd: number | null
+    isTraceableDeadEnd: boolean
+    outDegree: number
     createdAt: Date
   }, ExtArgs["result"]["graphNode"]>
   composites: {}
@@ -1360,6 +1454,8 @@ export interface GraphNodeFieldRefs {
   readonly riskLevel: Prisma.FieldRef<"GraphNode", 'String'>
   readonly totalInUsd: Prisma.FieldRef<"GraphNode", 'Float'>
   readonly totalOutUsd: Prisma.FieldRef<"GraphNode", 'Float'>
+  readonly isTraceableDeadEnd: Prisma.FieldRef<"GraphNode", 'Boolean'>
+  readonly outDegree: Prisma.FieldRef<"GraphNode", 'Int'>
   readonly createdAt: Prisma.FieldRef<"GraphNode", 'DateTime'>
 }
     

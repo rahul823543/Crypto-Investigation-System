@@ -12,15 +12,19 @@ import defaultAddressLabels from "../../datasets/address-labels.json" with {
   type: "json",
 };
 
+export const DEFAULT_HUB_THRESHOLD = 500;
+
 /**
  * Builds deterministic graph nodes and edges from a set of normalized transactions.
  * Classifies node types using address labels, aggregates totalInUsd/totalOutUsd,
- * and calculates hop depths via BFS traversal from the root address.
+ * calculates hop depths via BFS traversal from the root address, computes outDegree,
+ * and sets isTraceableDeadEnd based on node type and connectivity rules.
  */
 export async function buildGraph(
-  input: GraphBuildInput
+  input: GraphBuildInput & { hubThreshold?: number }
 ): Promise<GraphBuildOutput> {
   const { caseId, rootAddress, transactions } = input;
+  const hubThreshold = input.hubThreshold ?? DEFAULT_HUB_THRESHOLD;
   const addressLabels: AddressLabel[] =
     input.addressLabels && input.addressLabels.length > 0
       ? input.addressLabels
@@ -42,7 +46,7 @@ export async function buildGraph(
     if (tx.to) addressSet.add(tx.to.toLowerCase());
   }
 
-  // 2. Classify each address and generate node IDs
+  // 2. Classify each address and generate initial node entries
   const nodeMap = new Map<string, GraphNode>();
   const createdAtIso = new Date().toISOString();
 
@@ -65,6 +69,7 @@ export async function buildGraph(
         rawType === "mixer" ||
         rawType === "contract" ||
         rawType === "exchange" ||
+        rawType === "vasp" ||
         rawType === "wallet"
       ) {
         type = rawType as NodeType;
@@ -88,6 +93,8 @@ export async function buildGraph(
       riskLevel: isRoot ? "high" : null,
       totalInUsd: 0,
       totalOutUsd: 0,
+      isTraceableDeadEnd: false,
+      outDegree: 0,
       createdAt: createdAtIso,
     });
   }
@@ -199,6 +206,35 @@ export async function buildGraph(
       riskLevel: edgeRiskLevel,
       createdAt: createdAtIso,
     });
+  }
+
+  // 6. Compute outDegree and isTraceableDeadEnd for each node
+  const outDegreeMap = new Map<string, number>();
+  for (const edge of edges) {
+    outDegreeMap.set(edge.fromNodeId, (outDegreeMap.get(edge.fromNodeId) ?? 0) + 1);
+  }
+
+  for (const node of nodeMap.values()) {
+    const outDegree = outDegreeMap.get(node.id) ?? 0;
+    node.outDegree = outDegree;
+
+    const labelEntry = labelMap.get(node.address.toLowerCase());
+    const labelType = labelEntry?.type?.toLowerCase();
+    const hasVaspLabel = labelType === "vasp" || labelType === "exchange" || node.type === "vasp" || node.type === "exchange" || node.labels.includes("vasp") || node.labels.includes("exchange");
+    const hasMixerLabel = labelType === "mixer" || node.type === "mixer" || node.labels.includes("mixer");
+    const hasDexOrBridgeLabel = labelType === "dex" || labelType === "bridge" || node.type === "dex" || node.type === "bridge" || node.labels.includes("dex") || node.labels.includes("bridge");
+
+    if (hasVaspLabel) {
+      node.isTraceableDeadEnd = true;
+    } else if (hasMixerLabel) {
+      node.isTraceableDeadEnd = true;
+    } else if (hasDexOrBridgeLabel) {
+      node.isTraceableDeadEnd = false;
+    } else if (outDegree > hubThreshold) {
+      node.isTraceableDeadEnd = true;
+    } else {
+      node.isTraceableDeadEnd = false;
+    }
   }
 
   const nodes = Array.from(nodeMap.values());

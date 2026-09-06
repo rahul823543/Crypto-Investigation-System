@@ -265,6 +265,8 @@ export type CaseWhereInput = {
   graphEdges?: Prisma.GraphEdgeListRelationFilter
   riskFindings?: Prisma.RiskFindingListRelationFilter
   reports?: Prisma.ReportListRelationFilter
+  analysisResults?: Prisma.AnalysisResultListRelationFilter
+  evidenceRecords?: Prisma.EvidenceRecordListRelationFilter
 }
 
 export type CaseOrderByWithRelationInput = {
@@ -283,6 +285,8 @@ export type CaseOrderByWithRelationInput = {
   graphEdges?: Prisma.GraphEdgeOrderByRelationAggregateInput
   riskFindings?: Prisma.RiskFindingOrderByRelationAggregateInput
   reports?: Prisma.ReportOrderByRelationAggregateInput
+  analysisResults?: Prisma.AnalysisResultOrderByRelationAggregateInput
+  evidenceRecords?: Prisma.EvidenceRecordOrderByRelationAggregateInput
 }
 
 export type CaseWhereUniqueInput = Prisma.AtLeast<{
@@ -304,6 +308,8 @@ export type CaseWhereUniqueInput = Prisma.AtLeast<{
   graphEdges?: Prisma.GraphEdgeListRelationFilter
   riskFindings?: Prisma.RiskFindingListRelationFilter
   reports?: Prisma.ReportListRelationFilter
+  analysisResults?: Prisma.AnalysisResultListRelationFilter
+  evidenceRecords?: Prisma.EvidenceRecordListRelationFilter
 }, "id">
 
 export type CaseOrderByWithAggregationInput = {
@@ -356,6 +362,8 @@ export type CaseCreateInput = {
   graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateInput = {
@@ -374,6 +382,8 @@ export type CaseUncheckedCreateInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUpdateInput = {
@@ -392,6 +402,8 @@ export type CaseUpdateInput = {
   graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateInput = {
@@ -410,6 +422,8 @@ export type CaseUncheckedUpdateInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateManyInput = {
@@ -603,6 +617,34 @@ export type CaseUpdateOneRequiredWithoutReportsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CaseUpdateToOneWithWhereWithoutReportsInput, Prisma.CaseUpdateWithoutReportsInput>, Prisma.CaseUncheckedUpdateWithoutReportsInput>
 }
 
+export type CaseCreateNestedOneWithoutAnalysisResultsInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutAnalysisResultsInput, Prisma.CaseUncheckedCreateWithoutAnalysisResultsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutAnalysisResultsInput
+  connect?: Prisma.CaseWhereUniqueInput
+}
+
+export type CaseUpdateOneRequiredWithoutAnalysisResultsNestedInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutAnalysisResultsInput, Prisma.CaseUncheckedCreateWithoutAnalysisResultsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutAnalysisResultsInput
+  upsert?: Prisma.CaseUpsertWithoutAnalysisResultsInput
+  connect?: Prisma.CaseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CaseUpdateToOneWithWhereWithoutAnalysisResultsInput, Prisma.CaseUpdateWithoutAnalysisResultsInput>, Prisma.CaseUncheckedUpdateWithoutAnalysisResultsInput>
+}
+
+export type CaseCreateNestedOneWithoutEvidenceRecordsInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedCreateWithoutEvidenceRecordsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutEvidenceRecordsInput
+  connect?: Prisma.CaseWhereUniqueInput
+}
+
+export type CaseUpdateOneRequiredWithoutEvidenceRecordsNestedInput = {
+  create?: Prisma.XOR<Prisma.CaseCreateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedCreateWithoutEvidenceRecordsInput>
+  connectOrCreate?: Prisma.CaseCreateOrConnectWithoutEvidenceRecordsInput
+  upsert?: Prisma.CaseUpsertWithoutEvidenceRecordsInput
+  connect?: Prisma.CaseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CaseUpdateToOneWithWhereWithoutEvidenceRecordsInput, Prisma.CaseUpdateWithoutEvidenceRecordsInput>, Prisma.CaseUncheckedUpdateWithoutEvidenceRecordsInput>
+}
+
 export type CaseCreateWithoutTransactionsInput = {
   id?: string
   rootAddress: string
@@ -618,6 +660,8 @@ export type CaseCreateWithoutTransactionsInput = {
   graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateWithoutTransactionsInput = {
@@ -635,6 +679,8 @@ export type CaseUncheckedCreateWithoutTransactionsInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseCreateOrConnectWithoutTransactionsInput = {
@@ -668,6 +714,8 @@ export type CaseUpdateWithoutTransactionsInput = {
   graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateWithoutTransactionsInput = {
@@ -685,6 +733,8 @@ export type CaseUncheckedUpdateWithoutTransactionsInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateWithoutGraphNodesInput = {
@@ -702,6 +752,8 @@ export type CaseCreateWithoutGraphNodesInput = {
   graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateWithoutGraphNodesInput = {
@@ -719,6 +771,8 @@ export type CaseUncheckedCreateWithoutGraphNodesInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseCreateOrConnectWithoutGraphNodesInput = {
@@ -752,6 +806,8 @@ export type CaseUpdateWithoutGraphNodesInput = {
   graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateWithoutGraphNodesInput = {
@@ -769,6 +825,8 @@ export type CaseUncheckedUpdateWithoutGraphNodesInput = {
   graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateWithoutGraphEdgesInput = {
@@ -786,6 +844,8 @@ export type CaseCreateWithoutGraphEdgesInput = {
   graphNodes?: Prisma.GraphNodeCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateWithoutGraphEdgesInput = {
@@ -803,6 +863,8 @@ export type CaseUncheckedCreateWithoutGraphEdgesInput = {
   graphNodes?: Prisma.GraphNodeUncheckedCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseCreateOrConnectWithoutGraphEdgesInput = {
@@ -836,6 +898,8 @@ export type CaseUpdateWithoutGraphEdgesInput = {
   graphNodes?: Prisma.GraphNodeUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateWithoutGraphEdgesInput = {
@@ -853,6 +917,8 @@ export type CaseUncheckedUpdateWithoutGraphEdgesInput = {
   graphNodes?: Prisma.GraphNodeUncheckedUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateWithoutRiskFindingsInput = {
@@ -870,6 +936,8 @@ export type CaseCreateWithoutRiskFindingsInput = {
   graphNodes?: Prisma.GraphNodeCreateNestedManyWithoutCaseInput
   graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateWithoutRiskFindingsInput = {
@@ -887,6 +955,8 @@ export type CaseUncheckedCreateWithoutRiskFindingsInput = {
   graphNodes?: Prisma.GraphNodeUncheckedCreateNestedManyWithoutCaseInput
   graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
   reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseCreateOrConnectWithoutRiskFindingsInput = {
@@ -920,6 +990,8 @@ export type CaseUpdateWithoutRiskFindingsInput = {
   graphNodes?: Prisma.GraphNodeUpdateManyWithoutCaseNestedInput
   graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateWithoutRiskFindingsInput = {
@@ -937,6 +1009,8 @@ export type CaseUncheckedUpdateWithoutRiskFindingsInput = {
   graphNodes?: Prisma.GraphNodeUncheckedUpdateManyWithoutCaseNestedInput
   graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseCreateWithoutReportsInput = {
@@ -954,6 +1028,8 @@ export type CaseCreateWithoutReportsInput = {
   graphNodes?: Prisma.GraphNodeCreateNestedManyWithoutCaseInput
   graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
 }
 
 export type CaseUncheckedCreateWithoutReportsInput = {
@@ -971,6 +1047,8 @@ export type CaseUncheckedCreateWithoutReportsInput = {
   graphNodes?: Prisma.GraphNodeUncheckedCreateNestedManyWithoutCaseInput
   graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
   riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
 }
 
 export type CaseCreateOrConnectWithoutReportsInput = {
@@ -1004,6 +1082,8 @@ export type CaseUpdateWithoutReportsInput = {
   graphNodes?: Prisma.GraphNodeUpdateManyWithoutCaseNestedInput
   graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
 }
 
 export type CaseUncheckedUpdateWithoutReportsInput = {
@@ -1021,6 +1101,192 @@ export type CaseUncheckedUpdateWithoutReportsInput = {
   graphNodes?: Prisma.GraphNodeUncheckedUpdateManyWithoutCaseNestedInput
   graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
   riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
+}
+
+export type CaseCreateWithoutAnalysisResultsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutCaseInput
+  graphNodes?: Prisma.GraphNodeCreateNestedManyWithoutCaseInput
+  graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
+  reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordCreateNestedManyWithoutCaseInput
+}
+
+export type CaseUncheckedCreateWithoutAnalysisResultsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutCaseInput
+  graphNodes?: Prisma.GraphNodeUncheckedCreateNestedManyWithoutCaseInput
+  graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedCreateNestedManyWithoutCaseInput
+}
+
+export type CaseCreateOrConnectWithoutAnalysisResultsInput = {
+  where: Prisma.CaseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CaseCreateWithoutAnalysisResultsInput, Prisma.CaseUncheckedCreateWithoutAnalysisResultsInput>
+}
+
+export type CaseUpsertWithoutAnalysisResultsInput = {
+  update: Prisma.XOR<Prisma.CaseUpdateWithoutAnalysisResultsInput, Prisma.CaseUncheckedUpdateWithoutAnalysisResultsInput>
+  create: Prisma.XOR<Prisma.CaseCreateWithoutAnalysisResultsInput, Prisma.CaseUncheckedCreateWithoutAnalysisResultsInput>
+  where?: Prisma.CaseWhereInput
+}
+
+export type CaseUpdateToOneWithWhereWithoutAnalysisResultsInput = {
+  where?: Prisma.CaseWhereInput
+  data: Prisma.XOR<Prisma.CaseUpdateWithoutAnalysisResultsInput, Prisma.CaseUncheckedUpdateWithoutAnalysisResultsInput>
+}
+
+export type CaseUpdateWithoutAnalysisResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutCaseNestedInput
+  graphNodes?: Prisma.GraphNodeUpdateManyWithoutCaseNestedInput
+  graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUpdateManyWithoutCaseNestedInput
+}
+
+export type CaseUncheckedUpdateWithoutAnalysisResultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutCaseNestedInput
+  graphNodes?: Prisma.GraphNodeUncheckedUpdateManyWithoutCaseNestedInput
+  graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  evidenceRecords?: Prisma.EvidenceRecordUncheckedUpdateManyWithoutCaseNestedInput
+}
+
+export type CaseCreateWithoutEvidenceRecordsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionCreateNestedManyWithoutCaseInput
+  graphNodes?: Prisma.GraphNodeCreateNestedManyWithoutCaseInput
+  graphEdges?: Prisma.GraphEdgeCreateNestedManyWithoutCaseInput
+  riskFindings?: Prisma.RiskFindingCreateNestedManyWithoutCaseInput
+  reports?: Prisma.ReportCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultCreateNestedManyWithoutCaseInput
+}
+
+export type CaseUncheckedCreateWithoutEvidenceRecordsInput = {
+  id?: string
+  rootAddress: string
+  chainId: number
+  mode: string
+  status?: string
+  riskScore?: number | null
+  riskLevel?: string | null
+  errorMessage?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutCaseInput
+  graphNodes?: Prisma.GraphNodeUncheckedCreateNestedManyWithoutCaseInput
+  graphEdges?: Prisma.GraphEdgeUncheckedCreateNestedManyWithoutCaseInput
+  riskFindings?: Prisma.RiskFindingUncheckedCreateNestedManyWithoutCaseInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutCaseInput
+  analysisResults?: Prisma.AnalysisResultUncheckedCreateNestedManyWithoutCaseInput
+}
+
+export type CaseCreateOrConnectWithoutEvidenceRecordsInput = {
+  where: Prisma.CaseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CaseCreateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedCreateWithoutEvidenceRecordsInput>
+}
+
+export type CaseUpsertWithoutEvidenceRecordsInput = {
+  update: Prisma.XOR<Prisma.CaseUpdateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedUpdateWithoutEvidenceRecordsInput>
+  create: Prisma.XOR<Prisma.CaseCreateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedCreateWithoutEvidenceRecordsInput>
+  where?: Prisma.CaseWhereInput
+}
+
+export type CaseUpdateToOneWithWhereWithoutEvidenceRecordsInput = {
+  where?: Prisma.CaseWhereInput
+  data: Prisma.XOR<Prisma.CaseUpdateWithoutEvidenceRecordsInput, Prisma.CaseUncheckedUpdateWithoutEvidenceRecordsInput>
+}
+
+export type CaseUpdateWithoutEvidenceRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUpdateManyWithoutCaseNestedInput
+  graphNodes?: Prisma.GraphNodeUpdateManyWithoutCaseNestedInput
+  graphEdges?: Prisma.GraphEdgeUpdateManyWithoutCaseNestedInput
+  riskFindings?: Prisma.RiskFindingUpdateManyWithoutCaseNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUpdateManyWithoutCaseNestedInput
+}
+
+export type CaseUncheckedUpdateWithoutEvidenceRecordsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  rootAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  chainId?: Prisma.IntFieldUpdateOperationsInput | number
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  riskLevel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutCaseNestedInput
+  graphNodes?: Prisma.GraphNodeUncheckedUpdateManyWithoutCaseNestedInput
+  graphEdges?: Prisma.GraphEdgeUncheckedUpdateManyWithoutCaseNestedInput
+  riskFindings?: Prisma.RiskFindingUncheckedUpdateManyWithoutCaseNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutCaseNestedInput
+  analysisResults?: Prisma.AnalysisResultUncheckedUpdateManyWithoutCaseNestedInput
 }
 
 
@@ -1034,6 +1300,8 @@ export type CaseCountOutputType = {
   graphEdges: number
   riskFindings: number
   reports: number
+  analysisResults: number
+  evidenceRecords: number
 }
 
 export type CaseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1042,6 +1310,8 @@ export type CaseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   graphEdges?: boolean | CaseCountOutputTypeCountGraphEdgesArgs
   riskFindings?: boolean | CaseCountOutputTypeCountRiskFindingsArgs
   reports?: boolean | CaseCountOutputTypeCountReportsArgs
+  analysisResults?: boolean | CaseCountOutputTypeCountAnalysisResultsArgs
+  evidenceRecords?: boolean | CaseCountOutputTypeCountEvidenceRecordsArgs
 }
 
 /**
@@ -1089,6 +1359,20 @@ export type CaseCountOutputTypeCountReportsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.ReportWhereInput
 }
 
+/**
+ * CaseCountOutputType without action
+ */
+export type CaseCountOutputTypeCountAnalysisResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnalysisResultWhereInput
+}
+
+/**
+ * CaseCountOutputType without action
+ */
+export type CaseCountOutputTypeCountEvidenceRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EvidenceRecordWhereInput
+}
+
 
 export type CaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1106,6 +1390,8 @@ export type CaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   graphEdges?: boolean | Prisma.Case$graphEdgesArgs<ExtArgs>
   riskFindings?: boolean | Prisma.Case$riskFindingsArgs<ExtArgs>
   reports?: boolean | Prisma.Case$reportsArgs<ExtArgs>
+  analysisResults?: boolean | Prisma.Case$analysisResultsArgs<ExtArgs>
+  evidenceRecords?: boolean | Prisma.Case$evidenceRecordsArgs<ExtArgs>
   _count?: boolean | Prisma.CaseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["case"]>
 
@@ -1155,6 +1441,8 @@ export type CaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   graphEdges?: boolean | Prisma.Case$graphEdgesArgs<ExtArgs>
   riskFindings?: boolean | Prisma.Case$riskFindingsArgs<ExtArgs>
   reports?: boolean | Prisma.Case$reportsArgs<ExtArgs>
+  analysisResults?: boolean | Prisma.Case$analysisResultsArgs<ExtArgs>
+  evidenceRecords?: boolean | Prisma.Case$evidenceRecordsArgs<ExtArgs>
   _count?: boolean | Prisma.CaseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CaseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1168,6 +1456,8 @@ export type $CasePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     graphEdges: Prisma.$GraphEdgePayload<ExtArgs>[]
     riskFindings: Prisma.$RiskFindingPayload<ExtArgs>[]
     reports: Prisma.$ReportPayload<ExtArgs>[]
+    analysisResults: Prisma.$AnalysisResultPayload<ExtArgs>[]
+    evidenceRecords: Prisma.$EvidenceRecordPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1579,6 +1869,8 @@ export interface Prisma__CaseClient<T, Null = never, ExtArgs extends runtime.Typ
   graphEdges<T extends Prisma.Case$graphEdgesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$graphEdgesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GraphEdgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   riskFindings<T extends Prisma.Case$riskFindingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$riskFindingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RiskFindingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reports<T extends Prisma.Case$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  analysisResults<T extends Prisma.Case$analysisResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$analysisResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnalysisResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  evidenceRecords<T extends Prisma.Case$evidenceRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Case$evidenceRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EvidenceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2128,6 +2420,54 @@ export type Case$reportsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ReportScalarFieldEnum | Prisma.ReportScalarFieldEnum[]
+}
+
+/**
+ * Case.analysisResults
+ */
+export type Case$analysisResultsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AnalysisResult
+   */
+  select?: Prisma.AnalysisResultSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AnalysisResult
+   */
+  omit?: Prisma.AnalysisResultOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnalysisResultInclude<ExtArgs> | null
+  where?: Prisma.AnalysisResultWhereInput
+  orderBy?: Prisma.AnalysisResultOrderByWithRelationInput | Prisma.AnalysisResultOrderByWithRelationInput[]
+  cursor?: Prisma.AnalysisResultWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnalysisResultScalarFieldEnum | Prisma.AnalysisResultScalarFieldEnum[]
+}
+
+/**
+ * Case.evidenceRecords
+ */
+export type Case$evidenceRecordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EvidenceRecord
+   */
+  select?: Prisma.EvidenceRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EvidenceRecord
+   */
+  omit?: Prisma.EvidenceRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EvidenceRecordInclude<ExtArgs> | null
+  where?: Prisma.EvidenceRecordWhereInput
+  orderBy?: Prisma.EvidenceRecordOrderByWithRelationInput | Prisma.EvidenceRecordOrderByWithRelationInput[]
+  cursor?: Prisma.EvidenceRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EvidenceRecordScalarFieldEnum | Prisma.EvidenceRecordScalarFieldEnum[]
 }
 
 /**

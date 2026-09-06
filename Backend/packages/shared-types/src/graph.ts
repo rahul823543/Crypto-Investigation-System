@@ -1,8 +1,8 @@
 import type { RiskLevel } from "./case.js";
 import type { NormalizedTransaction } from "./transaction.js";
 
-export type NodeType = "wallet" | "contract" | "exchange" | "dex" | "bridge" | "mixer" | "unknown";
-export type AddressLabelType = "dex" | "bridge" | "mixer" | "risky" | "ofac";
+export type NodeType = "wallet" | "contract" | "exchange" | "vasp" | "dex" | "bridge" | "mixer" | "unknown";
+export type AddressLabelType = "dex" | "bridge" | "mixer" | "vasp" | "risky" | "ofac" | "exchange";
 
 // ─── Graph Node ─────────────────────────────────────────────────────────────
 
@@ -15,6 +15,8 @@ export interface GraphNode {
   riskLevel: RiskLevel | null;
   totalInUsd: number | null;
   totalOutUsd: number | null;
+  isTraceableDeadEnd: boolean;
+  outDegree: number;
   createdAt: string; // ISO date string
 }
 

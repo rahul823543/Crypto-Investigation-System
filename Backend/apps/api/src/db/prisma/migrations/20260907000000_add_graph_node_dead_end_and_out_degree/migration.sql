@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "GraphNode" ADD COLUMN "isTraceableDeadEnd" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "outDegree" INTEGER NOT NULL DEFAULT 0;

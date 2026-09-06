@@ -1,4 +1,4 @@
-export type FindingSeverity = "low" | "medium" | "high" | "critical";
+export type FindingSeverity = "low" | "medium" | "high" | "critical" | "info";
 
 export type FindingSource = "basic-risk" | "python-intelligence";
 

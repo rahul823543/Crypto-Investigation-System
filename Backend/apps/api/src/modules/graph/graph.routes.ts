@@ -56,6 +56,8 @@ export async function graphRoutes(app: FastifyInstance) {
             riskLevel: (node.riskLevel as RiskLevel) ?? null,
             totalInUsd: node.totalInUsd,
             totalOutUsd: node.totalOutUsd,
+            isTraceableDeadEnd: node.isTraceableDeadEnd ?? false,
+            outDegree: node.outDegree ?? 0,
             createdAt: node.createdAt.toISOString(),
           };
         });

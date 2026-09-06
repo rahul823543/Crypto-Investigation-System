@@ -6,6 +6,7 @@ declare module "fastify" {
   interface FastifyInstance {
     ingestQueue: Queue;
     buildGraphQueue: Queue;
+    analyzeQueue: Queue;
   }
 }
 
@@ -18,13 +19,19 @@ export default fp(async (app: FastifyInstance) => {
     connection: app.redis,
   });
 
+  const analyzeQueue = new Queue("analyze-case", {
+    connection: app.redis,
+  });
+
   app.decorate("ingestQueue", ingestQueue);
   app.decorate("buildGraphQueue", buildGraphQueue);
+  app.decorate("analyzeQueue", analyzeQueue);
 
   app.addHook("onClose", async (instance) => {
     await Promise.all([
       instance.ingestQueue.close(),
       instance.buildGraphQueue.close(),
+      instance.analyzeQueue.close(),
     ]);
   });
 });

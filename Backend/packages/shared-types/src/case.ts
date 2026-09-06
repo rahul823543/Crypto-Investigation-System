@@ -48,5 +48,5 @@ export interface SeededCaseData {
   transactions: import("./transaction").NormalizedTransaction[];
   graph: import("./graph").GraphResponse;
   basicFindings: import("./finding").RiskFinding[];
-  analysisResult: import("./transaction").AnalysisResponse;
+  analysisResult: import("./analysis").AnalysisResponse;
 }

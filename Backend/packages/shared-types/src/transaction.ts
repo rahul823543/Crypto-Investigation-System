@@ -21,9 +21,9 @@ export interface NormalizedTransaction {
   timestamp: string; // ISO-8601
   transferType: TransferType;
   /** ABI-decoded method name e.g. "transfer", "swapExactTokensForTokens" */
-  method: string | null;
+  method?: string | null;
   /** Opaque deduplication key supplied by the data provider (e.g. Alchemy uniqueId) */
-  rawProviderRef: string | null;
+  rawProviderRef?: string | null;
 }
 
 /**
@@ -32,50 +32,4 @@ export interface NormalizedTransaction {
  */
 export type NormalizedTransactionInput = Omit<NormalizedTransaction, "id" | "caseId">;
 
-// ─── Python Intelligence Contract ─────────────────────────────────────────────
 
-export interface AnalysisRequest {
-  caseId: string;
-  analysisRequestId: string;
-  rootAddress: string;
-  /** 1–3 for MVP */
-  maxDepth: number;
-  nodes: import("./graph").GraphNode[];
-  edges: import("./graph").GraphEdge[];
-  transactions: NormalizedTransaction[];
-  basicFindings: import("./finding").RiskFinding[];
-}
-
-export interface SuspiciousPath {
-  id: string;
-  rank: number;
-  score: number; // 0–100
-  nodeIds: string[];
-  edgeIds: string[];
-  reasonCodes: string[];
-  summary: string;
-}
-
-export interface CircularFlow {
-  id: string;
-  nodeIds: string[];
-  edgeIds: string[];
-  cycleLength: number;
-  summary: string;
-}
-
-export interface AnalysisMetadata {
-  engineVersion: string;
-  runtimeMs: number;
-}
-
-export interface AnalysisResponse {
-  analysisId: string;
-  caseId: string;
-  riskScore: number; // 0–100
-  riskLevel: import("./case").RiskLevel;
-  findings: import("./finding").RiskFinding[];
-  suspiciousPaths: SuspiciousPath[];
-  circularFlows: CircularFlow[];
-  analysisMetadata: AnalysisMetadata;
-}

@@ -57,7 +57,9 @@ export const ModelName = {
   GraphNode: 'GraphNode',
   GraphEdge: 'GraphEdge',
   RiskFinding: 'RiskFinding',
-  Report: 'Report'
+  Report: 'Report',
+  AnalysisResult: 'AnalysisResult',
+  EvidenceRecord: 'EvidenceRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -135,6 +137,8 @@ export const GraphNodeScalarFieldEnum = {
   riskLevel: 'riskLevel',
   totalInUsd: 'totalInUsd',
   totalOutUsd: 'totalOutUsd',
+  isTraceableDeadEnd: 'isTraceableDeadEnd',
+  outDegree: 'outDegree',
   createdAt: 'createdAt'
 } as const
 
@@ -188,6 +192,40 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const AnalysisResultScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  analysisRequestId: 'analysisRequestId',
+  riskScore: 'riskScore',
+  riskLevel: 'riskLevel',
+  suspiciousPathsJson: 'suspiciousPathsJson',
+  circularFlowsJson: 'circularFlowsJson',
+  attributedVaspJson: 'attributedVaspJson',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt'
+} as const
+
+export type AnalysisResultScalarFieldEnum = (typeof AnalysisResultScalarFieldEnum)[keyof typeof AnalysisResultScalarFieldEnum]
+
+
+export const EvidenceRecordScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  reportId: 'reportId',
+  caseKeyHash: 'caseKeyHash',
+  reportHash: 'reportHash',
+  contractAddress: 'contractAddress',
+  transactionHash: 'transactionHash',
+  chainId: 'chainId',
+  version: 'version',
+  storedAt: 'storedAt',
+  verifiedAt: 'verifiedAt',
+  verificationStatus: 'verificationStatus'
+} as const
+
+export type EvidenceRecordScalarFieldEnum = (typeof EvidenceRecordScalarFieldEnum)[keyof typeof EvidenceRecordScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -22,7 +22,21 @@ const envSchema = z.object({
   ALCHEMY_API_URL: z
     .string()
     .url("ALCHEMY_API_URL must be a valid URL"),
+
+  INTELLIGENCE_API_URL: z
+    .string()
+    .url("INTELLIGENCE_API_URL must be a valid URL")
+    .default("http://localhost:8000"),
+
+  EVIDENCE_CONTRACT_ADDRESS: z.string().optional(),
+  EVIDENCE_RPC_URL: z.string().optional(),
+  RELAYER_PRIVATE_KEY: z.string().optional(),
+  EVIDENCE_CHAIN_ID: z
+    .string()
+    .optional()
+    .transform((val) => (val && val.trim() !== "" ? Number(val) : undefined)),
 });
+
 
 export type Env = z.infer<typeof envSchema>;
 

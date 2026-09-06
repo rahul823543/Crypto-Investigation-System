@@ -10,6 +10,9 @@ import { riskRoutes } from "./modules/risk/risk.routes.js";
 import healthRoutes from "./modules/health/health.routes.js";
 import demoRoutes from "./demo/demo.routes.js";
 import { reportsRoutes } from "./modules/reports/reports.routes.js";
+import { analysisRoutes } from "./modules/analysis/analysis.routes.js";
+import { attributionRoutes } from "./modules/attribution/attribution.routes.js";
+import { evidenceRoutes } from "./modules/evidence/evidence.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const env = loadEnv();
@@ -31,6 +34,9 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(healthRoutes);
   await app.register(demoRoutes);
   await app.register(reportsRoutes);
+  await app.register(analysisRoutes);
+  await app.register(attributionRoutes);
+  await app.register(evidenceRoutes);
 
   return app;
 }

@@ -24,7 +24,10 @@ model Case {
   graphEdges   GraphEdge[]
   riskFindings RiskFinding[]
   reports      Report[]
+  analysisResults AnalysisResult[]
+  evidenceRecords EvidenceRecord[]
 }
+
 
 model Wallet {
   id        String   @id @default(cuid())
@@ -62,15 +65,17 @@ model Transaction {
 }
 
 model GraphNode {
-  id          String      @id @default(cuid())
-  caseId      String
-  address     String
-  type        String
-  labelsJson  String
-  riskLevel   String?
-  totalInUsd  Float?
-  totalOutUsd Float?
-  createdAt   DateTime    @default(now())
+  id                 String      @id @default(cuid())
+  caseId             String
+  address            String
+  type               String
+  labelsJson         String
+  riskLevel          String?
+  totalInUsd         Float?
+  totalOutUsd        Float?
+  isTraceableDeadEnd Boolean     @default(false)
+  outDegree          Int         @default(0)
+  createdAt          DateTime    @default(now())
 
   case          Case        @relation(fields: [caseId], references: [id], onDelete: Cascade)
   outgoingEdges GraphEdge[] @relation("OutgoingEdges")
@@ -128,6 +133,42 @@ model Report {
   sha256Hash  String
   generatedAt DateTime  @default(now())
   version     Int       @default(1)
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+}
+
+model AnalysisResult {
+  id                  String   @id @default(cuid())
+  caseId              String
+  analysisRequestId   String
+  riskScore           Int
+  riskLevel           String
+  suspiciousPathsJson String
+  circularFlowsJson   String
+  attributedVaspJson  String?
+  metadataJson        String
+  createdAt           DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+}
+
+model EvidenceRecord {
+  id                 String    @id @default(cuid())
+  caseId             String
+  reportId           String
+  caseKeyHash        String
+  reportHash         String
+  contractAddress    String?
+  transactionHash    String?
+  chainId            Int?
+  version            Int       @default(1)
+  storedAt           DateTime  @default(now())
+  verifiedAt         DateTime?
+  verificationStatus String    @default("pending")
 
   case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
 

@@ -115,6 +115,8 @@ export function createBuildGraphWorker(
                 riskLevel: node.riskLevel,
                 totalInUsd: node.totalInUsd,
                 totalOutUsd: node.totalOutUsd,
+                isTraceableDeadEnd: node.isTraceableDeadEnd,
+                outDegree: node.outDegree,
               })),
               skipDuplicates: true,
             });

@@ -36,6 +36,48 @@
     "chainId": 1
   },
   {
+    "address": "0x47ce0c6ed5b0ce3d3a51fdb1c52dc66a7c3c2936",
+    "type": "mixer",
+    "label": "Tornado Cash ETH 1",
+    "chainId": 1
+  },
+  {
+    "address": "0x3333333333333333333333333333333333333333",
+    "type": "mixer",
+    "label": "Tornado Cash (Testnet)",
+    "chainId": 80002
+  },
+  {
+    "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+    "type": "vasp",
+    "label": "Binance 14 (Deposit)",
+    "chainId": 1
+  },
+  {
+    "address": "0x21a31ee1afc51d94c2efccaa2092ad1028285549",
+    "type": "vasp",
+    "label": "Binance (Hot Wallet)",
+    "chainId": 1
+  },
+  {
+    "address": "0x710b8d7449594fec9b89151c8a14bceaafe3108c",
+    "type": "vasp",
+    "label": "Coinbase 10 (Deposit)",
+    "chainId": 1
+  },
+  {
+    "address": "0x2910543af39aba0cd09dbb2d50200b3e800a63d2",
+    "type": "vasp",
+    "label": "Kraken (Deposit)",
+    "chainId": 1
+  },
+  {
+    "address": "0x9999999999999999999999999999999999999999",
+    "type": "vasp",
+    "label": "Binance Testnet Deposit",
+    "chainId": 80002
+  },
+  {
     "address": "0x7f367cc41522ce07553e823bf3be79a889debe1b",
     "type": "ofac",
     "label": "OFAC SDN — Lazarus Group",

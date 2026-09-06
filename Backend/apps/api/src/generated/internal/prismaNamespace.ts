@@ -403,7 +403,9 @@ export const ModelName = {
   GraphNode: 'GraphNode',
   GraphEdge: 'GraphEdge',
   RiskFinding: 'RiskFinding',
-  Report: 'Report'
+  Report: 'Report',
+  AnalysisResult: 'AnalysisResult',
+  EvidenceRecord: 'EvidenceRecord'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "case" | "wallet" | "transaction" | "graphNode" | "graphEdge" | "riskFinding" | "report"
+    modelProps: "case" | "wallet" | "transaction" | "graphNode" | "graphEdge" | "riskFinding" | "report" | "analysisResult" | "evidenceRecord"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -941,6 +943,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AnalysisResult: {
+      payload: Prisma.$AnalysisResultPayload<ExtArgs>
+      fields: Prisma.AnalysisResultFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalysisResultFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalysisResultFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        findFirst: {
+          args: Prisma.AnalysisResultFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalysisResultFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        findMany: {
+          args: Prisma.AnalysisResultFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>[]
+        }
+        create: {
+          args: Prisma.AnalysisResultCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        createMany: {
+          args: Prisma.AnalysisResultCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalysisResultCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>[]
+        }
+        delete: {
+          args: Prisma.AnalysisResultDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        update: {
+          args: Prisma.AnalysisResultUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalysisResultDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalysisResultUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalysisResultUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalysisResultUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalysisResultPayload>
+        }
+        aggregate: {
+          args: Prisma.AnalysisResultAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalysisResult>
+        }
+        groupBy: {
+          args: Prisma.AnalysisResultGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalysisResultGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalysisResultCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalysisResultCountAggregateOutputType> | number
+        }
+      }
+    }
+    EvidenceRecord: {
+      payload: Prisma.$EvidenceRecordPayload<ExtArgs>
+      fields: Prisma.EvidenceRecordFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EvidenceRecordFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EvidenceRecordFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        findFirst: {
+          args: Prisma.EvidenceRecordFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EvidenceRecordFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        findMany: {
+          args: Prisma.EvidenceRecordFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>[]
+        }
+        create: {
+          args: Prisma.EvidenceRecordCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        createMany: {
+          args: Prisma.EvidenceRecordCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EvidenceRecordCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>[]
+        }
+        delete: {
+          args: Prisma.EvidenceRecordDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        update: {
+          args: Prisma.EvidenceRecordUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        deleteMany: {
+          args: Prisma.EvidenceRecordDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EvidenceRecordUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EvidenceRecordUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>[]
+        }
+        upsert: {
+          args: Prisma.EvidenceRecordUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EvidenceRecordPayload>
+        }
+        aggregate: {
+          args: Prisma.EvidenceRecordAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEvidenceRecord>
+        }
+        groupBy: {
+          args: Prisma.EvidenceRecordGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EvidenceRecordGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EvidenceRecordCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EvidenceRecordCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1039,6 +1189,8 @@ export const GraphNodeScalarFieldEnum = {
   riskLevel: 'riskLevel',
   totalInUsd: 'totalInUsd',
   totalOutUsd: 'totalOutUsd',
+  isTraceableDeadEnd: 'isTraceableDeadEnd',
+  outDegree: 'outDegree',
   createdAt: 'createdAt'
 } as const
 
@@ -1092,6 +1244,40 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const AnalysisResultScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  analysisRequestId: 'analysisRequestId',
+  riskScore: 'riskScore',
+  riskLevel: 'riskLevel',
+  suspiciousPathsJson: 'suspiciousPathsJson',
+  circularFlowsJson: 'circularFlowsJson',
+  attributedVaspJson: 'attributedVaspJson',
+  metadataJson: 'metadataJson',
+  createdAt: 'createdAt'
+} as const
+
+export type AnalysisResultScalarFieldEnum = (typeof AnalysisResultScalarFieldEnum)[keyof typeof AnalysisResultScalarFieldEnum]
+
+
+export const EvidenceRecordScalarFieldEnum = {
+  id: 'id',
+  caseId: 'caseId',
+  reportId: 'reportId',
+  caseKeyHash: 'caseKeyHash',
+  reportHash: 'reportHash',
+  contractAddress: 'contractAddress',
+  transactionHash: 'transactionHash',
+  chainId: 'chainId',
+  version: 'version',
+  storedAt: 'storedAt',
+  verifiedAt: 'verifiedAt',
+  verificationStatus: 'verificationStatus'
+} as const
+
+export type EvidenceRecordScalarFieldEnum = (typeof EvidenceRecordScalarFieldEnum)[keyof typeof EvidenceRecordScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1177,6 +1363,13 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 /**
@@ -1337,6 +1530,8 @@ export type GlobalOmitConfig = {
   graphEdge?: Prisma.GraphEdgeOmit
   riskFinding?: Prisma.RiskFindingOmit
   report?: Prisma.ReportOmit
+  analysisResult?: Prisma.AnalysisResultOmit
+  evidenceRecord?: Prisma.EvidenceRecordOmit
 }
 
 /* Types for Logging */

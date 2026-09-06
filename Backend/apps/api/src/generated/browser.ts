@@ -52,3 +52,13 @@ export type RiskFinding = Prisma.RiskFindingModel
  * 
  */
 export type Report = Prisma.ReportModel
+/**
+ * Model AnalysisResult
+ * 
+ */
+export type AnalysisResult = Prisma.AnalysisResultModel
+/**
+ * Model EvidenceRecord
+ * 
+ */
+export type EvidenceRecord = Prisma.EvidenceRecordModel
