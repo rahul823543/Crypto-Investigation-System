@@ -1,25 +1,31 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageFrame } from '@/components/layout/PageFrame';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Ghost } from 'lucide-react';
+import { ShieldAlert, Home } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
-export function NotFoundPage() {
+export const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <PageFrame className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-cyber-surface-2 border border-cyber-border mb-6">
-        <Ghost className="h-10 w-10 text-cyber-text-muted" />
+    <div className="py-20 text-center max-w-md mx-auto space-y-4">
+      <div className="w-16 h-16 rounded-3xl bg-purple-50 text-[#7E22CE] flex items-center justify-center mx-auto shadow-sm">
+        <ShieldAlert className="h-8 w-8" />
       </div>
-      <h1 className="text-4xl font-bold text-cyber-text mb-2 font-mono">404</h1>
-      <p className="text-lg text-cyber-text-dim mb-1">Page Not Found</p>
-      <p className="text-sm text-cyber-text-muted max-w-sm mb-8">
-        The investigation trail ends here. This page doesn't exist or has been moved.
+      <h2 className="font-display font-bold text-3xl text-[#0F172A] tracking-tight">
+        404 - Page Not Found
+      </h2>
+      <p className="text-xs sm:text-sm text-[#526077]">
+        The requested forensic triage resource, case, or route does not exist.
       </p>
-      <Button variant="default" onClick={() => navigate('/')} className="gap-2">
-        <ArrowLeft className="h-4 w-4" />
-        Return to Dashboard
-      </Button>
-    </PageFrame>
+      <div className="pt-4">
+        <Button
+          variant="primary"
+          onClick={() => navigate('/')}
+          leftIcon={<Home className="h-4 w-4" />}
+        >
+          Return to Dashboard
+        </Button>
+      </div>
+    </div>
   );
-}
+};

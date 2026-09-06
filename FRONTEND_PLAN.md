@@ -990,50 +990,138 @@ flowchart TD
 - The full demo can be completed without live blockchain APIs.
 
 ---
+Do not change the above plan at all. This is the original reference.
+Any changes in the frontend plan during implementation/future idea must be mentioned below it.
 
-## 13. Implementation Decisions (Addendum)
 
-> **Note**: The sections above (1–12) are the original frontend plan and remain unchanged. The decisions below document deviations and choices made during implementation.
+1. We will use using react standard structure rather than monorepo mentioned.
 
-### Folder Structure: Standard React (Not Monorepo)
+---
 
-The original plan (Section 4) describes an `apps/web/` monorepo-style folder structure. During implementation, we chose to use the **standard flat React structure** instead:
+## BACKEND_PLAN_v3 — Frontend Impact Notes
 
-```text
-Frontend/
-  src/
-    app/
-    pages/
-    components/
-    api/
-    hooks/
-    store/
-    types/
-    data/
-    utils/
-    lib/
+> Added: 2026-09-07. Reference: `BACKEND_PLAN_v3.md`.
+> The original frontend plan above is unchanged. These are additive amendments only.
+
+### What changed in v3 (backend)
+
+Backend v3 restructures the project for a 2-person team (Dev 1 = Fastify/DB/jobs, Dev 2 = graph/risk/Python/Solidity). No API shape from v1/v2 was removed. The following are the changes that affect the frontend contract.
+
+---
+
+### 1. New endpoint: `GET /cases/:caseId/attribution`
+
+This endpoint is brand-new in v3. It does not exist in the original frontend plan.
+
+**Response shape:**
+```json
+{
+  "attributedVasp": "Binance",
+  "vaspNodeId": "wallet:0x999...",
+  "hopDistance": 2,
+  "confidence": 0.74,
+  "pathNodeIds": ["wallet:0x111...", "wallet:0x777...", "wallet:0x999..."],
+  "pathEdgeIds": ["edge:0xaaa...:0", "edge:0xbbb...:1"],
+  "basis": "connected via 2 hops to labeled Binance deposit address",
+  "secondaryCandidates": []
+}
 ```
 
-**Reason**: The frontend is a single standalone application. The backend already lives in a separate `Backend/` folder with its own monorepo. Adding an `apps/web/` wrapper inside `Frontend/` provides no benefit and only adds unnecessary nesting. The internal `src/` structure (pages, components, hooks, api, types, etc.) remains identical to what the plan describes.
+`vaspAttribution` is `null` (not omitted) when no confident match was found. In that case a `reason` string is present (e.g. `"trail ended at mixer before reaching a labeled VASP"`).
 
-### Design Theme: Dark Cyberpunk / Forensics Command Center
+**Frontend responsibilities:**
+- Add `getAttribution(caseId: string): Promise<VaspAttribution | null>` to `CaseRepository` interface.
+- Implement in `MockCaseRepository` (return seeded fixture) and `ApiCaseRepository` (call `GET /cases/:caseId/attribution`).
+- Add `VaspAttribution` type to `src/types/`.
+- Build `AttributionPanel.tsx` component (see Phase 4 scope below).
+- Add `useAttribution(caseId)` hook.
 
-- Deep navy/charcoal base colors (`#0a0e1a`, `#111827`)
-- Neon cyan primary (`#00f0ff`), electric green accent (`#39ff14`)
-- Glowing borders, glassmorphism panels, subtle grid backgrounds
-- Inter (UI text) + JetBrains Mono (addresses, hashes, code) fonts
-- Micro-animations on hover, smooth route transitions
+---
 
-### UI Component Library: Shadcn/ui + Tailwind CSS
+### 2. GraphNode contract additions
 
-Using Shadcn/ui (copy-paste components built on Radix UI) with Tailwind CSS for styling. This gives full control over component appearance while providing accessible, well-tested primitives. Components are customized to match the cyberpunk theme.
+Two new fields on `GraphNode` from v3:
 
-### Build Tool: Vite
+| Field | Type | Meaning |
+|---|---|---|
+| `isTraceableDeadEnd` | `boolean` | `true` when the node is a mixer or labeled VASP — Python traversal stops here; trail goes no further on-chain |
+| `outDegree` | `number` | Count of outgoing edges from this node |
 
-Using Vite + React + TypeScript. The backend CORS configuration already allows `http://localhost:5173` (Vite's default dev port), confirming alignment.
+**Frontend responsibilities:**
+- Add both fields to the `GraphNode` TypeScript type in `src/types/`.
+- Update `seeded-graph.json` to include these fields on every node (mixer node → `isTraceableDeadEnd: true`, others → `false`).
+- Apply a visual "dead-end" indicator on the Cytoscape graph for nodes where `isTraceableDeadEnd === true` (e.g. a ⛔ badge or a dashed-border node style with a "Trail ends here" tooltip).
 
-### State Management
+---
 
-- **Server state**: TanStack React Query (as recommended in Section 9)
-- **UI state**: Zustand (lightweight, as recommended in Section 9)
-- **Routing**: React Router v6
+### 3. Two new RiskFinding types
+
+`RiskFinding.type` now includes:
+
+| Type | Severity | Meaning |
+|---|---|---|
+| `mixer_interaction` | `critical` | Funds routed through a labeled mixer/tumbler. Trail is deliberately obscured. |
+| `vasp_direct_touch` | `info` | Wallet transacted directly with a labeled VASP deposit address (cheap fast-path signal). |
+
+**Frontend responsibilities:**
+- `FindingCard` and `RiskFindingsPanel` must render badge styles for these two new types.
+- `mixer_interaction` → dark red/black `critical` badge (same as existing critical severity).
+- `vasp_direct_touch` → blue `info` badge, distinct from risk-finding severity badges.
+- Update `seeded-findings.json` to add one `mixer_interaction` and one `vasp_direct_touch` finding for demo coverage.
+
+---
+
+### 4. AnalysisResult adds `vaspAttribution`
+
+The `AnalysisResult` type (returned by `analyzeCase`) now includes `vaspAttribution` as a top-level field alongside `suspiciousPaths` and `circularFlows`.
+
+**Frontend responsibilities:**
+- Add `vaspAttribution: VaspAttribution | null` to the `AnalysisResult` TypeScript type.
+- Update `seeded-analysis.json` to include a realistic `vaspAttribution` object.
+
+---
+
+### Phase 4 — Updated Scope (incorporating v3 additions)
+
+The original Phase 4 scope (Suspicious Paths, Report UI, Evidence Status, Verification Page) is unchanged and still valid. The following items are **added** to Phase 4 because of v3:
+
+| Task | New because of v3? | Component |
+|---|---|---|
+| Suspicious Paths Panel | No (was already Phase 4) | `SuspiciousPathsPanel.tsx` |
+| Circular Flow visualization | No (was already Phase 4) | `graphStyles.ts` + `SuspiciousPathsPanel.tsx` |
+| Report Generation UI | No (was already Phase 4) | `ReportActionsPanel.tsx` |
+| Evidence Status Panel | No (was already Phase 4) | `EvidenceStatusPanel.tsx` |
+| Evidence Verification Page wiring | No (was already Phase 4) | `EvidenceVerificationPage.tsx` |
+| `useAnalysis` hook + `HashDisplay` UI | No (was already Phase 4) | `useAnalysis.ts`, `HashDisplay.tsx` |
+| **`VaspAttribution` type** | **YES — v3** | `src/types/index.ts` |
+| **`getAttribution()` on CaseRepository** | **YES — v3** | `repository.ts`, `mockRepository.ts`, `apiRepository.ts` |
+| **`useAttribution` hook** | **YES — v3** | `src/hooks/useAttribution.ts` |
+| **`AttributionPanel.tsx`** | **YES — v3** | `src/components/case/AttributionPanel.tsx` |
+| **Dead-end node styling in Cytoscape** | **YES — v3** | `graphStyles.ts`, `graphMapping.ts` |
+| **New finding types in `FindingCard`** | **YES — v3** | `FindingCard.tsx`, `RiskFindingsPanel.tsx` |
+| **Update `seeded-analysis.json`** | **YES — v3** | `src/data/seeded-analysis.json` |
+| **Update `seeded-graph.json`** | **YES — v3** | `src/data/seeded-graph.json` |
+| **Update `seeded-findings.json`** | **YES — v3** | `src/data/seeded-findings.json` |
+
+#### AttributionPanel component spec
+
+`AttributionPanel.tsx` renders the nearest-VASP attribution result. States:
+
+- **`null` result / pending** — "No confident VASP match found. Trail ended at mixer or untraceable node." with the `basis` reason string.
+- **Attributed** — Shows:
+  - VASP name (e.g. "Binance") in a prominent badge.
+  - Hop distance + confidence score bar.
+  - `basis` text (the "why" explanation from Python).
+  - "Highlight Attribution Path" button → passes `pathNodeIds` + `pathEdgeIds` to `investigationStore.selectFinding()`, switches active tab to Topology Graph.
+  - Secondary candidates list (if any).
+
+This is placed in the **"Analysis & Paths"** tab of `CaseInvestigationPage`, below the `SuspiciousPathsPanel`.
+
+---
+
+### No changes required to Phases 1, 2, or 3
+
+All Phase 1–3 work already delivered is unaffected. The v3 changes are purely additive:
+- New endpoint (attribution).
+- Two new field additions to existing types (`GraphNode.isTraceableDeadEnd`, `GraphNode.outDegree`, `AnalysisResult.vaspAttribution`).
+- Two new finding type values (`mixer_interaction`, `vasp_direct_touch`).
