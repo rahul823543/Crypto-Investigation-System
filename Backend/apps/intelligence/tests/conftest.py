@@ -47,7 +47,11 @@ MINIMAL_VALID_PAYLOAD: dict = {
     "caseId": "case_phase1_test",
     "analysisRequestId": "req_001",
     "rootAddress": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "maxDepth": 2,
+    # v3 §7: confidence-decay traversal control (replaces maxDepth)
+    "minConfidence": 0.15,
+    "decayFactor": 0.65,
+    "hardCeilingDepth": 10,
+    "hubThreshold": 500,
     "nodes": [
         {
             "id": "wallet:0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -57,6 +61,8 @@ MINIMAL_VALID_PAYLOAD: dict = {
             "riskLevel": "medium",
             "totalInUsd": 5000.0,
             "totalOutUsd": 4500.0,
+            "isTraceableDeadEnd": False,
+            "outDegree": 1,
         },
         {
             "id": "wallet:0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -66,6 +72,8 @@ MINIMAL_VALID_PAYLOAD: dict = {
             "riskLevel": "low",
             "totalInUsd": 2500.0,
             "totalOutUsd": 0.0,
+            "isTraceableDeadEnd": False,
+            "outDegree": 0,
         },
     ],
     "edges": [
@@ -108,3 +116,40 @@ MINIMAL_VALID_PAYLOAD: dict = {
 def minimal_valid_payload() -> dict:
     """A complete, structurally-valid POST /v1/analyze payload."""
     return copy.deepcopy(MINIMAL_VALID_PAYLOAD)
+
+
+# ---------------------------------------------------------------------------
+# Phase 5: Synthetic laundering scenario fixtures
+# ---------------------------------------------------------------------------
+import json
+from pathlib import Path
+
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture
+def fixture_empty_graph() -> dict:
+    """Zero nodes/edges edge case payload."""
+    with open(_FIXTURES_DIR / "empty_graph.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def fixture_simple_fanout() -> dict:
+    """Fan-out peeling and rapid relay scenario payload."""
+    with open(_FIXTURES_DIR / "simple_fanout.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def fixture_circular_flow() -> dict:
+    """Circular wash-trading flow with mixer dead-end scenario payload."""
+    with open(_FIXTURES_DIR / "circular_flow.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def fixture_dex_bridge_hop() -> dict:
+    """Multi-hop DEX and Bridge flow terminating at Binance VASP payload."""
+    with open(_FIXTURES_DIR / "dex_bridge_hop.json", "r", encoding="utf-8") as f:
+        return json.load(f)

@@ -88,5 +88,17 @@
     "type": "risky",
     "label": "Known Money Launderer",
     "chainId": null
+  },
+  {
+    "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+    "type": "vasp",
+    "label": "Binance 14 (Hot Wallet)",
+    "chainId": 1
+  },
+  {
+    "address": "0x503828976d22510aad0201ac7ec88293211d23dc",
+    "type": "vasp",
+    "label": "Coinbase 2 (Deposit Address)",
+    "chainId": 1
   }
 ]

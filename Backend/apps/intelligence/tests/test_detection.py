@@ -155,7 +155,8 @@ class TestCircularFlows:
 
 class TestSuspiciousPaths:
     def _paths_for(self, G: nx.MultiDiGraph, depth: int = 3) -> list[list[str]]:
-        return traverse_paths(G, max_depth=depth)
+        states = traverse_paths(G, hard_ceiling_depth=depth)
+        return [ps.node_ids for ps in states]
 
     # -- clean path fires no signals
 

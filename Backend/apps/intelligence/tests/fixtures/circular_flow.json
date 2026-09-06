@@ -1,0 +1,187 @@
+{
+  "caseId": "case_fixture_circular",
+  "analysisRequestId": "req_fixture_circular_001",
+  "rootAddress": "0xaaaa222233334444555566667777888899990000",
+  "minConfidence": 0.15,
+  "decayFactor": 0.65,
+  "hardCeilingDepth": 10,
+  "hubThreshold": 500,
+  "nodes": [
+    {
+      "id": "wallet:0xaaaa222233334444555566667777888899990000",
+      "address": "0xaaaa222233334444555566667777888899990000",
+      "type": "wallet",
+      "labels": ["root"],
+      "riskLevel": "high",
+      "totalInUsd": 20000.0,
+      "totalOutUsd": 20000.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 2
+    },
+    {
+      "id": "wallet:0xcccc111111111111111111111111111111111111",
+      "address": "0xcccc111111111111111111111111111111111111",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 10000.0,
+      "totalOutUsd": 10000.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "address": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "type": "dex",
+      "labels": ["dex", "quickswap"],
+      "riskLevel": "medium",
+      "totalInUsd": 10000.0,
+      "totalOutUsd": 9800.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "mixer:0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc",
+      "address": "0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc",
+      "type": "mixer",
+      "labels": ["mixer", "tornado"],
+      "riskLevel": "critical",
+      "totalInUsd": 10000.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": true,
+      "outDegree": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:0x2222000000000000000000000000000000000000000000000000000000000001:0",
+      "from": "wallet:0xaaaa222233334444555566667777888899990000",
+      "to": "wallet:0xcccc111111111111111111111111111111111111",
+      "transactionHash": "0x2222000000000000000000000000000000000000000000000000000000000001",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:00:00.000Z",
+      "hopDepth": 1,
+      "riskLevel": "medium"
+    },
+    {
+      "id": "edge:0x2222000000000000000000000000000000000000000000000000000000000002:0",
+      "from": "wallet:0xcccc111111111111111111111111111111111111",
+      "to": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "transactionHash": "0x2222000000000000000000000000000000000000000000000000000000000002",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:05:00.000Z",
+      "hopDepth": 2,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x2222000000000000000000000000000000000000000000000000000000000003:0",
+      "from": "dex:0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "to": "wallet:0xaaaa222233334444555566667777888899990000",
+      "transactionHash": "0x2222000000000000000000000000000000000000000000000000000000000003",
+      "asset": "USDC",
+      "amount": "9800.00",
+      "amountUsd": 9800.0,
+      "timestamp": "2026-08-25T11:10:00.000Z",
+      "hopDepth": 3,
+      "riskLevel": "critical"
+    },
+    {
+      "id": "edge:0x2222000000000000000000000000000000000000000000000000000000000004:0",
+      "from": "wallet:0xaaaa222233334444555566667777888899990000",
+      "to": "mixer:0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc",
+      "transactionHash": "0x2222000000000000000000000000000000000000000000000000000000000004",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:15:00.000Z",
+      "hopDepth": 1,
+      "riskLevel": "critical"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_circ_001",
+      "caseId": "case_fixture_circular",
+      "hash": "0x2222000000000000000000000000000000000000000000000000000000000001",
+      "chainId": 80002,
+      "blockNumber": 8700001,
+      "from": "0xaaaa222233334444555566667777888899990000",
+      "to": "0xcccc111111111111111111111111111111111111",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:00:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_circ_002",
+      "caseId": "case_fixture_circular",
+      "hash": "0x2222000000000000000000000000000000000000000000000000000000000002",
+      "chainId": 80002,
+      "blockNumber": 8700010,
+      "from": "0xcccc111111111111111111111111111111111111",
+      "to": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:05:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_circ_003",
+      "caseId": "case_fixture_circular",
+      "hash": "0x2222000000000000000000000000000000000000000000000000000000000003",
+      "chainId": 80002,
+      "blockNumber": 8700020,
+      "from": "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff",
+      "to": "0xaaaa222233334444555566667777888899990000",
+      "asset": "USDC",
+      "amount": "9800.00",
+      "amountUsd": 9800.0,
+      "timestamp": "2026-08-25T11:10:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_circ_004",
+      "caseId": "case_fixture_circular",
+      "hash": "0x2222000000000000000000000000000000000000000000000000000000000004",
+      "chainId": 80002,
+      "blockNumber": 8700030,
+      "from": "0xaaaa222233334444555566667777888899990000",
+      "to": "0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc",
+      "asset": "USDC",
+      "amount": "10000.00",
+      "amountUsd": 10000.0,
+      "timestamp": "2026-08-25T11:15:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    }
+  ],
+  "basicFindings": [
+    {
+      "id": "finding_circ_001",
+      "caseId": "case_fixture_circular",
+      "source": "basic-risk",
+      "type": "mixer_interaction",
+      "severity": "critical",
+      "confidence": 0.99,
+      "title": "Direct Mixer Deposit Detected",
+      "description": "Suspect address deposited $10,000 directly into Tornado Cash mixer pool.",
+      "relatedNodeIds": [
+        "wallet:0xaaaa222233334444555566667777888899990000",
+        "mixer:0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc"
+      ],
+      "relatedEdgeIds": [
+        "edge:0x2222000000000000000000000000000000000000000000000000000000000004:0"
+      ],
+      "signals": ["mixer", "obfuscation"]
+    }
+  ]
+}

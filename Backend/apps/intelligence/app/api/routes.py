@@ -1,27 +1,29 @@
 """
 app/api/routes.py
 ─────────────────
-Phase 3: Real algorithm implementation of POST /v1/analyze.
+**v3 Phase 4**: Real algorithm pipeline for POST /v1/analyze.
 
 Pipeline (in order):
   1. Build MultiDiGraph from the AnalysisRequest (Phase 2 graph.builder)
-  2. Enumerate all simple paths up to max_depth (Phase 3 traversal)
-  3. Detect circular flows (Phase 3 detection)
-  4. Flag suspicious paths using 6 heuristic signals (Phase 3 detection)
-  5. Score and rank suspicious paths (Phase 3 ranking)
-  6. Compute composite risk score (Phase 3 scoring)
-  7. Generate AdvancedFinding DTOs from the top paths and all cycles
-  8. Return AnalysisResponse (contract frozen since Phase 1)
+  2. Enumerate paths using confidence-decay stopping (Phase 4 traversal)
+  3. Re-order paths by suspicion-first priority queue (Phase 4)
+  4. Detect circular flows (Phase 3 detection, unchanged)
+  5. Flag suspicious paths using heuristic signals (Phase 3 detection)
+  6. Score and rank suspicious paths (Phase 3 ranking)
+  7. Compute composite risk score (Phase 3 scoring)
+  8. Compute nearest-VASP attribution (Phase 4 attribution)
+  9. Generate AdvancedFinding DTOs
+  10. Return AnalysisResponse with vaspAttribution field
 
 Contract guarantees (unchanged from Phase 1 mock):
   - caseId is echoed from the request
   - analysisId is deterministic: f"analysis_{caseId}_{analysisRequestId}"
-  - riskScore ∈ [0, 100]
-  - riskLevel ∈ {"low", "medium", "high", "critical"}
+  - riskScore in [0, 100]
+  - riskLevel in {"low", "medium", "high", "critical"}
   - analysisMetadata.engineVersion is always present
   - runtimeMs is measured wall-clock time
-  - All nodeIds and edgeIds in paths/findings are subsets of the request graph
-    (guaranteed because traversal only walks existing nodes and edges)
+  - All nodeIds/edgeIds in paths/findings are subsets of the request graph
+  - vaspAttribution is null (not omitted) when no confident VASP match found
 """
 from __future__ import annotations
 
@@ -29,6 +31,7 @@ import time
 
 from fastapi import APIRouter
 
+from app.attribution.vasp_attribution import compute_vasp_attribution
 from app.config import settings
 from app.detection.circular_flows import detect_circular_flows
 from app.detection.suspicious_paths import detect_suspicious_paths
@@ -44,6 +47,7 @@ from app.schemas.response import (
 )
 from app.scoring.risk_score import compute_risk_score, score_to_level
 from app.traversal.multi_hop import traverse_paths
+from app.traversal.priority_queue import rank_paths_by_priority
 
 router = APIRouter()
 
@@ -89,10 +93,10 @@ def health_check() -> dict:
 )
 def analyze(payload: AnalysisRequest) -> AnalysisResponse:
     """
-    Phase 3 — real pipeline.
+    v3 Phase 4 — confidence-decay traversal + VASP attribution.
 
-    The route path, request schema, and response schema are frozen from
-    Phase 1. Only the body changes.
+    The route path, request schema, and response schema contract are frozen
+    from Phase 1. The body now runs the full v3 algorithm pipeline.
     """
     t0 = time.monotonic()
 
@@ -102,9 +106,24 @@ def analyze(payload: AnalysisRequest) -> AnalysisResponse:
     G = build_graph(payload)
 
     # ------------------------------------------------------------------ #
-    # Step 2 — Enumerate simple paths up to max_depth
+    # Step 2 — Confidence-decay traversal (v3 §7, replaces fixed-depth DFS)
     # ------------------------------------------------------------------ #
-    raw_paths = traverse_paths(G, payload.max_depth)
+    raw_path_states = traverse_paths(
+        G,
+        min_confidence=payload.min_confidence,
+        decay_factor=payload.decay_factor,
+        hard_ceiling_depth=payload.hard_ceiling_depth,
+        hub_threshold=payload.hub_threshold,
+    )
+
+    # ------------------------------------------------------------------ #
+    # Step 3 — Re-order by suspicion-first priority queue (v3 §7)
+    # ------------------------------------------------------------------ #
+    ranked_path_states = rank_paths_by_priority(G, raw_path_states)
+
+    # Convert PathState objects to plain node-ID lists for downstream modules
+    # (detection/ranking modules still expect list[list[str]])
+    raw_paths = [ps.node_ids for ps in ranked_path_states]
 
     # ------------------------------------------------------------------ #
     # Step 3 — Detect circular flows
@@ -134,12 +153,21 @@ def analyze(payload: AnalysisRequest) -> AnalysisResponse:
     )
 
     # ------------------------------------------------------------------ #
-    # Step 7 — Generate AdvancedFinding DTOs
+    # Step 8 — VASP attribution (v3 §7, byproduct of same traversal)
+    # ------------------------------------------------------------------ #
+    vasp_attribution = compute_vasp_attribution(
+        G,
+        ranked_path_states,
+        min_confidence=payload.min_confidence,
+    )
+
+    # ------------------------------------------------------------------ #
+    # Step 9 — Generate AdvancedFinding DTOs
     # ------------------------------------------------------------------ #
     findings = _build_findings(payload.case_id, suspicious_paths, circular_flows)
 
     # ------------------------------------------------------------------ #
-    # Step 8 — Assemble and return
+    # Step 10 — Assemble and return
     # ------------------------------------------------------------------ #
     runtime_ms = int((time.monotonic() - t0) * 1000)
 
@@ -151,6 +179,7 @@ def analyze(payload: AnalysisRequest) -> AnalysisResponse:
         findings=findings,
         suspiciousPaths=suspicious_paths,
         circularFlows=circular_flows,
+        vaspAttribution=vasp_attribution,
         analysisMetadata=AnalysisMetadata(
             engineVersion=settings.engine_version,
             runtimeMs=runtime_ms,

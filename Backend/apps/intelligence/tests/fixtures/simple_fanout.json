@@ -1,0 +1,282 @@
+{
+  "caseId": "case_fixture_fanout",
+  "analysisRequestId": "req_fixture_fanout_001",
+  "rootAddress": "0xaaaa111122223333444455556666777788889999",
+  "minConfidence": 0.15,
+  "decayFactor": 0.65,
+  "hardCeilingDepth": 10,
+  "hubThreshold": 500,
+  "nodes": [
+    {
+      "id": "wallet:0xaaaa111122223333444455556666777788889999",
+      "address": "0xaaaa111122223333444455556666777788889999",
+      "type": "wallet",
+      "labels": ["root"],
+      "riskLevel": "high",
+      "totalInUsd": 25000.0,
+      "totalOutUsd": 25000.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 5
+    },
+    {
+      "id": "wallet:0xbbbb111111111111111111111111111111111111",
+      "address": "0xbbbb111111111111111111111111111111111111",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 5000.0,
+      "totalOutUsd": 4800.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
+    },
+    {
+      "id": "wallet:0xbbbb222222222222222222222222222222222222",
+      "address": "0xbbbb222222222222222222222222222222222222",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 5000.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 0
+    },
+    {
+      "id": "wallet:0xbbbb333333333333333333333333333333333333",
+      "address": "0xbbbb333333333333333333333333333333333333",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 5000.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 0
+    },
+    {
+      "id": "wallet:0xbbbb444444444444444444444444444444444444",
+      "address": "0xbbbb444444444444444444444444444444444444",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 5000.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 0
+    },
+    {
+      "id": "wallet:0xbbbb555555555555555555555555555555555555",
+      "address": "0xbbbb555555555555555555555555555555555555",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 5000.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 0
+    },
+    {
+      "id": "wallet:0xcccc222222222222222222222222222222222222",
+      "address": "0xcccc222222222222222222222222222222222222",
+      "type": "wallet",
+      "labels": [],
+      "riskLevel": "medium",
+      "totalInUsd": 4800.0,
+      "totalOutUsd": 0.0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000001:0",
+      "from": "wallet:0xaaaa111122223333444455556666777788889999",
+      "to": "wallet:0xbbbb111111111111111111111111111111111111",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000001",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:00:00.000Z",
+      "hopDepth": 1,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000002:0",
+      "from": "wallet:0xaaaa111122223333444455556666777788889999",
+      "to": "wallet:0xbbbb222222222222222222222222222222222222",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000002",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:00:45.000Z",
+      "hopDepth": 1,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000003:0",
+      "from": "wallet:0xaaaa111122223333444455556666777788889999",
+      "to": "wallet:0xbbbb333333333333333333333333333333333333",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000003",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:01:30.000Z",
+      "hopDepth": 1,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000004:0",
+      "from": "wallet:0xaaaa111122223333444455556666777788889999",
+      "to": "wallet:0xbbbb444444444444444444444444444444444444",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000004",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:02:15.000Z",
+      "hopDepth": 1,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000005:0",
+      "from": "wallet:0xaaaa111122223333444455556666777788889999",
+      "to": "wallet:0xbbbb555555555555555555555555555555555555",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000005",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:03:00.000Z",
+      "hopDepth": 1,
+      "riskLevel": "high"
+    },
+    {
+      "id": "edge:0x1111000000000000000000000000000000000000000000000000000000000006:0",
+      "from": "wallet:0xbbbb111111111111111111111111111111111111",
+      "to": "wallet:0xcccc222222222222222222222222222222222222",
+      "transactionHash": "0x1111000000000000000000000000000000000000000000000000000000000006",
+      "asset": "USDC",
+      "amount": "4800.00",
+      "amountUsd": 4800.0,
+      "timestamp": "2026-08-25T10:04:00.000Z",
+      "hopDepth": 2,
+      "riskLevel": "medium"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_fanout_001",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000001",
+      "chainId": 80002,
+      "blockNumber": 8600001,
+      "from": "0xaaaa111122223333444455556666777788889999",
+      "to": "0xbbbb111111111111111111111111111111111111",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:00:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_fanout_002",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000002",
+      "chainId": 80002,
+      "blockNumber": 8600005,
+      "from": "0xaaaa111122223333444455556666777788889999",
+      "to": "0xbbbb222222222222222222222222222222222222",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:00:45.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_fanout_003",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000003",
+      "chainId": 80002,
+      "blockNumber": 8600010,
+      "from": "0xaaaa111122223333444455556666777788889999",
+      "to": "0xbbbb333333333333333333333333333333333333",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:01:30.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_fanout_004",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000004",
+      "chainId": 80002,
+      "blockNumber": 8600015,
+      "from": "0xaaaa111122223333444455556666777788889999",
+      "to": "0xbbbb444444444444444444444444444444444444",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:02:15.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_fanout_005",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000005",
+      "chainId": 80002,
+      "blockNumber": 8600020,
+      "from": "0xaaaa111122223333444455556666777788889999",
+      "to": "0xbbbb555555555555555555555555555555555555",
+      "asset": "USDC",
+      "amount": "5000.00",
+      "amountUsd": 5000.0,
+      "timestamp": "2026-08-25T10:03:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    },
+    {
+      "id": "tx_fanout_006",
+      "caseId": "case_fixture_fanout",
+      "hash": "0x1111000000000000000000000000000000000000000000000000000000000006",
+      "chainId": 80002,
+      "blockNumber": 8600025,
+      "from": "0xbbbb111111111111111111111111111111111111",
+      "to": "0xcccc222222222222222222222222222222222222",
+      "asset": "USDC",
+      "amount": "4800.00",
+      "amountUsd": 4800.0,
+      "timestamp": "2026-08-25T10:04:00.000Z",
+      "transferType": "erc20",
+      "tokenAddress": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+    }
+  ],
+  "basicFindings": [
+    {
+      "id": "finding_fanout_001",
+      "caseId": "case_fixture_fanout",
+      "source": "basic-risk",
+      "type": "fan_out",
+      "severity": "high",
+      "confidence": 0.95,
+      "title": "Rapid Fan-Out Detected",
+      "description": "Suspect address dispersed $25,000 across 5 unique recipients within 3 minutes.",
+      "relatedNodeIds": [
+        "wallet:0xaaaa111122223333444455556666777788889999",
+        "wallet:0xbbbb111111111111111111111111111111111111",
+        "wallet:0xbbbb222222222222222222222222222222222222",
+        "wallet:0xbbbb333333333333333333333333333333333333",
+        "wallet:0xbbbb444444444444444444444444444444444444",
+        "wallet:0xbbbb555555555555555555555555555555555555"
+      ],
+      "relatedEdgeIds": [
+        "edge:0x1111000000000000000000000000000000000000000000000000000000000001:0",
+        "edge:0x1111000000000000000000000000000000000000000000000000000000000002:0",
+        "edge:0x1111000000000000000000000000000000000000000000000000000000000003:0",
+        "edge:0x1111000000000000000000000000000000000000000000000000000000000004:0",
+        "edge:0x1111000000000000000000000000000000000000000000000000000000000005:0"
+      ],
+      "signals": ["fan_out", "rapid_movement", "high_value"]
+    }
+  ]
+}
