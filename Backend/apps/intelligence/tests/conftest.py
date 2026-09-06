@@ -47,7 +47,11 @@ MINIMAL_VALID_PAYLOAD: dict = {
     "caseId": "case_phase1_test",
     "analysisRequestId": "req_001",
     "rootAddress": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "maxDepth": 2,
+    # v3 §7: confidence-decay traversal control (replaces maxDepth)
+    "minConfidence": 0.15,
+    "decayFactor": 0.65,
+    "hardCeilingDepth": 10,
+    "hubThreshold": 500,
     "nodes": [
         {
             "id": "wallet:0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -57,6 +61,8 @@ MINIMAL_VALID_PAYLOAD: dict = {
             "riskLevel": "medium",
             "totalInUsd": 5000.0,
             "totalOutUsd": 4500.0,
+            "isTraceableDeadEnd": False,
+            "outDegree": 1,
         },
         {
             "id": "wallet:0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -66,6 +72,8 @@ MINIMAL_VALID_PAYLOAD: dict = {
             "riskLevel": "low",
             "totalInUsd": 2500.0,
             "totalOutUsd": 0.0,
+            "isTraceableDeadEnd": False,
+            "outDegree": 0,
         },
     ],
     "edges": [

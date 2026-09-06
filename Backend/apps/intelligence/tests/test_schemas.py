@@ -27,7 +27,10 @@ class TestAnalysisRequestValid:
     def test_parses_minimal_valid_payload(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         assert req.case_id == "case_phase1_test"
-        assert req.max_depth == 2
+        assert req.min_confidence == 0.15
+        assert req.decay_factor == 0.65
+        assert req.hard_ceiling_depth == 10
+        assert req.hub_threshold == 500
 
     def test_root_address_normalised_to_lowercase(self):
         payload = {**MINIMAL_VALID_PAYLOAD, "rootAddress": "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}
@@ -51,13 +54,16 @@ class TestAnalysisRequestValid:
         assert req.nodes == []
         assert req.edges == []
 
-    def test_max_depth_boundary_1(self):
-        req = AnalysisRequest.model_validate({**MINIMAL_VALID_PAYLOAD, "maxDepth": 1})
-        assert req.max_depth == 1
+    def test_confidence_boundaries(self):
+        req = AnalysisRequest.model_validate({**MINIMAL_VALID_PAYLOAD, "minConfidence": 0.0, "decayFactor": 1.0})
+        assert req.min_confidence == 0.0
+        assert req.decay_factor == 1.0
 
-    def test_max_depth_boundary_3(self):
-        req = AnalysisRequest.model_validate({**MINIMAL_VALID_PAYLOAD, "maxDepth": 3})
-        assert req.max_depth == 3
+    def test_hard_ceiling_boundaries(self):
+        req1 = AnalysisRequest.model_validate({**MINIMAL_VALID_PAYLOAD, "hardCeilingDepth": 1})
+        req15 = AnalysisRequest.model_validate({**MINIMAL_VALID_PAYLOAD, "hardCeilingDepth": 15})
+        assert req1.hard_ceiling_depth == 1
+        assert req15.hard_ceiling_depth == 15
 
 
 # ---------------------------------------------------------------------------
@@ -83,13 +89,23 @@ class TestAnalysisRequestInvalid:
         with pytest.raises(ValidationError):
             AnalysisRequest.model_validate(payload)
 
-    def test_max_depth_zero_rejected(self):
-        payload = {**MINIMAL_VALID_PAYLOAD, "maxDepth": 0}
+    def test_min_confidence_negative_rejected(self):
+        payload = {**MINIMAL_VALID_PAYLOAD, "minConfidence": -0.1}
         with pytest.raises(ValidationError):
             AnalysisRequest.model_validate(payload)
 
-    def test_max_depth_four_rejected(self):
-        payload = {**MINIMAL_VALID_PAYLOAD, "maxDepth": 4}
+    def test_min_confidence_greater_than_one_rejected(self):
+        payload = {**MINIMAL_VALID_PAYLOAD, "minConfidence": 1.1}
+        with pytest.raises(ValidationError):
+            AnalysisRequest.model_validate(payload)
+
+    def test_hard_ceiling_zero_rejected(self):
+        payload = {**MINIMAL_VALID_PAYLOAD, "hardCeilingDepth": 0}
+        with pytest.raises(ValidationError):
+            AnalysisRequest.model_validate(payload)
+
+    def test_hard_ceiling_sixteen_rejected(self):
+        payload = {**MINIMAL_VALID_PAYLOAD, "hardCeilingDepth": 16}
         with pytest.raises(ValidationError):
             AnalysisRequest.model_validate(payload)
 
@@ -171,3 +187,32 @@ class TestAnalysisResponseSchema:
                 riskLevel="extreme",  # not in the enum
                 analysisMetadata=AnalysisMetadata(engineVersion="0.1.0", runtimeMs=0),
             )
+
+    def test_response_with_vasp_attribution_round_trips(self):
+        from app.schemas.response import VaspAttribution
+
+        resp = AnalysisResponse(
+            analysisId="analysis_case_001_req_001",
+            caseId="case_001",
+            riskScore=42,
+            riskLevel="medium",
+            findings=[],
+            suspiciousPaths=[],
+            circularFlows=[],
+            vaspAttribution=VaspAttribution(
+                attributedVasp="Binance",
+                vaspNodeId="wallet:0x999",
+                hopDistance=2,
+                confidence=0.74,
+                pathNodeIds=["wallet:0x1", "wallet:0x2", "wallet:0x999"],
+                pathEdgeIds=["edge:0x1", "edge:0x2"],
+                basis="2 hops to Binance",
+                secondaryCandidates=[],
+            ),
+            analysisMetadata=AnalysisMetadata(engineVersion="0.1.0", runtimeMs=12),
+        )
+        data = resp.model_dump(by_alias=True)
+        assert data["vaspAttribution"] is not None
+        assert data["vaspAttribution"]["attributedVasp"] == "Binance"
+        assert data["vaspAttribution"]["hopDistance"] == 2
+

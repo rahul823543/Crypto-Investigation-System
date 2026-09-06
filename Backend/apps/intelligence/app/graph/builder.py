@@ -45,7 +45,9 @@ def build_graph(request: AnalysisRequest) -> nx.MultiDiGraph:
         timestamp, hop_depth, risk_level
 
     Graph-level metadata:
-        G.graph["case_id"], G.graph["root_address"], G.graph["max_depth"]
+        G.graph["case_id"], G.graph["root_address"]
+        G.graph["min_confidence"], G.graph["decay_factor"]
+        G.graph["hard_ceiling_depth"], G.graph["hub_threshold"]
 
     Returns:
         nx.MultiDiGraph — may be empty if request.nodes and request.edges
@@ -57,7 +59,12 @@ def build_graph(request: AnalysisRequest) -> nx.MultiDiGraph:
     # available to every downstream algorithm without re-passing the request.
     G.graph["case_id"] = request.case_id
     G.graph["root_address"] = request.root_address
-    G.graph["max_depth"] = request.max_depth
+    # v3: store confidence-decay traversal params on the graph so algorithms
+    # don't need to re-pass the full request object.
+    G.graph["min_confidence"] = request.min_confidence
+    G.graph["decay_factor"] = request.decay_factor
+    G.graph["hard_ceiling_depth"] = request.hard_ceiling_depth
+    G.graph["hub_threshold"] = request.hub_threshold
 
     for node in request.nodes:
         G.add_node(
@@ -68,6 +75,11 @@ def build_graph(request: AnalysisRequest) -> nx.MultiDiGraph:
             risk_level=node.risk_level,
             total_in_usd=node.total_in_usd,
             total_out_usd=node.total_out_usd,
+            # v3: dead-end flag set by Role C node classification.
+            # Traversal reads this directly from G.nodes[node_id] so it
+            # never re-derives label logic that belongs in Node.js.
+            isTraceableDeadEnd=node.is_traceable_dead_end,
+            outDegree=node.out_degree,
         )
 
     for edge in request.edges:

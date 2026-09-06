@@ -38,8 +38,16 @@ export interface AnalysisRequest {
   caseId: string;
   analysisRequestId: string;
   rootAddress: string;
-  /** 1–3 for MVP */
-  maxDepth: number;
+  /** Stop expanding a path once decayed confidence falls below this (default: 0.15) */
+  minConfidence?: number;
+  /** Per-hop confidence retention fraction (default: 0.65) */
+  decayFactor?: number;
+  /** Maximum traversal hop limit safety valve (default: 10) */
+  hardCeilingDepth?: number;
+  /** Unlabeled out-degree threshold above which a node is treated as a hub (default: 500) */
+  hubThreshold?: number;
+  /** Legacy depth limit; retained for backwards compatibility */
+  maxDepth?: number;
   nodes: import("./graph").GraphNode[];
   edges: import("./graph").GraphEdge[];
   transactions: NormalizedTransaction[];
@@ -64,6 +72,24 @@ export interface CircularFlow {
   summary: string;
 }
 
+export interface VaspAttributionSecondaryCandidate {
+  vaspNodeId: string;
+  attributedVasp: string;
+  hopDistance: number;
+  confidence: number;
+}
+
+export interface VaspAttribution {
+  attributedVasp: string;
+  vaspNodeId: string;
+  hopDistance: number;
+  confidence: number;
+  pathNodeIds: string[];
+  pathEdgeIds: string[];
+  basis: string;
+  secondaryCandidates: VaspAttributionSecondaryCandidate[];
+}
+
 export interface AnalysisMetadata {
   engineVersion: string;
   runtimeMs: number;
@@ -77,5 +103,6 @@ export interface AnalysisResponse {
   findings: import("./finding").RiskFinding[];
   suspiciousPaths: SuspiciousPath[];
   circularFlows: CircularFlow[];
+  vaspAttribution: VaspAttribution | null;
   analysisMetadata: AnalysisMetadata;
 }

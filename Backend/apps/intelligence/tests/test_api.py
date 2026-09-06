@@ -92,6 +92,7 @@ class TestAnalyzeEndpointValid:
             "findings",
             "suspiciousPaths",
             "circularFlows",
+            "vaspAttribution",  # v3: present (null or object), never omitted
             "analysisMetadata",
         }
         assert required_keys.issubset(body.keys())
@@ -150,13 +151,15 @@ class TestAnalyzeEndpointValid:
             for eid in finding["relatedEdgeIds"]:
                 assert eid in edge_ids_in_graph
 
-    async def test_max_depth_1_accepted(self, client, minimal_valid_payload):
-        payload = {**minimal_valid_payload, "maxDepth": 1}
+    async def test_min_confidence_default_accepted(self, client, minimal_valid_payload):
+        """Default minConfidence=0.15 must be accepted."""
+        payload = {**minimal_valid_payload, "minConfidence": 0.15}
         r = await client.post("/v1/analyze", json=payload)
         assert r.status_code == 200
 
-    async def test_max_depth_3_accepted(self, client, minimal_valid_payload):
-        payload = {**minimal_valid_payload, "maxDepth": 3}
+    async def test_hard_ceiling_depth_5_accepted(self, client, minimal_valid_payload):
+        """hardCeilingDepth=5 must be accepted."""
+        payload = {**minimal_valid_payload, "hardCeilingDepth": 5}
         r = await client.post("/v1/analyze", json=payload)
         assert r.status_code == 200
 
@@ -177,13 +180,21 @@ class TestAnalyzeEndpointInvalid:
         r = await client.post("/v1/analyze", json=payload)
         assert r.status_code == 422
 
-    async def test_max_depth_zero_returns_422(self, client, minimal_valid_payload):
-        payload = {**minimal_valid_payload, "maxDepth": 0}
+    async def test_min_confidence_above_1_returns_422(self, client, minimal_valid_payload):
+        """minConfidence > 1.0 must be rejected."""
+        payload = {**minimal_valid_payload, "minConfidence": 1.5}
         r = await client.post("/v1/analyze", json=payload)
         assert r.status_code == 422
 
-    async def test_max_depth_four_returns_422(self, client, minimal_valid_payload):
-        payload = {**minimal_valid_payload, "maxDepth": 4}
+    async def test_hard_ceiling_depth_zero_returns_422(self, client, minimal_valid_payload):
+        """hardCeilingDepth=0 must be rejected (ge=1)."""
+        payload = {**minimal_valid_payload, "hardCeilingDepth": 0}
+        r = await client.post("/v1/analyze", json=payload)
+        assert r.status_code == 422
+
+    async def test_hard_ceiling_depth_above_15_returns_422(self, client, minimal_valid_payload):
+        """hardCeilingDepth=16 must be rejected (le=15)."""
+        payload = {**minimal_valid_payload, "hardCeilingDepth": 16}
         r = await client.post("/v1/analyze", json=payload)
         assert r.status_code == 422
 

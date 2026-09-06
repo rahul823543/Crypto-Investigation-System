@@ -1,283 +1,276 @@
-﻿# Work Done — On-Chain Forensic Triage Engine
-## Phase 1 Complete | Roles: C, D, E
+# Project Overview, Context & Work Completed
+## On-Chain Forensic Triage Engine (SIH26182)
+*Current Status: Phase 3 Completed & Merged, Phase 4 (v3 Alignment & Intelligence Upgrades) in Progress*
 
 ---
 
-## Quick Context
+## 1. Executive Summary & Purpose
 
-This project is a hackathon prototype that helps law enforcement trace suspicious crypto transactions.
-You are solo-handling three roles (C, D, E) while your partner handles the main Node.js backend (Role B).
+The **On-Chain Forensic Triage Engine** is a specialized investigative platform developed for crypto crime triage, financial intelligence units, and law enforcement (addressing Problem Statement **SIH26182**).
 
-How the overall system works:
+### The Problem
+When illicit funds are moved across EVM blockchains (Ethereum, Polygon, etc.), perpetrators frequently obscure money trails using multi-hop hops, rapid relays, decentralized exchange (DEX) liquidity pools, peeling chains, and mixer smart contracts. Manual transaction analysis is slow and error-prone. Furthermore, forensic evidence gathered during investigations must maintain an unbroken chain of custody and be tamper-evident for court presentation.
 
-  Investigator enters a wallet address
-           ↓
-  Node.js backend fetches transactions and builds a graph
-           ↓
-  Python service (your work) analyses the graph for suspicious patterns
-           ↓
-  A PDF report is generated and its hash is stored on-chain (blockchain)
-           ↓
-  Anyone can verify the report has not been tampered with
-
-Phase 1 goal: get all the foundations in place so every role can work independently.
+### The System Solution
+1. **Target Ingestion**: An investigator inputs a suspect EVM wallet address and case parameters.
+2. **Transaction Ingestion & Graph Construction**: The backend ingests on-chain transfers (native currency + ERC-20 tokens) and builds an in-memory directed multigraph (`MultiDiGraph`) with classified entity nodes and transaction edges.
+3. **Automated Intelligence & Risk Scoring**: A dedicated Python intelligence service analyzes the transaction graph using graph traversal, heuristic pattern detection (mixers, fan-outs, rapid movements, bridges, DEX swaps), circular flow detection, and composite risk scoring.
+4. **VASP Attribution**: The system automatically locates the nearest Virtual Asset Service Provider (centralized exchange, regulated off-ramp) along the fund trail, recording the hop distance and confidence to enable subpoena requests.
+5. **Forensic Reporting & Blockchain Anchoring**: An unalterable PDF case report is generated. Its SHA-256 cryptographic hash is anchored on an EVM smart contract (`EvidenceRegistry.sol` deployed on Polygon Amoy testnet). Any party can independently verify that the report has not been altered or tampered with.
+6. **Investigator Dashboard**: A reactive web interface provides case management, visual graph exploration, flagged findings triage, and evidence verification.
 
 ---
 
-## ROLE D — Python Intelligence Service
-Location: apps/intelligence/
+## 2. Architecture & Team Structure (v3 Model)
 
-This is a Python web service that receives a transaction graph from the Node.js backend,
-runs analysis on it, and sends back a risk score with suspicious paths flagged.
+Under `BACKEND_PLAN_v3.md`, the backend development is divided between a two-person team structure:
 
-### What was built:
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                                  REACT FRONTEND (Vite / TS)                              │
+│   Case Management │ Graph Visualization │ Findings Triage │ Report / Proof Verification  │
+└────────────────────────────────────────┬─────────────────────────────────────────────────┘
+                                         │ HTTP / JSON
+                                         ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                            DEV 1 — ROLE B: FASTIFY API & ORCHESTRATION                   │
+│  • Fastify REST API with Zod validation                                                  │
+│  • PostgreSQL + Prisma ORM (Cases, Wallets, Transactions, Findings, Evidence)            │
+│  • BullMQ + Redis job queues (Async ingestion, analysis dispatch, PDF generation)        │
+│  • Blockchain data provider & transaction normalization                                  │
+│  • PDF report generation & SHA-256 evidence hashing                                      │
+│  • Ethers.js integration with deployed EvidenceRegistry contract                         │
+└───────────────────┬───────────────────────────────────────────────────┬──────────────────┘
+                    │ REST: POST /v1/analyze                            │ Calls via ethers.js
+                    ▼                                                   ▼
+┌───────────────────────────────────────────────┐     ┌────────────────────────────────────┐
+│      DEV 2 — ROLE D: PYTHON INTELLIGENCE      │     │  DEV 2 — ROLE E: EVIDENCE REGISTRY │
+│  • FastAPI service (uvicorn)                  │     │  • Solidity contract (Polygon)     │
+│  • NetworkX MultiDiGraph reconstruction       │     │  • Role-based access control       │
+│  • Confidence-decay traversal                 │     │  • Versioned SHA-256 hash storage  │
+│  • Suspicion-first priority queue search      │     │  • On-chain hash verification      │
+│  • Cycle / Circular-flow detection            │     └────────────────────────────────────┘
+│  • Heuristic detectors & composite risk score │
+│  • Nearest VASP attribution                   │
+└───────────────────▲───────────────────────────┘
+                    │
+                    │ Consumes labels, DTOs & graph definitions
+┌───────────────────┴───────────────────────────┐
+│        DEV 2 — ROLE C: GRAPH & BASIC RISK     │
+│  • Shared DTOs (@sih/shared-types)            │
+│  • 23-Address label dataset (DEX/Bridge/Mixer)│
+│  • Seeded demo case fixture                   │
+│  • Basic rule-based risk detectors            │
+└───────────────────────────────────────────────┘
+```
 
-PROJECT STRUCTURE
-  Set up a complete Python project using Poetry (the dependency/package manager).
-  Organised into folders: api, schemas, graph, traversal, detection, scoring, ranking.
-  Each folder beyond api and schemas is a stub — ready to be filled in Phases 2-4.
-
-CONFIGURATION
-  config.py       reads settings (port, version) from a .env file
-  .env.example    template file — copy to .env before running
-
-DATA SCHEMAS (app/schemas/)
-  These are strict definitions of what data the service accepts and sends back.
-
-  Request schema (request.py) — what the Node.js backend must send:
-    - Case ID
-    - Root wallet address (must be a valid Ethereum address: 0x + 40 hex chars)
-    - Max hops to trace (between 1 and 3)
-    - List of graph nodes (wallets, DEX routers, bridges, etc.)
-    - List of graph edges (the fund transfers between those nodes)
-    - Raw transactions and any basic risk findings already detected
-    - Built-in safety check: every edge must connect two nodes that exist in the graph
-
-  Response schema (response.py) — what the service sends back:
-    - riskScore (0-100) and riskLevel (low / medium / high / critical)
-    - suspiciousPaths: ranked list of flagged fund routes
-    - circularFlows: loops where money returns to an earlier wallet
-    - findings: human-readable explanations of what was flagged
-    - analysisMetadata: engine version + how long analysis took
-
-API ENDPOINTS (app/api/routes.py)
-  GET  /health         confirms the service is alive, returns engine version
-  POST /v1/analyze     the main analysis endpoint
-                       (currently returns a dummy response to unblock Role B
-                        while real algorithms are built in Phases 2-4)
-
-TESTS (tests/)
-  49 tests written — all 49 passing in 0.20 seconds
-  What is tested:
-    - Valid request   → 200 OK with correct response structure
-    - Invalid address → 422 error
-    - Edge with unknown node → 422 error
-    - Missing fields  → 422 error
-    - Same input always gives same output (determinism)
-
-How to start the service:
-  cd apps/intelligence
-  cp .env.example .env
-  poetry install
-  poetry run uvicorn app.main:app --port 8001 --reload
+### Team Responsibilities:
+- **Dev 1 (Role B)**: Owns the Node.js / Fastify backend, database, queue orchestration, blockchain ingestion, reporting, and frontend-facing REST endpoints.
+- **Dev 2 (Roles C + D + E)**: Owns the core forensic intelligence pipeline:
+  - **Role C**: Shared schemas/types, curated entity labels, seeded case fixtures, basic risk findings.
+  - **Role D**: Python intelligence service, graph traversal, cycle detection, path ranking, risk scoring, and VASP attribution.
+  - **Role E**: Solidity smart contract (`EvidenceRegistry.sol`), Hardhat tests, and testnet deployment scripts. Front-loaded into early phases to keep Phase 4 focused on algorithms.
 
 ---
 
-## ROLE C — Seeded Data and Shared Types
-Location: Backend/apps/api/datasets/  and  Backend/packages/shared-types/
+## 3. Chronological Progression of Work Done
 
-Role C provides realistic test data and the TypeScript type definitions used across the system.
+### Phase 1: Foundations & Independent Contracts (Completed)
+*Objective: Establish project structure, configuration, strict contracts, and mocks so all components can build and test independently.*
 
-### What was built:
+1. **Role B (Node.js API Foundation)**:
+   - Initialized Fastify application with TypeScript and structured routing.
+   - Configured Prisma with PostgreSQL schema for `Case`, `Transaction`, `GraphNode`, `GraphEdge`, and `Report`.
+   - Setup Redis and BullMQ for asynchronous queue infrastructure.
+   - Built Docker Compose environment for local PostgreSQL and Redis services.
+   - Implemented `GET /health` and seeded fallback routes `GET /demo/seeded-case`.
 
-ADDRESS LABEL DATASET (datasets/address-labels.json)
-  A curated list of 23 known blockchain addresses used to auto-classify wallets.
+2. **Role D (Python Intelligence Service Foundation)**:
+   - Structured `apps/intelligence` with Poetry dependency management.
+   - Built FastAPI app factory with configuration loading from `.env`.
+   - Implemented strict Pydantic schemas in `schemas/request.py` and `schemas/response.py` with custom EVM address validators (`0x` + 40 hex characters) and referential edge integrity guards.
+   - Created `GET /health` and initial `POST /v1/analyze` endpoint.
+   - Created 49 initial unit tests in pytest.
 
-  Category             Count   Examples
-  ─────────────────────────────────────────────────────────────
-  DEX Routers            6     QuickSwap V2/V3, Uniswap V3, SushiSwap, 1inch
-  Bridge Contracts       5     Polygon PoS Bridge, Hop Protocol, xDai Bridge
-  Tornado Cash Mixers    5     ETH 0.1, 1, 10, 100, DAI 100 pools
-  OFAC Sanctioned        5     Lazarus Group addresses from OFAC SDN list
-  Flagged / Risky        2     Known launderers
+3. **Role C (Seeded Data & Shared Types)**:
+   - Curated `address-labels.json` containing 23 high-profile verified addresses:
+     - DEX Routers: QuickSwap, Uniswap V3, SushiSwap, 1inch.
+     - Bridge Contracts: Polygon PoS Bridge, Hop Protocol, xDai Bridge.
+     - Mixers: Tornado Cash pools (0.1, 1, 10, 100 ETH, 100 DAI).
+     - OFAC Sanctioned: Lazarus Group sanctioned addresses.
+   - Created `seeded-case.json`: realistic 5-transaction demo scenario exhibiting rapid fund fan-out and DEX routing.
+   - Created `@sih/shared-types` monorepo package exporting synchronized TypeScript definitions (`GraphNode`, `GraphEdge`, `NormalizedTransaction`, `AnalysisRequest`, `AnalysisResponse`, etc.).
 
-  Each entry has: address, type, label, chainId (null = applies across all chains)
-
-SEEDED DEMO CASE (datasets/seeded-case.json)
-  A complete fake investigation scenario used for:
-    1. Demo when live blockchain APIs are unavailable
-    2. Development and testing without real data
-
-  The scenario:
-    A suspect wallet fans out USDC to 3 wallets very quickly,
-    and also routes funds through a DEX router — classic laundering patterns.
-
-  What is inside the file:
-
-    case
-      The investigation case: ID, root address, status = "analyzed"
-
-    transactions (5 entries)
-      tx1: Root → Wallet A  (3,000 USDC, 10:00)
-      tx2: Root → Wallet B  (3,000 USDC, 10:03)
-      tx3: Root → Wallet C  (4,000 USDC, 10:05)
-      tx4: Root → QuickSwap (5,000 USDC, 10:07)  ← DEX swap to hide trail
-      tx5: Wallet A → Wallet D (2,800 USDC, 10:25) ← second hop
-
-    graph
-      nodes: 6  (root, 3 recipients, 1 DEX router, 1 final wallet)
-      edges: 5  (one per transaction, with stable IDs)
-
-    basicFindings (2 findings)
-      fan_out:         "Sent to 4 addresses in 7 minutes"  severity: HIGH
-      dex_interaction: "Routed through QuickSwap"           severity: MEDIUM
-
-    analysisResult (pre-baked Python response for the demo fallback)
-      riskScore: 78 / riskLevel: "high"
-      suspiciousPaths: 2 flagged routes
-      circularFlows: none
-
-  VALIDATION: tested against Python schemas — all 3 checks passed:
-    [PASS] AnalysisRequest: 6 nodes, 5 edges, 5 transactions, 2 findings
-    [PASS] AnalysisResponse: score=78, level=high, 2 paths
-    [PASS] All cross-references valid
-
-SHARED TYPESCRIPT TYPES (packages/shared-types/src/)
-  Were empty stubs — now fully populated.
-
-  graph.ts        GraphNode, GraphEdge, GraphResponse, RiskFinding, AddressLabel
-  transaction.ts  NormalizedTransaction, AnalysisRequest, AnalysisResponse,
-                  SuspiciousPath, CircularFlow
-  index.ts        Re-exports everything so the backend can use:
-                  import { GraphNode } from "@sih/shared-types"
+4. **Role E (Smart Contract Foundation)**:
+   - Initialized Hardhat project in `Backend/apps/contracts`.
+   - Authored `EvidenceRegistry.sol`:
+     - Secure case-indexed array of SHA-256 evidence hashes.
+     - Auto-incrementing version history allowing case amendments while preserving original audit trails.
+     - Granular investigator authorization allowlist controlled by the contract owner.
+     - Read functions `getEvidence`, `getLatestEvidence`, and `verifyReportHash`.
+   - Configured Polygon Amoy testnet (`chainId: 80002`).
+   - Verified compilation with TypeChain generating TypeScript contract bindings.
 
 ---
 
-## ROLE E — Smart Contract (Hardhat)
-Location: Backend/apps/contracts/
+### Phase 2: Ingestion Pipelines & Contract Verification (Completed)
+*Objective: Wire data pipelines, build graph parsing structures, and prove contract functionality.*
 
-After a PDF investigation report is generated, its SHA-256 hash is stored on a blockchain.
-Anyone can re-hash the PDF later and compare — matching hashes proves the report was not altered.
+1. **Role B (Data Pipeline)**:
+   - Implemented case creation endpoints and transaction ingestion workers.
+   - Built transaction normalization transforming raw EVM transfer logs into unified transaction DTOs.
+   - Established transaction query layer with filtering and pagination.
 
-The contract only stores HASHES — never wallet addresses, case details, or officer notes.
+2. **Role C & D (Graph Reconstruction Engine)**:
+   - Relocated intelligence service to `Backend/apps/intelligence`.
+   - Built NetworkX graph builder (`graph/builder.py`) transforming `AnalysisRequest` nodes and edges into an in-memory graph.
+   - Preserved node attributes (wallet type, labels, risk level, in/out USD volume) and edge attributes (transaction hash, value, token, timestamp).
+   - Created fixture validation script in TypeScript (`validateFixtures.ts`) validating seeded fixtures against schemas.
 
-### What was built:
-
-EvidenceRegistry.sol — THE SMART CONTRACT
-
-  What it does:
-    - Stores report hashes on-chain, tied to a case ID
-    - Supports multiple versions (corrected reports can be appended, original not erased)
-    - Only authorised investigators can submit hashes (allowlist controlled by owner)
-
-  Key functions:
-    storeEvidence(caseId, reportHash)       Authorised investigators only — stores hash, auto-increments version
-    getEvidence(caseId, index)              Anyone — reads a specific version
-    getLatestEvidence(caseId)               Anyone — gets the most recent version
-    verifyReportHash(caseId, version, hash) Anyone — returns true/false (the integrity check)
-    setInvestigator(address, bool)          Owner only — grant or revoke access
-    transferOwnership(newOwner)             Owner only — hand off contract control
-
-HARDHAT PROJECT SETUP
-  hardhat.config.ts   Polygon Amoy testnet (chainId 80002) + Polygonscan verification
-  tsconfig.json       TypeScript settings
-  .env.example        Template: PRIVATE_KEY, POLYGON_AMOY_RPC_URL, POLYGONSCAN_API_KEY
-  package.json        All Hardhat dependencies listed
-
-SCRIPT STUBS (to be completed in Phase 4)
-  scripts/deploy.ts           will deploy the contract to Polygon Amoy
-  scripts/storeEvidence.ts    will submit a report hash after PDF generation
-  scripts/verifyEvidence.ts   will run the MATCH / MISMATCH verification flow
-
-TEST FILE
-  test/EvidenceRegistry.test.ts
-    3 smoke tests for Phase 1 (deploys OK, sets owner, authorises owner)
-    Detailed outline of all Phase 2 tests as TODO comments
-
-COMPILATION RESULT
-  Compiled 1 Solidity file successfully (evm target: paris)
-  Generated 6 TypeScript typings (TypeChain)
-  Node.js backend can now import EvidenceRegistry type from typechain-types/
+3. **Role E (Smart Contract Test Suite)**:
+   - Implemented full unit test suite for `EvidenceRegistry.sol` using Hardhat, Chai, and Ethers.
+   - Verified hash storage, version increments, non-investigator rejections, owner transfer mechanics, and verification status checks.
+   - Smoke tested Hardhat deployment scripts for Polygon Amoy.
 
 ---
 
-## File Tree — Everything Created
+### Phase 3: Graph Analytics, Detection, & Composite Risk (Completed & Merged)
+*Objective: Implement real forensic algorithms, graph traversal, heuristic pattern detection, cycle detection, path ranking, and composite risk scoring.*
 
-  SIH2026/
-  │
-  ├── apps/
-  │   └── intelligence/                    ← Role D: Python service
-  │       ├── pyproject.toml               ← Poetry config + dependencies
-  │       ├── .env.example                 ← Env var template
-  │       ├── README.md
-  │       ├── app/
-  │       │   ├── main.py                  ← FastAPI app factory
-  │       │   ├── config.py                ← Settings from .env
-  │       │   ├── api/routes.py            ← GET /health + POST /v1/analyze (mock)
-  │       │   ├── schemas/
-  │       │   │   ├── request.py           ← AnalysisRequest (with validators)
-  │       │   │   └── response.py          ← AnalysisResponse
-  │       │   ├── graph/builder.py         ← Phase 2 stub
-  │       │   ├── traversal/multi_hop.py   ← Phase 4 stub
-  │       │   ├── detection/
-  │       │   │   ├── circular_flows.py    ← Phase 4 stub
-  │       │   │   └── suspicious_paths.py  ← Phase 4 stub
-  │       │   ├── scoring/risk_score.py    ← Phase 4 stub
-  │       │   └── ranking/path_ranker.py   ← Phase 4 stub
-  │       └── tests/
-  │           ├── conftest.py              ← Fixtures + ASGI test client
-  │           ├── test_api.py              ← 31 HTTP endpoint tests
-  │           └── test_schemas.py          ← 18 schema unit tests
-  │
-  └── Backend/
-      ├── apps/
-      │   ├── api/datasets/
-      │   │   ├── address-labels.json      ← Role C: 23 labelled addresses
-      │   │   └── seeded-case.json         ← Role C: full demo scenario
-      │   └── contracts/                   ← Role E: Hardhat project
-      │       ├── package.json
-      │       ├── hardhat.config.ts        ← Polygon Amoy configured
-      │       ├── tsconfig.json
-      │       ├── .env.example
-      │       ├── contracts/
-      │       │   └── EvidenceRegistry.sol ← The smart contract
-      │       ├── scripts/
-      │       │   ├── deploy.ts            ← Phase 4 stub
-      │       │   ├── storeEvidence.ts     ← Phase 4 stub
-      │       │   └── verifyEvidence.ts    ← Phase 4 stub
-      │       └── test/
-      │           └── EvidenceRegistry.test.ts ← Smoke tests + Phase 2 outline
-      └── packages/shared-types/src/
-          ├── case.ts                      ← Role B's (unchanged)
-          ├── graph.ts                     ← Role C: GraphNode, RiskFinding...
-          ├── transaction.ts               ← Role C: NormalizedTransaction, AnalysisRequest...
-          └── index.ts                     ← Exports all three modules
+1. **Multi-Hop Traversal Engine (`traversal/multi_hop.py`)**:
+   - Implemented manual DFS stack traversal originating from the suspect root address.
+   - Avoided infinite cycles with path-local visited tracking.
+   - Resolved multi-edge transaction keys and stable edge IDs across parallel transfers.
+
+2. **Cycle & Circular Flow Detection (`detection/circular_flows.py`)**:
+   - Utilized NetworkX simple cycle algorithms (`nx.simple_cycles`).
+   - Filtered cycles containing the suspect root address, extracting participating node and edge sequences.
+
+3. **Heuristic Suspicious Path Detection (`detection/suspicious_paths.py`)**:
+   - Built pattern detection signals:
+     - `rapid_movement`: Transfers occurring within a calibrated 30-minute window (1,800 seconds).
+     - `fan_out_relay`: Multi-hop path originating from high out-degree fan-out nodes ($\ge 3$).
+     - `dex_touchpoint`: Transfers routing through recognized DEX router contracts.
+     - `bridge_touchpoint`: Transfers interacting with cross-chain bridge contracts.
+     - `mixer_touchpoint`: Severe penalty for interactions with mixer pools (e.g. Tornado Cash).
+     - `risky_label` / `ofac_sanctioned`: Direct or indirect association with OFAC-sanctioned addresses.
+     - `high_value_flow`: Transactions exceeding USD value threshold ($5,000+).
+     - `circular_return`: Paths overlapping with detected circular flow cycles.
+
+4. **Path Ranking & Scoring (`ranking/path_ranker.py` & `scoring/risk_score.py`)**:
+   - Developed weighted path scoring system based on behavioral signals.
+   - Built composite risk scoring engine producing an explainable 0–100 risk score and mapped risk level (`low`, `medium`, `high`, `critical`).
+   - Implemented deterministic sorting `(-score, id)` for repeatable path ranking.
+
+5. **Pre-PR Self-Review & Hardening**:
+   - Converted graph builder from `nx.DiGraph` to `nx.MultiDiGraph` to properly model parallel transactions between identical addresses without edge collisions.
+   - Fixed TypeScript circular dependency in `@sih/shared-types` (`case.ts` vs `graph.ts`).
+   - Calibrated heuristics to properly triage `seeded-case.json` (producing Risk Score: 50, Level: High, 2 Flagged Paths, 2 Findings).
+   - Expanded Python test suite to 135 passing tests.
+   - Successfully merged PR #4, PR #5, and PR #6 into `master`.
 
 ---
 
-## Phase 1 Definition of Done
-
-  Checkpoint                                  Who      Status
-  ──────────────────────────────────────────────────────────
-  Fastify API starts locally                  Role B   Done (partner)
-  PostgreSQL connection works                 Role B   Done (partner)
-  Redis + BullMQ working                      Role B   Done (partner)
-  Python service starts and returns mock      Role D   DONE
-  Seeded dataset exists                       Role C   DONE
-  Contract compiles                           Role E   DONE
-  Shared DTOs frozen for MVP                  C+D+E    DONE
-
-  PHASE 1: 100% COMPLETE
+### Frontend Milestones (Phases 1–3 Completed)
+- **Phase 1**: React + TypeScript + Vite project setup, layout structure, responsive navigation, and initial dashboard widgets.
+- **Phase 2**: Case overview pages, transaction inspection tables, and interactive node-edge graph visualization.
+- **Phase 3**: Integration with basic and advanced findings, visual indicator cards for suspicious paths, risk severity badges, and report generation/verification UI.
 
 ---
 
-## What Comes Next (Phases 2-5)
+### Phase 4: Intelligence & Evidence Integration (v3 Plan - Current Status)
+*Objective: Retroactively upgrade Phase 1-3 components to align with `BACKEND_PLAN_v3.md` requirements and implement advanced tracking capabilities.*
 
-  Phase 2   Parse the seeded transaction fixture in Python; Role E writes contract unit tests
-  Phase 3   Build the real NetworkX graph from nodes/edges; align Python parser with graph output
-  Phase 4   Real algorithms: multi-hop traversal, circular flow detection, risk scoring;
-            deploy contract to Polygon Amoy testnet
-  Phase 5   All pytest scenario fixtures; latency tests; final README
+1. **Traversal Evolution (Fixed Depth → Confidence-Decay Search)**:
+   - Replaced naive fixed-depth cutoff (`maxDepth = 3`) with dynamic confidence decay.
+   - Created `traversal/confidence.py`: calculates exponential confidence decay per hop ($C_d = C_0 \cdot \lambda^d$).
+   - Pruning criteria:
+     - Stops when path confidence drops below `minConfidence` (default: 0.15).
+     - Stops immediately at dead-end sink nodes (`isTraceableDeadEnd = True`).
+     - Bounded by `hardCeilingDepth` (default: 10) and `hubThreshold` (prunes high-degree exchange hubs).
 
-  Note: The Phase 1 mock in app/api/routes.py has clear MOCK RESPONSE comments showing
-  exactly where the real algorithm calls slot in — it is a clean swap-in, no restructuring needed.
+2. **Suspicion-First Priority Queue (`traversal/priority_queue.py`)**:
+   - Replaced arbitrary DFS exploration order with a max-priority queue (min-heap with inverted priority).
+   - Explores paths ordered by suspicious behavioral markers and confidence, ensuring the most illicit trails are evaluated first under compute/time budgets.
+
+3. **Nearest-VASP Attribution Engine (`attribution/vasp_attribution.py`)**:
+   - Solves the primary forensic requirement of SIH26182: locating the nearest regulated exchange/VASP where funds exited.
+   - Evaluates traversed paths reaching `vasp` labeled nodes, calculating hop distance, attribution confidence, supporting path IDs, and secondary candidate alternatives.
+
+4. **Schema Migrations for v3 (`schemas/request.py` & `schemas/response.py`)**:
+   - `AnalysisRequest`: Added `minConfidence`, `decayFactor`, `hardCeilingDepth`, `hubThreshold`, and `isTraceableDeadEnd` / `outDegree` to `GraphNode`.
+   - `AnalysisResponse`: Added `vaspAttribution` model (`VaspAttribution`).
+
+---
+
+## 4. Current Repository Structure
+
+```text
+SIH2026/
+├── BACKEND_PLAN_v3.md                     ← Master backend specification (v3, 2-person team model)
+├── FRONTEND_PLAN.md                       ← Master frontend specification
+├── WORK_DONE.md                           ← This document (cumulative progress & context)
+│
+├── Backend/
+│   ├── apps/
+│   │   ├── api/                           ← Fastify Backend (Dev 1 / Role B)
+│   │   │   ├── src/                       ← Routes, controllers, Prisma client, queues, workers
+│   │   │   ├── datasets/                  ← address-labels.json & seeded-case.json (Role C)
+│   │   │   ├── prisma/                    ← PostgreSQL schema & migrations
+│   │   │   └── package.json
+│   │   │
+│   │   ├── intelligence/                  ← Python Intelligence Service (Dev 2 / Role D)
+│   │   │   ├── app/
+│   │   │   │   ├── main.py                ← FastAPI application entrypoint
+│   │   │   │   ├── config.py              ← Environment configuration
+│   │   │   │   ├── api/routes.py          ← /health and /v1/analyze endpoints
+│   │   │   │   ├── schemas/               ← Pydantic request & response models (v3 aligned)
+│   │   │   │   ├── graph/builder.py       ← MultiDiGraph construction
+│   │   │   │   ├── traversal/             ← confidence.py, priority_queue.py, multi_hop.py
+│   │   │   │   ├── detection/             ← suspicious_paths.py, circular_flows.py
+│   │   │   │   ├── ranking/               ← path_ranker.py
+│   │   │   │   ├── scoring/               ← risk_score.py
+│   │   │   │   └── attribution/           ← vasp_attribution.py
+│   │   │   ├── tests/                     ← Comprehensive pytest test suite
+│   │   │   └── pyproject.toml             ← Poetry project definition
+│   │   │
+│   │   └── contracts/                     ← Blockchain Evidence Registry (Dev 2 / Role E)
+│   │       ├── contracts/
+│   │       │   └── EvidenceRegistry.sol   ← On-chain SHA-256 hash storage contract
+│   │       ├── test/                      ← EvidenceRegistry.test.ts (Hardhat unit tests)
+│   │       ├── scripts/                   ← deploy.ts, storeEvidence.ts, verifyEvidence.ts
+│   │       └── hardhat.config.ts          ← Polygon Amoy configuration
+│   │
+│   └── packages/
+│       └── shared-types/                  ← TypeScript DTO definitions across monorepo
+│           ├── src/                       ← graph.ts, transaction.ts, case.ts, index.ts
+│           └── scripts/                   ← validateFixtures.ts
+│
+└── Frontend/                              ← React Dashboard Application
+    ├── src/
+    │   ├── components/                    │ Case cards, graph renderer, findings lists
+    │   ├── pages/                         │ Dashboard, Case View, Investigation, Verification
+    │   └── services/                      │ API client communicating with Fastify
+    └── package.json
+```
+
+---
+
+## 5. Verification & Testing Overview
+
+| Component | Test Mechanism | Current Status |
+|---|---|---|
+| **Python Intelligence** | `poetry run pytest` (in `Backend/apps/intelligence`) | 108+ passing tests (v3 schema migration updates being finalized) |
+| **Shared Types** | `npx tsc --noEmit` (in `Backend/packages/shared-types`) | 0 compiler errors |
+| **Seeded Fixtures** | `npx ts-node scripts/validateFixtures.ts` | 100% schema validation pass |
+| **Smart Contract** | `npx hardhat test` (in `Backend/apps/contracts`) | All storage, versioning, and access control tests pass |
+| **Fastify API** | `npm test` (in `Backend/apps/api`) | Health & seeded demo case endpoints functional |
+
+---
+
+## 6. Immediate Next Steps (To Finish Phase 4 & 5)
+
+1. **Complete v3 Intelligence Test Updates**: Finish adjusting remaining legacy `maxDepth` test assertions in `test_schemas.py` and `test_traversal.py` to the new `minConfidence` and priority-queue traversal signatures.
+2. **Fastify Orchestration Hookup (Dev 1 & Dev 2 interface)**: Dev 1 wires the Fastify analysis queue to call `POST /v1/analyze` on the Python service and stores the composite risk score, suspicious paths, and `vaspAttribution` in PostgreSQL.
+3. **Report Generation & Ethers Anchoring**: Dev 1 triggers PDF report compilation, computes SHA-256 hash, and submits the hash to the deployed `EvidenceRegistry` contract.
+4. **End-to-End Demo Triage**: Validate the complete flow using `seeded-case.json` through the UI from wallet input to on-chain verified evidence.

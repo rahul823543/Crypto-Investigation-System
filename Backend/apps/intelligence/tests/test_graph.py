@@ -102,10 +102,13 @@ class TestBuildGraphStructure:
         # root_address is normalised to lowercase by the schema validator
         assert G.graph["root_address"] == req.root_address
 
-    def test_graph_metadata_max_depth(self):
+    def test_graph_metadata_v3_params(self):
         req = AnalysisRequest.model_validate(MINIMAL_VALID_PAYLOAD)
         G = build_graph(req)
-        assert G.graph["max_depth"] == req.max_depth
+        assert G.graph["min_confidence"] == req.min_confidence
+        assert G.graph["decay_factor"] == req.decay_factor
+        assert G.graph["hard_ceiling_depth"] == req.hard_ceiling_depth
+        assert G.graph["hub_threshold"] == req.hub_threshold
 
     def test_node_ids_are_stable_role_c_format(self):
         """All node IDs must follow the 'type:0x...' stable-ID format."""

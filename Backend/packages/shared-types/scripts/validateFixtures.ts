@@ -48,9 +48,9 @@ const addressLabels: AddressLabel[] = JSON.parse(
 // Allowed value sets (mirrors the shared-types Literal unions)
 // ---------------------------------------------------------------------------
 
-const VALID_NODE_TYPES    = new Set<string>(["wallet","contract","dex","bridge","mixer","unknown"]);
+const VALID_NODE_TYPES    = new Set<string>(["wallet","contract","dex","bridge","mixer","vasp","unknown"]);
 const VALID_RISK_LEVELS   = new Set<RiskLevel>(["low","medium","high","critical"]);
-const VALID_LABEL_TYPES   = new Set<AddressLabelType>(["dex","bridge","mixer","risky","ofac"]);
+const VALID_LABEL_TYPES   = new Set<AddressLabelType>(["dex","bridge","mixer","risky","ofac","vasp"]);
 const VALID_FINDING_SRC   = new Set(["basic-risk","python-intelligence"]);
 const VALID_TRANSFER_TYPE = new Set(["native","erc20"]);
 

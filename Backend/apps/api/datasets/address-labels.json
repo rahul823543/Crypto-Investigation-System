@@ -136,5 +136,29 @@
     "type": "risky",
     "label": "Flagged by Chainalysis",
     "chainId": null
+  },
+  {
+    "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+    "type": "vasp",
+    "label": "Binance 14 (Hot Wallet)",
+    "chainId": 1
+  },
+  {
+    "address": "0x21a31ee1afc51d94c2efccaa2092ad1028285549",
+    "type": "vasp",
+    "label": "Binance 15 (Deposit Wallet)",
+    "chainId": 1
+  },
+  {
+    "address": "0x503828976d22510aad0201ac7ec88293211d23dc",
+    "type": "vasp",
+    "label": "Coinbase 2 (Deposit Address)",
+    "chainId": 1
+  },
+  {
+    "address": "0x2910543af39aba0cd09dbb2d50200b3e800a63d2",
+    "type": "vasp",
+    "label": "Kraken 1 (Exchange Wallet)",
+    "chainId": 1
   }
 ]
