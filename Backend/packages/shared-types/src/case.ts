@@ -14,7 +14,7 @@ export type CaseStatus =
   | "completed"
   | "failed"
   | "demo_fallback_used";
-export type RiskLevel = "low" | "medium" | "high" | "critical";
+import type { RiskLevel } from "./graph";
 
 export interface Case {
   id: string;
@@ -50,4 +50,4 @@ export interface SeededCaseData {
   graph: import("./graph").GraphResponse;
   basicFindings: import("./finding").RiskFinding[];
   analysisResult: import("./transaction").AnalysisResponse;
-}
+}
