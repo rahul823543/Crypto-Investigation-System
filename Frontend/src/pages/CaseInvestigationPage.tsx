@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   AlertTriangle,
-  ArrowRight,
-  FileCheck2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -15,36 +13,64 @@ import { CaseMetricsGrid } from '@/components/case/CaseMetricsGrid';
 import { RiskMatrixBreakdown } from '@/components/case/RiskMatrixBreakdown';
 import { TransactionFeedTable } from '@/components/case/TransactionFeedTable';
 import { CaseActionBar } from '@/components/case/CaseActionBar';
+import { SuspiciousPathsPanel } from '@/components/case/SuspiciousPathsPanel';
+import { AttributionPanel } from '@/components/case/AttributionPanel';
+import { EvidenceStatusPanel } from '@/components/evidence/EvidenceStatusPanel';
 import { TransactionGraph } from '@/components/graph/TransactionGraph';
 import { GraphInspectorPanel } from '@/components/graph/GraphInspectorPanel';
 import { RiskFindingsPanel } from '@/components/graph/RiskFindingsPanel';
 import { useCasePolling } from '@/hooks/useCasePolling';
 import { useCaseGraph } from '@/hooks/useCaseGraph';
 import { useCaseFindings } from '@/hooks/useCaseFindings';
+import { useAnalysis } from '@/hooks/useAnalysis';
+import { useAttribution } from '@/hooks/useAttribution';
+import { useEvidence } from '@/hooks/useEvidence';
 import { useInvestigationStore } from '@/store/investigationStore';
+import { useUiStore } from '@/store/uiStore';
 import type { GraphFinding } from '@/types';
 
 export const CaseInvestigationPage: React.FC = () => {
   const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
+  const { setActiveChainId } = useUiStore();
 
   const { data: caseDetail, isLoading: caseLoading, isError: caseError } = useCasePolling(caseId);
   const { data: graphData, isLoading: graphLoading } = useCaseGraph(caseId);
   const { data: findingsData, isLoading: findingsLoading } = useCaseFindings(caseId);
+  const { data: analysisData, isLoading: analysisLoading } = useAnalysis(caseId);
+  const { data: attributionData, isLoading: attributionLoading } = useAttribution(caseId);
+  const {
+    data: evidenceData,
+    isLoading: evidenceLoading,
+    isError: evidenceError,
+    refetch: refetchEvidence,
+  } = useEvidence(caseId);
 
   const { selectFinding } = useInvestigationStore();
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('graph');
+
+  React.useEffect(() => {
+    if (caseDetail?.chainId) {
+      setActiveChainId(caseDetail.chainId);
+    }
+  }, [caseDetail?.chainId, setActiveChainId]);
 
   const workspaceTabs = [
     { id: 'graph', label: 'Topology Graph' },
     { id: 'overview', label: 'Case Overview' },
     { id: 'findings', label: 'Risk Findings & Vectors' },
+    { id: 'analysis', label: 'Analysis & Paths' },
     { id: 'evidence', label: 'Evidence Attestation' },
   ];
 
   const handleHighlightFinding = (finding: GraphFinding) => {
     const allRelated = [...finding.relatedNodeIds, ...finding.relatedEdgeIds];
     selectFinding(finding.id, allRelated);
+  };
+
+  const handleHighlightPath = (nodeIds: string[], edgeIds: string[]) => {
+    selectFinding('custom-path-highlight', [...nodeIds, ...edgeIds]);
+    setActiveWorkspaceTab('graph');
   };
 
   if (caseLoading || graphLoading || findingsLoading) {
@@ -111,7 +137,10 @@ export const CaseInvestigationPage: React.FC = () => {
       </div>
 
       {/* Quick Actions Bar */}
-      <CaseActionBar caseId={caseDetail.caseId} />
+      <CaseActionBar
+        caseId={caseDetail.caseId}
+        onAnalysisTriggered={() => setActiveWorkspaceTab('analysis')}
+      />
 
       {/* Workspace Tabs Navigation */}
       <div className="space-y-6">
@@ -166,66 +195,32 @@ export const CaseInvestigationPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 4: Evidence Attestation */}
-        {activeWorkspaceTab === 'evidence' && (
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-emerald-50 text-[#10B981]">
-                  <FileCheck2 className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-lg text-slate-900">
-                    Polygon Amoy Cryptographic Attestation
-                  </h3>
-                  <p className="text-xs text-[#526077]">
-                    Immutable evidence record anchored to the EvidenceRegistry contract.
-                  </p>
-                </div>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-mono text-xs font-semibold border border-emerald-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>On-Chain Notarized</span>
-              </span>
-            </div>
+        {/* Tab 4: Analysis & Paths (Suspicious Paths & VASP Attribution) */}
+        {activeWorkspaceTab === 'analysis' && (
+          <div className="space-y-6">
+            <AttributionPanel
+              attribution={attributionData ?? analysisData?.vaspAttribution}
+              isLoading={attributionLoading || analysisLoading}
+              onHighlightPath={handleHighlightPath}
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Contract Address
-                </span>
-                <span className="text-slate-800 font-bold break-all">
-                  0x71c504A7aFdC370B3C46c24385ea1502476b7A6B
-                </span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Transaction Hash
-                </span>
-                <span className="text-slate-800 font-bold break-all">
-                  0x3f5c9e2b1a8d7f4e6a0c8b2d1e3f5a7b9c1d3e5f7a9b1c3d5e7f9a1b3c5d7e9f
-                </span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Evidence Version
-                </span>
-                <span className="text-slate-800 font-bold">Version #1 (Immutable)</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <Button
-                variant="primary"
-                onClick={() => navigate('/evidence')}
-                rightIcon={<ArrowRight className="h-4 w-4" />}
-              >
-                Perform Independent Verification
-              </Button>
-            </div>
+            <SuspiciousPathsPanel
+              paths={analysisData?.suspiciousPaths || []}
+              circularFlows={analysisData?.circularFlows || []}
+              isLoading={analysisLoading}
+              onHighlightPath={handleHighlightPath}
+            />
           </div>
+        )}
+
+        {/* Tab 5: Evidence Attestation */}
+        {activeWorkspaceTab === 'evidence' && (
+          <EvidenceStatusPanel
+            evidence={evidenceData}
+            isLoading={evidenceLoading}
+            isError={evidenceError}
+            onRetry={() => refetchEvidence()}
+          />
         )}
       </div>
     </div>

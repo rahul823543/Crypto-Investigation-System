@@ -5,6 +5,7 @@ import type {
   CaseGraph,
   GraphFinding,
   AnalysisResult,
+  VaspAttribution,
   ReportMetadata,
   EvidenceMetadata,
   EvidenceVerificationResult,
@@ -21,8 +22,11 @@ export interface CaseRepository {
   getCase(caseId: string): Promise<CaseDetail>;
   getGraph(caseId: string): Promise<CaseGraph>;
   getFindings(caseId: string): Promise<GraphFinding[]>;
+  getAnalysis(caseId: string): Promise<AnalysisResult | null>;
   analyzeCase(caseId: string): Promise<AnalysisResult>;
+  getAttribution(caseId: string): Promise<VaspAttribution | null>;
   generateReport(caseId: string): Promise<ReportMetadata>;
   getEvidence(caseId: string): Promise<EvidenceMetadata>;
+  anchorEvidence(caseId: string, reportId: string): Promise<EvidenceMetadata>;
   verifyEvidence(input: VerifyEvidenceInput): Promise<EvidenceVerificationResult>;
 }

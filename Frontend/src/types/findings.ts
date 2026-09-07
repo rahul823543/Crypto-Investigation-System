@@ -14,7 +14,9 @@ export type FindingType =
   | 'circular_flow'
   | 'rapid_movement'
   | 'suspicious_path'
-  | 'multi_hop_laundering';
+  | 'multi_hop_laundering'
+  | 'mixer_interaction'
+  | 'vasp_direct_touch';
 
 export interface GraphFinding {
   id: string;

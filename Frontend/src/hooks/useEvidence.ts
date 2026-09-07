@@ -27,3 +27,10 @@ export function useVerifyEvidence() {
       caseRepository.verifyEvidence(input),
   });
 }
+
+/** Anchors an existing generated report through the Fastify evidence endpoint. */
+export function useAnchorEvidence() {
+  return useMutation<EvidenceMetadata, Error, { caseId: string; reportId: string }>({
+    mutationFn: ({ caseId, reportId }) => caseRepository.anchorEvidence(caseId, reportId),
+  });
+}

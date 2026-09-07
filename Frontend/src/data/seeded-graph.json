@@ -9,7 +9,9 @@
       "riskLevel": "high",
       "totalInUsd": 150000,
       "totalOutUsd": 148500,
-      "hopDepth": 0
+      "hopDepth": 0,
+      "isTraceableDeadEnd": false,
+      "outDegree": 3
     },
     {
       "id": "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
@@ -19,7 +21,9 @@
       "riskLevel": "medium",
       "totalInUsd": 45000,
       "totalOutUsd": 44800,
-      "hopDepth": 1
+      "hopDepth": 1,
+      "isTraceableDeadEnd": false,
+      "outDegree": 2
     },
     {
       "id": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
@@ -29,7 +33,9 @@
       "riskLevel": "medium",
       "totalInUsd": 38000,
       "totalOutUsd": 37500,
-      "hopDepth": 1
+      "hopDepth": 1,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
     },
     {
       "id": "wallet:0xC3D4e5F6a7B8c9D0e1F2a3B4c5D6E7f8A9B0c1D2",
@@ -39,7 +45,9 @@
       "riskLevel": "low",
       "totalInUsd": 32000,
       "totalOutUsd": 31800,
-      "hopDepth": 1
+      "hopDepth": 1,
+      "isTraceableDeadEnd": false,
+      "outDegree": 2
     },
     {
       "id": "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
@@ -49,7 +57,9 @@
       "riskLevel": "low",
       "totalInUsd": 82000,
       "totalOutUsd": 81500,
-      "hopDepth": 2
+      "hopDepth": 2,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
     },
     {
       "id": "bridge:0x3ee18B2214AFF97000D974cf647E7C347E8fa585",
@@ -59,27 +69,33 @@
       "riskLevel": "medium",
       "totalInUsd": 37500,
       "totalOutUsd": 37200,
-      "hopDepth": 2
+      "hopDepth": 2,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
     },
     {
       "id": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
       "address": "0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
       "type": "wallet",
-      "labels": ["collector"],
+      "labels": ["collector", "binance_deposit"],
       "riskLevel": "high",
       "totalInUsd": 75000,
       "totalOutUsd": 200,
-      "hopDepth": 3
+      "hopDepth": 3,
+      "isTraceableDeadEnd": false,
+      "outDegree": 1
     },
     {
       "id": "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
       "address": "0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
-      "type": "risky_address",
+      "type": "mixer",
       "labels": ["flagged", "mixer_associated"],
       "riskLevel": "critical",
       "totalInUsd": 33000,
       "totalOutUsd": 32800,
-      "hopDepth": 2
+      "hopDepth": 2,
+      "isTraceableDeadEnd": true,
+      "outDegree": 1
     }
   ],
   "edges": [

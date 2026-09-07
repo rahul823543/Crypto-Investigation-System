@@ -6,6 +6,9 @@ import {
   Flame,
   Shuffle,
   Layers,
+  Building2,
+  Ban,
+  Repeat,
 } from 'lucide-react';
 import { RiskBadge } from '@/components/ui/Badge';
 import { useInvestigationStore } from '@/store/investigationStore';
@@ -33,6 +36,12 @@ export const RiskFindingsPanel: React.FC<RiskFindingsPanelProps> = ({
         return Shuffle;
       case 'bridge_interaction':
         return Layers;
+      case 'mixer_interaction':
+        return Ban;
+      case 'vasp_direct_touch':
+        return Building2;
+      case 'circular_flow':
+        return Repeat;
       default:
         return AlertTriangle;
     }
@@ -57,6 +66,9 @@ export const RiskFindingsPanel: React.FC<RiskFindingsPanelProps> = ({
           const Icon = getFindingIcon(f.type);
           const isSelected = selectedFindingId === f.id;
 
+          const isVaspTouch = f.type === 'vasp_direct_touch';
+          const isMixer = f.type === 'mixer_interaction';
+
           return (
             <div
               key={f.id}
@@ -76,7 +88,9 @@ export const RiskFindingsPanel: React.FC<RiskFindingsPanelProps> = ({
                   <div className="flex items-center gap-2.5">
                     <div
                       className={`p-2.5 rounded-2xl border ${
-                        f.severity === 'high' || f.severity === 'critical'
+                        isVaspTouch
+                          ? 'bg-blue-50 text-blue-600 border-blue-100'
+                          : isMixer || f.severity === 'high' || f.severity === 'critical'
                           ? 'bg-red-50 text-red-600 border-red-100'
                           : 'bg-amber-50 text-amber-600 border-amber-100'
                       }`}
@@ -88,11 +102,17 @@ export const RiskFindingsPanel: React.FC<RiskFindingsPanelProps> = ({
                         {f.title}
                       </h4>
                       <span className="text-[10px] font-mono text-[#94A3B8] capitalize">
-                        {f.type.replace('_', ' ')}
+                        {f.type.replace(/_/g, ' ')}
                       </span>
                     </div>
                   </div>
-                  <RiskBadge riskLevel={f.severity} size="sm" />
+                  {isVaspTouch ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 font-mono text-xs font-semibold border border-blue-200">
+                      VASP Info
+                    </span>
+                  ) : (
+                    <RiskBadge riskLevel={f.severity} size="sm" />
+                  )}
                 </div>
 
                 <p className="text-xs text-[#526077] leading-relaxed">

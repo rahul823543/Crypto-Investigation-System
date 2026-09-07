@@ -1,4 +1,3 @@
-import type { DataMode } from '@/types';
 import type { CaseRepository } from './repository';
 import { MockCaseRepository } from './mockRepository';
 import { ApiCaseRepository } from './apiRepository';
@@ -6,20 +5,24 @@ import { ApiCaseRepository } from './apiRepository';
 export type { CaseRepository } from './repository';
 
 /**
- * Determine data mode from environment variable
+ * Named singletons — both are always instantiated at boot.
+ * Hooks choose which one to use based on the case's mode field.
  */
-export const dataMode: DataMode =
-  import.meta.env.VITE_DATA_MODE === 'api' ? 'api' : 'mock';
+export const mockRepository: CaseRepository = new MockCaseRepository();
+export const apiRepository: CaseRepository = new ApiCaseRepository();
 
 /**
- * Factory: creates the appropriate repository based on data mode
+ * Returns the correct repository for a given mode string.
+ * 'live' or 'api' → ApiCaseRepository (calls Fastify)
+ * 'demo' or 'mock' (or anything else) → MockCaseRepository
  */
-export function createCaseRepository(): CaseRepository {
-  if (dataMode === 'api') {
-    return new ApiCaseRepository();
-  }
-  return new MockCaseRepository();
+export function getRepository(mode: string): CaseRepository {
+  return mode === 'live' || mode === 'api' ? apiRepository : mockRepository;
 }
 
-// Singleton repository instance for the app
-export const caseRepository = createCaseRepository();
+/**
+ * Default singleton — used by hooks that don't have per-case mode context.
+ * Defaults to mock (seeded) mode; override with VITE_DATA_MODE=api env var.
+ */
+export const caseRepository: CaseRepository =
+  import.meta.env.VITE_DATA_MODE === 'api' ? apiRepository : mockRepository;

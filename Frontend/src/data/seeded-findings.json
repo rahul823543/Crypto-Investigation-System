@@ -78,6 +78,36 @@
       ],
       "relatedEdgeIds": ["edge:0xabc003:0", "edge:0xabc006:0", "edge:0xabc010:0"],
       "signals": ["circular_flow", "return_to_origin", "layering"]
+    },
+    {
+      "id": "finding_006",
+      "source": "python-intelligence",
+      "type": "mixer_interaction",
+      "severity": "critical",
+      "confidence": 0.99,
+      "title": "Mixer & Tumbler Obfuscation Point",
+      "description": "Node 0xE5F6...e3F4 is an identified mixer pool where on-chain traceability terminates. The transaction pattern exhibits deliberate entropy injection to sever the deterministic custody chain.",
+      "relatedNodeIds": [
+        "wallet:0xE5F6a7B8c9D0e1F2a3B4c5D6e7F8A9b0C1D2e3F4",
+        "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"
+      ],
+      "relatedEdgeIds": ["edge:0xabc006:0", "edge:0xabc010:0"],
+      "signals": ["mixer_pool", "privacy_protocol", "dead_end_traversal"]
+    },
+    {
+      "id": "finding_007",
+      "source": "basic-risk",
+      "type": "vasp_direct_touch",
+      "severity": "low",
+      "confidence": 0.86,
+      "title": "Direct VASP Touchpoint (Binance Deposit)",
+      "description": "Collector wallet 0xD4E5...1d2E3 was identified as an attributed Binance exchange deposit address, providing a primary off-ramp identification endpoint.",
+      "relatedNodeIds": [
+        "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+        "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+      ],
+      "relatedEdgeIds": ["edge:0xabc007:0", "edge:0xabc008:0"],
+      "signals": ["vasp_identified", "binance_deposit", "off_ramp_candidate"]
     }
   ]
 }

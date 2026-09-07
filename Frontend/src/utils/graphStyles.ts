@@ -84,6 +84,17 @@ export const graphStyles: StylesheetStyle[] = [
     } as any,
   },
 
+  // ─── Dead-End / Mixer Traversal Stop (v3 Requirement) ───────────────────────
+  {
+    selector: 'node.dead-end, node[?isTraceableDeadEnd]',
+    style: {
+      'border-style': 'dashed',
+      'border-width': 3.5,
+      'border-color': '#DC2626',
+      'background-color': '#FFF1F2',
+    } as any,
+  },
+
   // ─── Node Risk Levels ──────────────────────────────────────────────────────
   {
     selector: 'node[riskLevel = "high"], node[riskLevel = "critical"]',
@@ -130,6 +141,18 @@ export const graphStyles: StylesheetStyle[] = [
       'text-margin-y': -6,
       'transition-property': 'line-color, target-arrow-color, width, opacity',
       'transition-duration': 200,
+    } as any,
+  },
+
+  // ─── Circular Flow Edge ───────────────────────────────────────────────────
+  {
+    selector: 'edge.circular-flow',
+    style: {
+      'line-style': 'dashed',
+      'line-color': '#F59E0B',
+      'target-arrow-color': '#D97706',
+      'width': 3.5,
+      'color': '#B45309',
     } as any,
   },
 

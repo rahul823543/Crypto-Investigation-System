@@ -15,10 +15,15 @@ export function mapGraphToCytoscapeElements(
 
     return {
       group: 'nodes',
+      classes: n.isTraceableDeadEnd ? 'dead-end' : undefined,
       data: {
         id: n.id,
         address: n.address,
-        label: isRoot ? `★ ${displayLabel}` : displayLabel,
+        label: isRoot
+          ? `★ ${displayLabel}`
+          : n.isTraceableDeadEnd
+          ? `⛔ ${displayLabel}`
+          : displayLabel,
         fullAddress: n.address,
         nodeType: n.type,
         riskLevel: n.riskLevel,
@@ -26,6 +31,8 @@ export function mapGraphToCytoscapeElements(
         totalInUsd: n.totalInUsd,
         totalOutUsd: n.totalOutUsd,
         hopDepth: n.hopDepth ?? 0,
+        isTraceableDeadEnd: n.isTraceableDeadEnd ?? false,
+        outDegree: n.outDegree ?? 0,
         labels: n.labels,
       },
     };

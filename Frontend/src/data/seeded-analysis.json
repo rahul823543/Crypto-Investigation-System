@@ -47,6 +47,35 @@
       "summary": "3-hop circular flow returning 1.2 ETH to root wallet via mixer-associated address."
     }
   ],
+  "vaspAttribution": {
+    "attributedVasp": "Binance",
+    "vaspNodeId": "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3",
+    "hopDistance": 2,
+    "confidence": 0.86,
+    "pathNodeIds": [
+      "wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
+      "wallet:0xA1B2c3D4e5F6a7B8c9D0E1F2a3B4C5d6E7F8a9B0",
+      "dex:0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "wallet:0xD4E5f6A7b8C9d0E1f2A3b4C5d6E7F8a9B0C1d2E3"
+    ],
+    "pathEdgeIds": [
+      "edge:0xabc001:0",
+      "edge:0xabc004:0",
+      "edge:0xabc007:0"
+    ],
+    "basis": "Connected via 2 hops from root through Uniswap V2 router into labeled Binance deposit address",
+    "secondaryCandidates": [
+      {
+        "attributedVasp": "Coinbase",
+        "vaspNodeId": "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1",
+        "hopDistance": 3,
+        "confidence": 0.42,
+        "pathNodeIds": ["wallet:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18", "wallet:0xB2C3d4E5f6A7b8C9d0E1f2A3b4C5D6e7F8A9b0C1"],
+        "pathEdgeIds": ["edge:0xabc002:0"],
+        "basis": "Secondary flow trace touching Coinbase custodian cluster"
+      }
+    ]
+  },
   "analysisMetadata": {
     "engineVersion": "0.1.0",
     "runtimeMs": 240

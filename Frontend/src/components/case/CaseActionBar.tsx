@@ -9,25 +9,31 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { caseRepository } from '@/api';
+import { useRunAnalysis } from '@/hooks/useAnalysis';
 
 export interface CaseActionBarProps {
   caseId: string;
+  onAnalysisTriggered?: () => void;
   className?: string;
 }
 
-export const CaseActionBar: React.FC<CaseActionBarProps> = ({ caseId, className }) => {
-  const [analyzing, setAnalyzing] = useState(false);
+export const CaseActionBar: React.FC<CaseActionBarProps> = ({
+  caseId,
+  onAnalysisTriggered,
+  className,
+}) => {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportReady, setReportReady] = useState(false);
   const navigate = useNavigate();
 
-  const handleRunAnalysis = async () => {
-    setAnalyzing(true);
-    try {
-      await caseRepository.analyzeCase(caseId);
-    } finally {
-      setAnalyzing(false);
-    }
+  const runAnalysisMutation = useRunAnalysis(caseId);
+
+  const handleRunAnalysis = () => {
+    runAnalysisMutation.mutate(undefined, {
+      onSuccess: () => {
+        if (onAnalysisTriggered) onAnalysisTriggered();
+      },
+    });
   };
 
   const handleGenerateReport = async () => {
@@ -44,11 +50,15 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({ caseId, className 
     const caseData = await caseRepository.getCase(caseId);
     const graphData = await caseRepository.getGraph(caseId);
     const findingsData = await caseRepository.getFindings(caseId);
+    const analysisData = await caseRepository.getAnalysis(caseId);
+    const attributionData = await caseRepository.getAttribution(caseId);
 
     const fullExport = {
       case: caseData,
       graph: graphData,
       findings: findingsData,
+      analysis: analysisData,
+      attribution: attributionData,
       exportedAt: new Date().toISOString(),
     };
 
@@ -76,7 +86,7 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({ caseId, className 
           size="sm"
           variant="outline"
           onClick={handleRunAnalysis}
-          isLoading={analyzing}
+          isLoading={runAnalysisMutation.isPending}
           leftIcon={<Zap className="h-4 w-4 text-[#7E22CE]" />}
         >
           Re-Analyze Topology

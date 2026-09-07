@@ -5,6 +5,7 @@ import type {
   CaseGraph,
   GraphFinding,
   AnalysisResult,
+  VaspAttribution,
   ReportMetadata,
   EvidenceMetadata,
   EvidenceVerificationResult,
@@ -19,6 +20,41 @@ import seededGraphData from '@/data/seeded-graph.json';
 import seededFindingsData from '@/data/seeded-findings.json';
 import seededAnalysisData from '@/data/seeded-analysis.json';
 import seededEvidenceData from '@/data/seeded-evidence.json';
+import backendSeededCaseData from '@/data/backend-seeded-case.json';
+
+const backendGraph: CaseGraph = {
+  caseId: backendSeededCaseData.case.id,
+  nodes: (backendSeededCaseData.graph.nodes as any[]).map((n) => ({
+    id: n.id,
+    address: n.address,
+    type: n.type,
+    labels: n.labels ?? [],
+    riskLevel: n.riskLevel,
+    totalInUsd: n.totalInUsd,
+    totalOutUsd: n.totalOutUsd,
+    hopDepth: n.hopDepth ?? (n.labels?.includes('root') ? 0 : 1),
+    isTraceableDeadEnd: false,
+    outDegree: n.outDegree ?? 0,
+  })),
+  edges: (backendSeededCaseData.graph.edges as any[]).map((e) => ({
+    id: e.id,
+    from: e.from,
+    to: e.to,
+    transactionHash: e.transactionHash,
+    asset: e.asset,
+    amount: e.amount,
+    amountUsd: e.amountUsd,
+    timestamp: e.timestamp,
+    transferType: 'erc20',
+    hopDepth: e.hopDepth,
+    riskLevel: e.riskLevel,
+  })),
+  metadata: {
+    nodeCount: backendSeededCaseData.graph.nodes.length,
+    edgeCount: backendSeededCaseData.graph.edges.length,
+    maxHopDepth: 2,
+  },
+};
 
 // In-memory runtime state for mock cases created in current session
 const dynamicCases: Map<string, CaseDetail> = new Map();
@@ -121,19 +157,54 @@ export class MockCaseRepository implements CaseRepository {
     return { ...seeded };
   }
 
-  async getGraph(_caseId: string): Promise<CaseGraph> {
+  async getGraph(caseId: string): Promise<CaseGraph> {
     await mockDelay(500, 1200);
+    const caseObj = dynamicCases.get(caseId);
+    if (caseId === 'case_seed_demo' || caseObj?.rootAddress.toLowerCase() === '0x1234567890abcdef1234567890abcdef12345678'.toLowerCase()) {
+      return backendGraph;
+    }
     return seededGraphData as CaseGraph;
   }
 
-  async getFindings(_caseId: string): Promise<GraphFinding[]> {
+  async getFindings(caseId: string): Promise<GraphFinding[]> {
     await mockDelay();
+    const caseObj = dynamicCases.get(caseId);
+    if (caseId === 'case_seed_demo' || caseObj?.rootAddress.toLowerCase() === '0x1234567890abcdef1234567890abcdef12345678'.toLowerCase()) {
+      return (backendSeededCaseData.basicFindings as any[]).map((f) => ({
+        ...f,
+        signals: f.signals ?? [],
+        remediation: 'Inspect DEX swap and fan-out endpoints',
+        createdAt: new Date().toISOString(),
+      })) as GraphFinding[];
+    }
     return seededFindingsData.findings as GraphFinding[];
   }
 
-  async analyzeCase(_caseId: string): Promise<AnalysisResult> {
-    await mockDelay(800, 1500);
+  async getAnalysis(caseId: string): Promise<AnalysisResult | null> {
+    await mockDelay(200, 500);
+    const caseObj = dynamicCases.get(caseId);
+    if (caseId === 'case_seed_demo' || caseObj?.rootAddress.toLowerCase() === '0x1234567890abcdef1234567890abcdef12345678'.toLowerCase()) {
+      return backendSeededCaseData.analysisResult as unknown as AnalysisResult;
+    }
     return seededAnalysisData as AnalysisResult;
+  }
+
+  async analyzeCase(caseId: string): Promise<AnalysisResult> {
+    await mockDelay(800, 1500);
+    const caseObj = dynamicCases.get(caseId);
+    if (caseId === 'case_seed_demo' || caseObj?.rootAddress.toLowerCase() === '0x1234567890abcdef1234567890abcdef12345678'.toLowerCase()) {
+      return backendSeededCaseData.analysisResult as unknown as AnalysisResult;
+    }
+    return seededAnalysisData as AnalysisResult;
+  }
+
+  async getAttribution(caseId: string): Promise<VaspAttribution | null> {
+    await mockDelay(200, 400);
+    const caseObj = dynamicCases.get(caseId);
+    if (caseId === 'case_seed_demo' || caseObj?.rootAddress.toLowerCase() === '0x1234567890abcdef1234567890abcdef12345678'.toLowerCase()) {
+      return (backendSeededCaseData.analysisResult as any).vaspAttribution ?? null;
+    }
+    return (seededAnalysisData as any).vaspAttribution ?? null;
   }
 
   async generateReport(_caseId: string): Promise<ReportMetadata> {
@@ -143,6 +214,11 @@ export class MockCaseRepository implements CaseRepository {
 
   async getEvidence(_caseId: string): Promise<EvidenceMetadata> {
     await mockDelay();
+    return seededEvidenceData.evidence as EvidenceMetadata;
+  }
+
+  async anchorEvidence(_caseId: string, _reportId: string): Promise<EvidenceMetadata> {
+    await mockDelay(600, 1200);
     return seededEvidenceData.evidence as EvidenceMetadata;
   }
 

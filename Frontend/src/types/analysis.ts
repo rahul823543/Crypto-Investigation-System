@@ -1,8 +1,19 @@
 // ─── Analysis Types ─────────────────────────────────────────────────────────
-// Aligned with Backend/packages/shared-types/src/transaction.ts
+// Aligned with Backend/packages/shared-types/src/analysis.ts and attribution.ts
 
 import type { RiskLevel } from './case';
 import type { GraphFinding } from './findings';
+
+export interface VaspAttribution {
+  attributedVasp: string;
+  vaspNodeId: string;
+  hopDistance: number;
+  confidence: number;
+  pathNodeIds: string[];
+  pathEdgeIds: string[];
+  basis: string;
+  secondaryCandidates?: VaspAttribution[];
+}
 
 export interface SuspiciousPath {
   id: string;
@@ -35,5 +46,20 @@ export interface AnalysisResult {
   findings: GraphFinding[];
   suspiciousPaths: SuspiciousPath[];
   circularFlows: CircularFlow[];
+  vaspAttribution?: VaspAttribution | null;
   analysisMetadata: AnalysisMetadata;
+}
+
+export type AnalysisStatus = 'pending' | 'complete' | 'failed';
+
+export interface AnalysisResponse {
+  status: AnalysisStatus;
+  analysis: AnalysisResult | null;
+  message?: string;
+}
+
+export interface AttributionResponse {
+  status: AnalysisStatus;
+  attribution: VaspAttribution | null;
+  message?: string;
 }

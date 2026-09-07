@@ -1,6 +1,25 @@
 {
   "cases": [
     {
+      "caseId": "case_seed_demo",
+      "rootAddress": "0x1234567890abcdef1234567890abcdef12345678",
+      "chainId": 80002,
+      "mode": "demo",
+      "status": "analysis_complete",
+      "riskScore": 78,
+      "riskLevel": "high",
+      "createdAt": "2026-08-21T10:00:00.000Z",
+      "updatedAt": "2026-08-21T10:30:00.000Z",
+      "errorMessage": null,
+      "steps": {
+        "ingestion": "complete",
+        "graph": "complete",
+        "analysis": "complete",
+        "report": "ready",
+        "evidence": "stored"
+      }
+    },
+    {
       "caseId": "case_demo_001",
       "rootAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18",
       "chainId": 80002,

@@ -16,6 +16,10 @@ export interface GraphNode {
   totalInUsd: number;
   totalOutUsd: number;
   hopDepth?: number;
+  /** True when the node is a mixer or labeled VASP — traversal stops here */
+  isTraceableDeadEnd?: boolean;
+  /** Count of outgoing edges from this node */
+  outDegree?: number;
 }
 
 export type TransferType = 'native' | 'erc20' | 'contract_call';
