@@ -48,6 +48,7 @@ export interface AnalysisResult {
   circularFlows: CircularFlow[];
   vaspAttribution?: VaspAttribution | null;
   analysisMetadata: AnalysisMetadata;
+  createdAt?: string;
 }
 
 export type AnalysisStatus = 'pending' | 'complete' | 'failed';

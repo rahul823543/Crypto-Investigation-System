@@ -20,7 +20,7 @@ export interface CaseActionBarProps {
 export const CaseActionBar: React.FC<CaseActionBarProps> = ({
   caseId,
   onAnalysisTriggered,
-  className,
+  className = '',
 }) => {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportReady, setReportReady] = useState(false);
@@ -62,7 +62,9 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
       exportedAt: new Date().toISOString(),
     };
 
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(fullExport, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(fullExport, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute('download', `${caseId}_forensic_export.json`);
@@ -89,7 +91,7 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
           isLoading={runAnalysisMutation.isPending}
           leftIcon={<Zap className="h-4 w-4 text-[#7E22CE]" />}
         >
-          Re-Analyze Topology
+          {runAnalysisMutation.isPending ? 'Analyzing Graph...' : 'Re-Analyze Topology'}
         </Button>
 
         <Button
@@ -105,13 +107,17 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
             )
           }
         >
-          {reportReady ? 'Report Ready (Regenerate)' : 'Generate PDF Dossier'}
+          {generatingReport
+            ? 'Generating Dossier...'
+            : reportReady
+            ? 'Report Ready (Regenerate)'
+            : 'Generate PDF Dossier'}
         </Button>
 
         <Button
           size="sm"
           variant="outline"
-          onClick={() => navigate('/evidence')}
+          onClick={() => navigate(`/evidence?caseId=${caseId}`)}
           leftIcon={<ShieldCheck className="h-4 w-4 text-[#10B981]" />}
         >
           Verify Proof

@@ -26,7 +26,9 @@ export interface CaseRepository {
   analyzeCase(caseId: string): Promise<AnalysisResult>;
   getAttribution(caseId: string): Promise<VaspAttribution | null>;
   generateReport(caseId: string): Promise<ReportMetadata>;
+  listReports(caseId: string): Promise<ReportMetadata[]>;
   getEvidence(caseId: string): Promise<EvidenceMetadata>;
+  listEvidence(caseId: string): Promise<EvidenceMetadata[]>;
   anchorEvidence(caseId: string, reportId: string): Promise<EvidenceMetadata>;
   verifyEvidence(input: VerifyEvidenceInput): Promise<EvidenceVerificationResult>;
 }

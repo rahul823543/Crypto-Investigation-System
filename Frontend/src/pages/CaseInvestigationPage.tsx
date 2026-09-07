@@ -55,11 +55,24 @@ export const CaseInvestigationPage: React.FC = () => {
     }
   }, [caseDetail?.chainId, setActiveChainId]);
 
+  const totalFindingsCount =
+    (findingsData?.length || 0) + (analysisData?.findings?.length || 0);
+
+  const totalPathsAndLoops =
+    (analysisData?.suspiciousPaths?.length || 0) +
+    (analysisData?.circularFlows?.length || 0);
+
   const workspaceTabs = [
     { id: 'graph', label: 'Topology Graph' },
+    {
+      id: 'analysis',
+      label: `Analysis & Paths ${totalPathsAndLoops > 0 ? `(${totalPathsAndLoops})` : ''}`,
+    },
+    {
+      id: 'findings',
+      label: `Risk Findings ${totalFindingsCount > 0 ? `(${totalFindingsCount})` : ''}`,
+    },
     { id: 'overview', label: 'Case Overview' },
-    { id: 'findings', label: 'Risk Findings & Vectors' },
-    { id: 'analysis', label: 'Analysis & Paths' },
     { id: 'evidence', label: 'Evidence Attestation' },
   ];
 
@@ -131,7 +144,7 @@ export const CaseInvestigationPage: React.FC = () => {
             nodeCount={graphData.metadata.nodeCount}
             edgeCount={graphData.metadata.edgeCount}
             maxHopDepth={graphData.metadata.maxHopDepth}
-            findingCount={findingsData?.length || 2}
+            findingCount={totalFindingsCount || 2}
           />
         </div>
       </div>
@@ -166,6 +179,8 @@ export const CaseInvestigationPage: React.FC = () => {
                 nodes={graphData.nodes}
                 edges={graphData.edges}
                 findings={findingsData || []}
+                paths={analysisData?.suspiciousPaths || []}
+                circularFlows={analysisData?.circularFlows || []}
                 onHighlightFinding={handleHighlightFinding}
                 className="sticky top-20"
               />
@@ -173,29 +188,7 @@ export const CaseInvestigationPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Overview (Subject Matrix + Transaction Feed) */}
-        {activeWorkspaceTab === 'overview' && (
-          <div className="space-y-6">
-            <RiskMatrixBreakdown />
-            <TransactionFeedTable />
-          </div>
-        )}
-
-        {/* Tab 3: Risk Findings & Vectors */}
-        {activeWorkspaceTab === 'findings' && (
-          <div className="space-y-6">
-            <RiskFindingsPanel
-              findings={findingsData || []}
-              onHighlightFinding={(f) => {
-                handleHighlightFinding(f);
-                setActiveWorkspaceTab('graph');
-              }}
-            />
-            <RiskMatrixBreakdown />
-          </div>
-        )}
-
-        {/* Tab 4: Analysis & Paths (Suspicious Paths & VASP Attribution) */}
+        {/* Tab 2: Analysis & Paths (Suspicious Paths, Circular Flows, VASP Attribution) */}
         {activeWorkspaceTab === 'analysis' && (
           <div className="space-y-6">
             <AttributionPanel
@@ -210,6 +203,29 @@ export const CaseInvestigationPage: React.FC = () => {
               isLoading={analysisLoading}
               onHighlightPath={handleHighlightPath}
             />
+          </div>
+        )}
+
+        {/* Tab 3: Risk Findings & Vectors */}
+        {activeWorkspaceTab === 'findings' && (
+          <div className="space-y-6">
+            <RiskFindingsPanel
+              findings={findingsData || []}
+              advancedFindings={analysisData?.findings || []}
+              onHighlightFinding={(f) => {
+                handleHighlightFinding(f);
+                setActiveWorkspaceTab('graph');
+              }}
+            />
+            <RiskMatrixBreakdown />
+          </div>
+        )}
+
+        {/* Tab 4: Overview (Subject Matrix + Transaction Feed) */}
+        {activeWorkspaceTab === 'overview' && (
+          <div className="space-y-6">
+            <RiskMatrixBreakdown />
+            <TransactionFeedTable />
           </div>
         )}
 

@@ -5,11 +5,14 @@ interface InvestigationUiState {
   selectedEdgeId: string | null;
   selectedFindingId: string | null;
   selectedPathId: string | null;
+  selectedCircularFlowId: string | null;
+  highlightMode: 'default' | 'path' | 'loop' | null;
   highlightedElementIds: string[];
   selectNode: (nodeId: string | null) => void;
   selectEdge: (edgeId: string | null) => void;
   selectFinding: (findingId: string | null, relatedIds?: string[]) => void;
   selectPath: (pathId: string | null, elementIds?: string[]) => void;
+  selectCircularFlow: (flowId: string | null, elementIds?: string[]) => void;
   clearSelection: () => void;
 }
 
@@ -18,6 +21,8 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
   selectedEdgeId: null,
   selectedFindingId: null,
   selectedPathId: null,
+  selectedCircularFlowId: null,
+  highlightMode: null,
   highlightedElementIds: [],
   selectNode: (nodeId) =>
     set({
@@ -25,6 +30,8 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
       selectedEdgeId: null,
       selectedFindingId: null,
       selectedPathId: null,
+      selectedCircularFlowId: null,
+      highlightMode: null,
       highlightedElementIds: nodeId ? [nodeId] : [],
     }),
   selectEdge: (edgeId) =>
@@ -33,6 +40,8 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
       selectedNodeId: null,
       selectedFindingId: null,
       selectedPathId: null,
+      selectedCircularFlowId: null,
+      highlightMode: null,
       highlightedElementIds: edgeId ? [edgeId] : [],
     }),
   selectFinding: (findingId, relatedIds = []) =>
@@ -41,6 +50,8 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
       selectedNodeId: null,
       selectedEdgeId: null,
       selectedPathId: null,
+      selectedCircularFlowId: null,
+      highlightMode: 'default',
       highlightedElementIds: relatedIds,
     }),
   selectPath: (pathId, elementIds = []) =>
@@ -49,6 +60,18 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
       selectedNodeId: null,
       selectedEdgeId: null,
       selectedFindingId: null,
+      selectedCircularFlowId: null,
+      highlightMode: 'path',
+      highlightedElementIds: elementIds,
+    }),
+  selectCircularFlow: (flowId, elementIds = []) =>
+    set({
+      selectedCircularFlowId: flowId,
+      selectedPathId: null,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+      selectedFindingId: null,
+      highlightMode: 'loop',
       highlightedElementIds: elementIds,
     }),
   clearSelection: () =>
@@ -57,6 +80,8 @@ export const useInvestigationStore = create<InvestigationUiState>((set) => ({
       selectedEdgeId: null,
       selectedFindingId: null,
       selectedPathId: null,
+      selectedCircularFlowId: null,
+      highlightMode: null,
       highlightedElementIds: [],
     }),
 }));

@@ -115,13 +115,89 @@ export class ApiCaseRepository implements CaseRepository {
     return data;
   }
 
+  async listReports(caseId: string): Promise<ReportMetadata[]> {
+    const data = await apiGet<{ reports?: any[] }>(`/cases/${caseId}/reports`);
+    return (data.reports || []).map((r) => ({
+      id: r.id,
+      reportId: r.id,
+      caseId: r.caseId,
+      status: r.status === 'generated' ? 'ready' : r.status,
+      computedHash: r.sha256Hash || r.computedHash,
+      sha256Hash: r.sha256Hash,
+      filePath: r.filePath,
+      version: r.version ?? 1,
+      generatedAt: r.createdAt || r.generatedAt || new Date().toISOString(),
+    }));
+  }
+
   async getEvidence(caseId: string): Promise<EvidenceMetadata> {
-    return apiGet<EvidenceMetadata>(`/cases/${caseId}/evidence`);
+    const data = await apiGet<{ evidenceRecords?: any[] }>(`/cases/${caseId}/evidence`);
+    const first = data.evidenceRecords?.[0];
+    if (first) {
+      return {
+        id: first.id,
+        caseId: first.caseId,
+        reportId: first.reportId,
+        computedHash: first.reportHash || first.computedHash,
+        reportHash: first.reportHash,
+        transactionHash: first.transactionHash,
+        contractAddress: first.contractAddress,
+        chainId: first.chainId,
+        version: first.version,
+        storedAt: first.storedAt,
+        status: first.verificationStatus === 'confirmed' ? 'stored' : 'failed',
+        verificationStatus: first.verificationStatus,
+      };
+    }
+    return {
+      caseId,
+      reportId: '',
+      computedHash: '',
+      transactionHash: null,
+      contractAddress: null,
+      chainId: null,
+      version: 0,
+      storedAt: '',
+      status: 'pending',
+      verificationStatus: 'unanchored',
+    };
+  }
+
+  async listEvidence(caseId: string): Promise<EvidenceMetadata[]> {
+    const data = await apiGet<{ evidenceRecords?: any[] }>(`/cases/${caseId}/evidence`);
+    return (data.evidenceRecords || []).map((rec) => ({
+      id: rec.id,
+      caseId: rec.caseId,
+      reportId: rec.reportId,
+      computedHash: rec.reportHash || rec.computedHash,
+      reportHash: rec.reportHash,
+      transactionHash: rec.transactionHash,
+      contractAddress: rec.contractAddress,
+      chainId: rec.chainId,
+      version: rec.version,
+      storedAt: rec.storedAt,
+      status: rec.verificationStatus === 'confirmed' ? 'stored' : 'failed',
+      verificationStatus: rec.verificationStatus,
+    }));
   }
 
   async anchorEvidence(caseId: string, reportId: string): Promise<EvidenceMetadata> {
-    const data = await apiPost<{ evidenceRecord?: EvidenceMetadata; evidence?: EvidenceMetadata }>(`/cases/${caseId}/evidence`, { reportId });
-    return (data.evidenceRecord || data.evidence || data) as EvidenceMetadata;
+    const data = await apiPost<{ evidenceRecord?: any; evidence?: any }>(`/cases/${caseId}/evidence`, { reportId });
+    const rec = data.evidenceRecord || data.evidence || data;
+    return {
+      id: rec.id || 'ev_live',
+      caseId: rec.caseId,
+      reportId: rec.reportId,
+      computedHash: rec.reportHash || rec.computedHash || '',
+      reportHash: rec.reportHash || rec.computedHash,
+      transactionHash: rec.transactionHash || '',
+      contractAddress: rec.contractAddress || '',
+      chainId: rec.chainId ?? 80002,
+      version: rec.version ?? 1,
+      storedAt: rec.storedAt || new Date().toISOString(),
+      status: rec.verificationStatus === 'confirmed' ? 'stored' : 'failed',
+      verificationStatus: rec.verificationStatus,
+    };
   }
 
   async verifyEvidence(input: VerifyEvidenceInput): Promise<EvidenceVerificationResult> {

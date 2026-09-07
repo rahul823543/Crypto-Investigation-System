@@ -28,14 +28,14 @@ export const EvidenceStatusPanel: React.FC<EvidenceStatusPanelProps> = ({
   onRetry,
   onAnchorEvidence,
   isAnchoring,
-  className,
+  className = '',
 }) => {
   const navigate = useNavigate();
 
   // Loading State
   if (isLoading) {
     return (
-      <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-4 animate-pulse ${className}`}>
+      <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.02)] space-y-4 animate-pulse ${className}`}>
         <div className="h-6 w-1/3 bg-slate-200 rounded-md" />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="h-20 bg-slate-100 rounded-2xl" />
@@ -46,10 +46,10 @@ export const EvidenceStatusPanel: React.FC<EvidenceStatusPanelProps> = ({
     );
   }
 
-  // Error State: Recoverable API failure with Retry (Addresses [P2])
+  // Error State: Recoverable API failure with Retry
   if (isError) {
     return (
-      <div className={`p-8 rounded-3xl bg-red-50/50 border border-red-200 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-4 ${className}`}>
+      <div className={`p-8 rounded-3xl bg-red-50/50 border border-red-200 shadow-[0_10px_35px_rgba(0,0,0,0.02)] space-y-4 ${className}`}>
         <div className="flex items-start gap-3">
           <div className="p-2.5 rounded-2xl bg-red-100 text-red-600 shrink-0">
             <AlertTriangle className="h-6 w-6" />
@@ -82,7 +82,7 @@ export const EvidenceStatusPanel: React.FC<EvidenceStatusPanelProps> = ({
   // Not Anchored State
   if (!evidence || evidence.status === 'pending' || evidence.status === 'failed') {
     return (
-      <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-6 ${className}`}>
+      <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.02)] space-y-6 ${className}`}>
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-slate-100 text-slate-600">
@@ -124,7 +124,7 @@ export const EvidenceStatusPanel: React.FC<EvidenceStatusPanelProps> = ({
 
   // Confirmed On-Chain Notarized State
   return (
-    <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-6 ${className}`}>
+    <div className={`p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.02)] space-y-6 ${className}`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-2xl bg-emerald-50 text-[#10B981] border border-emerald-100">
