@@ -1,23 +1,31 @@
 // ─── Evidence & Report Types ────────────────────────────────────────────────
 
 export interface ReportMetadata {
+  id?: string;
   caseId: string;
   reportId: string;
-  status: 'generating' | 'ready' | 'failed';
+  status: 'generating' | 'ready' | 'failed' | 'generated';
   computedHash: string;
+  sha256Hash?: string;
+  filePath?: string;
+  version?: number;
   generatedAt: string;
 }
 
 export interface EvidenceMetadata {
+  id?: string;
   caseId: string;
   reportId: string;
-  computedHash: string;
-  transactionHash: string;
-  contractAddress: string;
-  chainId: number;
+  caseKeyHash?: string;
+  computedHash?: string;
+  reportHash?: string;
+  transactionHash: string | null;
+  contractAddress: string | null;
+  chainId: number | null;
   version: number;
   storedAt: string;
-  status: 'pending' | 'storing' | 'stored' | 'failed';
+  status?: 'pending' | 'storing' | 'stored' | 'failed';
+  verificationStatus?: 'confirmed' | 'storage_failed' | 'unanchored' | string;
 }
 
 export interface VerifyEvidenceInput {
@@ -29,11 +37,13 @@ export interface EvidenceVerificationResult {
   caseId: string;
   reportId: string;
   computedHash: string;
-  onChainHash: string;
+  onChainHash: string | null;
   verified: boolean;
-  contractAddress: string;
-  transactionHash: string;
-  chainId: number;
-  version: number;
-  storedAt: string;
+  reason?: string;
+  contractAddress: string | null;
+  transactionHash: string | null;
+  chainId: number | null;
+  version: number | null;
+  storedAt: string | null;
 }
+

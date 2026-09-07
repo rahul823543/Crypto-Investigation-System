@@ -28,6 +28,7 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
     selectedNodeId,
     selectedEdgeId,
     highlightedElementIds,
+    highlightMode,
     selectNode,
     selectEdge,
     clearSelection,
@@ -152,17 +153,27 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
 
     cy.batch(() => {
       // Clear previous classes
-      cy.elements().removeClass('highlighted dimmed selected');
+      cy.elements().removeClass(
+        'highlighted dimmed selected path-highlight circular-flow loop-highlight'
+      );
 
       if (highlightedElementIds.length > 0) {
         // Dim all elements first
         cy.elements().addClass('dimmed');
 
+        // Determine which highlight class to apply
+        let activeHighlightClass = 'highlighted';
+        if (highlightMode === 'path') {
+          activeHighlightClass = 'path-highlight';
+        } else if (highlightMode === 'loop') {
+          activeHighlightClass = 'circular-flow loop-highlight';
+        }
+
         // Highlight specific elements
         highlightedElementIds.forEach((id) => {
           const el = cy.getElementById(id);
           if (el.nonempty()) {
-            el.removeClass('dimmed').addClass('highlighted');
+            el.removeClass('dimmed').addClass(activeHighlightClass);
           }
         });
       }
@@ -175,7 +186,7 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
         cy.getElementById(selectedEdgeId).addClass('selected');
       }
     });
-  }, [highlightedElementIds, selectedNodeId, selectedEdgeId]);
+  }, [highlightedElementIds, highlightMode, selectedNodeId, selectedEdgeId]);
 
   // Camera Actions
   const handleZoomIn = () => {
