@@ -35,5 +35,13 @@ export interface AnalysisResult {
   findings: GraphFinding[];
   suspiciousPaths: SuspiciousPath[];
   circularFlows: CircularFlow[];
+  vaspAttribution?: {
+    vaspAddress: string;
+    vaspName: string;
+    category: string;
+    hopCount: number;
+  } | null;
   analysisMetadata: AnalysisMetadata;
+  createdAt?: string;
 }
+

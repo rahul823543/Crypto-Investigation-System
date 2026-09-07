@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   AlertTriangle,
-  ArrowRight,
-  FileCheck2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -18,11 +16,16 @@ import { CaseActionBar } from '@/components/case/CaseActionBar';
 import { TransactionGraph } from '@/components/graph/TransactionGraph';
 import { GraphInspectorPanel } from '@/components/graph/GraphInspectorPanel';
 import { RiskFindingsPanel } from '@/components/graph/RiskFindingsPanel';
+import { SuspiciousPathPanel } from '@/components/analysis/SuspiciousPathPanel';
+import { CircularFlowPanel } from '@/components/analysis/CircularFlowPanel';
+import { ReportHashPanel } from '@/components/report/ReportHashPanel';
+import { EvidenceStatusPanel } from '@/components/evidence/EvidenceStatusPanel';
 import { useCasePolling } from '@/hooks/useCasePolling';
 import { useCaseGraph } from '@/hooks/useCaseGraph';
 import { useCaseFindings } from '@/hooks/useCaseFindings';
+import { useCaseAnalysis } from '@/hooks/useCaseAnalysis';
 import { useInvestigationStore } from '@/store/investigationStore';
-import type { GraphFinding } from '@/types';
+import type { GraphFinding, SuspiciousPath, CircularFlow } from '@/types';
 
 export const CaseInvestigationPage: React.FC = () => {
   const { caseId } = useParams<{ caseId: string }>();
@@ -31,20 +34,50 @@ export const CaseInvestigationPage: React.FC = () => {
   const { data: caseDetail, isLoading: caseLoading, isError: caseError } = useCasePolling(caseId);
   const { data: graphData, isLoading: graphLoading } = useCaseGraph(caseId);
   const { data: findingsData, isLoading: findingsLoading } = useCaseFindings(caseId);
+  const { data: analysisData } = useCaseAnalysis(caseId);
 
-  const { selectFinding } = useInvestigationStore();
+  const { selectFinding, selectPath, selectCircularFlow } = useInvestigationStore();
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('graph');
+
+  // Compute combined finding count
+  const totalFindingsCount =
+    (findingsData?.length || 0) + (analysisData?.findings?.length || 0);
+
+  // Compute total paths and loops
+  const totalPathsAndLoops =
+    (analysisData?.suspiciousPaths?.length || 0) +
+    (analysisData?.circularFlows?.length || 0);
 
   const workspaceTabs = [
     { id: 'graph', label: 'Topology Graph' },
+    {
+      id: 'paths',
+      label: `Suspicious Paths & Loops ${totalPathsAndLoops > 0 ? `(${totalPathsAndLoops})` : ''}`,
+    },
+    {
+      id: 'findings',
+      label: `Risk Findings & Vectors ${totalFindingsCount > 0 ? `(${totalFindingsCount})` : ''}`,
+    },
     { id: 'overview', label: 'Case Overview' },
-    { id: 'findings', label: 'Risk Findings & Vectors' },
+    { id: 'reports', label: 'Forensic Dossier & Hash' },
     { id: 'evidence', label: 'Evidence Attestation' },
   ];
 
   const handleHighlightFinding = (finding: GraphFinding) => {
     const allRelated = [...finding.relatedNodeIds, ...finding.relatedEdgeIds];
     selectFinding(finding.id, allRelated);
+  };
+
+  const handleSelectPath = (path: SuspiciousPath) => {
+    const allIds = [...path.nodeIds, ...path.edgeIds];
+    selectPath(path.id, allIds);
+    setActiveWorkspaceTab('graph');
+  };
+
+  const handleSelectFlow = (flow: CircularFlow) => {
+    const allIds = [...flow.nodeIds, ...flow.edgeIds];
+    selectCircularFlow(flow.id, allIds);
+    setActiveWorkspaceTab('graph');
   };
 
   if (caseLoading || graphLoading || findingsLoading) {
@@ -105,13 +138,16 @@ export const CaseInvestigationPage: React.FC = () => {
             nodeCount={graphData.metadata.nodeCount}
             edgeCount={graphData.metadata.edgeCount}
             maxHopDepth={graphData.metadata.maxHopDepth}
-            findingCount={findingsData?.length || 2}
+            findingCount={totalFindingsCount || 2}
           />
         </div>
       </div>
 
       {/* Quick Actions Bar */}
-      <CaseActionBar caseId={caseDetail.caseId} />
+      <CaseActionBar
+        caseId={caseDetail.caseId}
+        onTabChange={(tab) => setActiveWorkspaceTab(tab)}
+      />
 
       {/* Workspace Tabs Navigation */}
       <div className="space-y-6">
@@ -137,6 +173,8 @@ export const CaseInvestigationPage: React.FC = () => {
                 nodes={graphData.nodes}
                 edges={graphData.edges}
                 findings={findingsData || []}
+                paths={analysisData?.suspiciousPaths || []}
+                circularFlows={analysisData?.circularFlows || []}
                 onHighlightFinding={handleHighlightFinding}
                 className="sticky top-20"
               />
@@ -144,19 +182,27 @@ export const CaseInvestigationPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Overview (Subject Matrix + Transaction Feed) */}
-        {activeWorkspaceTab === 'overview' && (
-          <div className="space-y-6">
-            <RiskMatrixBreakdown />
-            <TransactionFeedTable />
+        {/* Tab 2: Suspicious Paths & Circular Flows */}
+        {activeWorkspaceTab === 'paths' && (
+          <div className="space-y-8">
+            <SuspiciousPathPanel
+              paths={analysisData?.suspiciousPaths || []}
+              onSelectPath={handleSelectPath}
+            />
+
+            <CircularFlowPanel
+              circularFlows={analysisData?.circularFlows || []}
+              onSelectFlow={handleSelectFlow}
+            />
           </div>
         )}
 
-        {/* Tab 3: Risk Findings & Vectors */}
+        {/* Tab 3: Unified Risk Findings & Vectors */}
         {activeWorkspaceTab === 'findings' && (
           <div className="space-y-6">
             <RiskFindingsPanel
               findings={findingsData || []}
+              advancedFindings={analysisData?.findings || []}
               onHighlightFinding={(f) => {
                 handleHighlightFinding(f);
                 setActiveWorkspaceTab('graph');
@@ -166,66 +212,27 @@ export const CaseInvestigationPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 4: Evidence Attestation */}
-        {activeWorkspaceTab === 'evidence' && (
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-emerald-50 text-[#10B981]">
-                  <FileCheck2 className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-lg text-slate-900">
-                    Polygon Amoy Cryptographic Attestation
-                  </h3>
-                  <p className="text-xs text-[#526077]">
-                    Immutable evidence record anchored to the EvidenceRegistry contract.
-                  </p>
-                </div>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-mono text-xs font-semibold border border-emerald-200 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>On-Chain Notarized</span>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Contract Address
-                </span>
-                <span className="text-slate-800 font-bold break-all">
-                  0x71c504A7aFdC370B3C46c24385ea1502476b7A6B
-                </span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Transaction Hash
-                </span>
-                <span className="text-slate-800 font-bold break-all">
-                  0x3f5c9e2b1a8d7f4e6a0c8b2d1e3f5a7b9c1d3e5f7a9b1c3d5e7f9a1b3c5d7e9f
-                </span>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
-                  Evidence Version
-                </span>
-                <span className="text-slate-800 font-bold">Version #1 (Immutable)</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <Button
-                variant="primary"
-                onClick={() => navigate('/evidence')}
-                rightIcon={<ArrowRight className="h-4 w-4" />}
-              >
-                Perform Independent Verification
-              </Button>
-            </div>
+        {/* Tab 4: Overview (Subject Matrix + Transaction Feed) */}
+        {activeWorkspaceTab === 'overview' && (
+          <div className="space-y-6">
+            <RiskMatrixBreakdown />
+            <TransactionFeedTable />
           </div>
+        )}
+
+        {/* Tab 5: Forensic Report & Cryptographic Hash */}
+        {activeWorkspaceTab === 'reports' && (
+          <ReportHashPanel
+            caseId={caseDetail.caseId}
+            onSelectReportForVerification={(reportId) =>
+              navigate(`/evidence?caseId=${caseDetail.caseId}&reportId=${reportId}`)
+            }
+          />
+        )}
+
+        {/* Tab 6: Evidence Attestation */}
+        {activeWorkspaceTab === 'evidence' && (
+          <EvidenceStatusPanel caseId={caseDetail.caseId} />
         )}
       </div>
     </div>

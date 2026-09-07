@@ -202,6 +202,55 @@ export const graphStyles: StylesheetStyle[] = [
     } as any,
   },
 
+  // ─── Suspicious Path Route Highlighting ────────────────────────────────────
+  {
+    selector: 'node.path-highlight',
+    style: {
+      'border-width': 4.5,
+      'border-color': '#4F46E5',
+      'background-color': '#EEF2FF',
+      'color': '#3730A3',
+      'z-index': 950,
+    } as any,
+  },
+  {
+    selector: 'edge.path-highlight',
+    style: {
+      'line-color': '#4F46E5',
+      'target-arrow-color': '#4F46E5',
+      'width': 4.5,
+      'arrow-scale': 1.3,
+      'z-index': 950,
+    } as any,
+  },
+
+  // ─── Circular Flow / Loop Highlighting ─────────────────────────────────────
+  {
+    selector: 'node.circular-flow, node.loop-highlight',
+    style: {
+      'border-width': 5,
+      'border-color': '#D946EF',
+      'background-color': '#FDF4FF',
+      'color': '#86198F',
+      'font-weight': 700,
+      'z-index': 960,
+    } as any,
+  },
+  {
+    selector: 'edge.circular-flow, edge.loop-highlight',
+    style: {
+      'line-color': '#D946EF',
+      'target-arrow-color': '#C026D3',
+      'width': 4.8,
+      'arrow-scale': 1.4,
+      'line-style': 'dashed',
+      'line-dash-pattern': [8, 4],
+      'color': '#86198F',
+      'font-weight': 700,
+      'z-index': 960,
+    } as any,
+  },
+
   // ─── Dimmed Unrelated Elements ─────────────────────────────────────────────
   {
     selector: 'node.dimmed',
@@ -216,3 +265,4 @@ export const graphStyles: StylesheetStyle[] = [
     } as any,
   },
 ];
+

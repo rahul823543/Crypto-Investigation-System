@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Zap,
@@ -9,50 +9,57 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { caseRepository } from '@/api';
+import { useTriggerAnalysis } from '@/hooks/useCaseAnalysis';
+import { useGenerateReport } from '@/hooks/useReports';
 
 export interface CaseActionBarProps {
   caseId: string;
+  onTabChange?: (tab: string) => void;
   className?: string;
 }
 
-export const CaseActionBar: React.FC<CaseActionBarProps> = ({ caseId, className }) => {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [generatingReport, setGeneratingReport] = useState(false);
-  const [reportReady, setReportReady] = useState(false);
+export const CaseActionBar: React.FC<CaseActionBarProps> = ({
+  caseId,
+  onTabChange,
+  className = '',
+}) => {
   const navigate = useNavigate();
+  const triggerAnalysisMutation = useTriggerAnalysis();
+  const generateReportMutation = useGenerateReport();
 
-  const handleRunAnalysis = async () => {
-    setAnalyzing(true);
-    try {
-      await caseRepository.analyzeCase(caseId);
-    } finally {
-      setAnalyzing(false);
-    }
+  const handleRunAnalysis = () => {
+    triggerAnalysisMutation.mutate(caseId, {
+      onSuccess: () => {
+        if (onTabChange) onTabChange('paths');
+      },
+    });
   };
 
-  const handleGenerateReport = async () => {
-    setGeneratingReport(true);
-    try {
-      await caseRepository.generateReport(caseId);
-      setReportReady(true);
-    } finally {
-      setGeneratingReport(false);
-    }
+  const handleGenerateReport = () => {
+    generateReportMutation.mutate(caseId, {
+      onSuccess: () => {
+        if (onTabChange) onTabChange('reports');
+      },
+    });
   };
 
   const handleExportJson = async () => {
     const caseData = await caseRepository.getCase(caseId);
     const graphData = await caseRepository.getGraph(caseId);
     const findingsData = await caseRepository.getFindings(caseId);
+    const analysisData = await caseRepository.getAnalysis(caseId);
 
     const fullExport = {
       case: caseData,
       graph: graphData,
       findings: findingsData,
+      analysis: analysisData,
       exportedAt: new Date().toISOString(),
     };
 
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(fullExport, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' +
+      encodeURIComponent(JSON.stringify(fullExport, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
     downloadAnchor.setAttribute('download', `${caseId}_forensic_export.json`);
@@ -76,32 +83,36 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({ caseId, className 
           size="sm"
           variant="outline"
           onClick={handleRunAnalysis}
-          isLoading={analyzing}
+          isLoading={triggerAnalysisMutation.isPending}
           leftIcon={<Zap className="h-4 w-4 text-[#7E22CE]" />}
         >
-          Re-Analyze Topology
+          {triggerAnalysisMutation.isPending ? 'Analyzing Graph...' : 'Re-Analyze Topology'}
         </Button>
 
         <Button
           size="sm"
           variant="outline"
           onClick={handleGenerateReport}
-          isLoading={generatingReport}
+          isLoading={generateReportMutation.isPending}
           leftIcon={
-            reportReady ? (
+            generateReportMutation.isSuccess ? (
               <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
             ) : (
               <FileText className="h-4 w-4 text-[#4F46E5]" />
             )
           }
         >
-          {reportReady ? 'Report Ready (Regenerate)' : 'Generate PDF Dossier'}
+          {generateReportMutation.isPending
+            ? 'Generating Dossier...'
+            : generateReportMutation.isSuccess
+            ? 'Report Ready'
+            : 'Generate PDF Dossier'}
         </Button>
 
         <Button
           size="sm"
           variant="outline"
-          onClick={() => navigate('/evidence')}
+          onClick={() => navigate(`/evidence?caseId=${caseId}`)}
           leftIcon={<ShieldCheck className="h-4 w-4 text-[#10B981]" />}
         >
           Verify Proof
