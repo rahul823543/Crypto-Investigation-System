@@ -37,7 +37,10 @@ export const CaseInvestigationPage: React.FC = () => {
   const { data: caseDetail, isLoading: caseLoading, isError: caseError } = useCasePolling(caseId);
   const { data: graphData, isLoading: graphLoading } = useCaseGraph(caseId);
   const { data: findingsData, isLoading: findingsLoading } = useCaseFindings(caseId);
-  const { data: analysisData, isLoading: analysisLoading } = useAnalysis(caseId);
+  const { data: analysisState, isLoading: analysisLoading } = useAnalysis(caseId);
+  const analysisData = analysisState?.analysis ?? null;
+  const isAnalysisRunning = analysisState?.status === 'analyzing';
+  const analysisError = analysisState?.status === 'failed' ? analysisState.error ?? analysisState.message : null;
   const { data: attributionData, isLoading: attributionLoading } = useAttribution(caseId);
   const {
     data: evidenceData,
@@ -153,6 +156,8 @@ export const CaseInvestigationPage: React.FC = () => {
       <CaseActionBar
         caseId={caseDetail.caseId}
         onAnalysisTriggered={() => setActiveWorkspaceTab('analysis')}
+        isAnalysisRunning={isAnalysisRunning}
+        analysisError={analysisError}
       />
 
       {/* Workspace Tabs Navigation */}
@@ -191,16 +196,26 @@ export const CaseInvestigationPage: React.FC = () => {
         {/* Tab 2: Analysis & Paths (Suspicious Paths, Circular Flows, VASP Attribution) */}
         {activeWorkspaceTab === 'analysis' && (
           <div className="space-y-6">
+            {isAnalysisRunning && (
+              <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+                {analysisState?.message ?? 'Analysis is currently running. Results will appear automatically.'}
+              </div>
+            )}
+            {analysisError && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                Analysis failed: {analysisError}. You can re-run the topology analysis after the service is available.
+              </div>
+            )}
             <AttributionPanel
               attribution={attributionData ?? analysisData?.vaspAttribution}
-              isLoading={attributionLoading || analysisLoading}
+              isLoading={attributionLoading || analysisLoading || isAnalysisRunning}
               onHighlightPath={handleHighlightPath}
             />
 
             <SuspiciousPathsPanel
               paths={analysisData?.suspiciousPaths || []}
               circularFlows={analysisData?.circularFlows || []}
-              isLoading={analysisLoading}
+              isLoading={analysisLoading || isAnalysisRunning}
               onHighlightPath={handleHighlightPath}
             />
           </div>

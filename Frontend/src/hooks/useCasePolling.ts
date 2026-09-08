@@ -16,6 +16,7 @@ export function useCasePolling(caseId: string | undefined) {
       // Stop polling when reached terminal states
       if (
         data.status === 'analysis_complete' ||
+        data.status === 'analyzed' ||
         data.status === 'completed' ||
         data.status === 'failed' ||
         data.status === 'demo_fallback_used'

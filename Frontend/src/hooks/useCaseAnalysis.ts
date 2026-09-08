@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { caseRepository } from '@/api';
-import type { AnalysisResult } from '@/types';
+import type { AnalysisResult, AnalysisTriggerResponse } from '@/types';
 
 /**
  * Hook to fetch advanced graph analysis results for a case
@@ -20,10 +20,14 @@ export function useCaseAnalysis(caseId: string | undefined) {
 export function useTriggerAnalysis() {
   const queryClient = useQueryClient();
 
-  return useMutation<AnalysisResult, Error, string>({
+  return useMutation<AnalysisTriggerResponse, Error, string>({
     mutationFn: (caseId: string) => caseRepository.analyzeCase(caseId),
     onSuccess: (data, caseId) => {
-      queryClient.setQueryData(['analysis', caseId], data);
+      queryClient.setQueryData(['analysis', caseId], {
+        status: data.status,
+        analysis: null,
+        message: data.message,
+      });
       queryClient.invalidateQueries({ queryKey: ['case', caseId] });
       queryClient.invalidateQueries({ queryKey: ['findings', caseId] });
       queryClient.invalidateQueries({ queryKey: ['cases'] });

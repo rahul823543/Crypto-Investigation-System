@@ -10,7 +10,9 @@
  * In production, Role B calls the contract directly via ethers.js in
  * apps/api/src/evidence/evidence.contract.ts using the ABI from artifacts/.
  */
-import { ethers } from "hardhat";
+import { network } from "hardhat";
+
+const { ethers } = await network.create();
 
 async function main() {
   // TODO Phase 4 — implement evidence storage

@@ -1,16 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { caseRepository } from '@/api';
-import type { AnalysisResult } from '@/types';
+import type { AnalysisResponse, AnalysisTriggerResponse } from '@/types';
 
 /**
  * Hook to fetch analysis results for a case
  */
 export function useAnalysis(caseId: string | undefined) {
-  return useQuery<AnalysisResult | null, Error>({
+  return useQuery<AnalysisResponse, Error>({
     queryKey: ['analysis', caseId],
-    queryFn: () => caseRepository.getAnalysis(caseId!),
+    queryFn: () => caseRepository.getAnalysisStatus(caseId!),
     enabled: !!caseId,
-    staleTime: 30_000,
+    staleTime: 1_000,
+    refetchInterval: (query) =>
+      query.state.data?.status === 'analyzing' ? 2_000 : false,
   });
 }
 
@@ -20,10 +22,14 @@ export function useAnalysis(caseId: string | undefined) {
 export function useRunAnalysis(caseId: string | undefined) {
   const queryClient = useQueryClient();
 
-  return useMutation<AnalysisResult, Error, void>({
+  return useMutation<AnalysisTriggerResponse, Error, void>({
     mutationFn: () => caseRepository.analyzeCase(caseId!),
     onSuccess: (data) => {
-      queryClient.setQueryData(['analysis', caseId], data);
+      queryClient.setQueryData(['analysis', caseId], {
+        status: data.status,
+        analysis: null,
+        message: data.message,
+      } satisfies AnalysisResponse);
       queryClient.invalidateQueries({ queryKey: ['case', caseId] });
       queryClient.invalidateQueries({ queryKey: ['attribution', caseId] });
       queryClient.invalidateQueries({ queryKey: ['findings', caseId] });

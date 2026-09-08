@@ -16,5 +16,21 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      // In live API mode (VITE_DATA_MODE=api), proxy Fastify routes to avoid CORS in dev.
+      // This is transparent to the frontend — fetch('/cases') works in both dev and prod.
+      '/cases': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/evidence': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/demo': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
 })

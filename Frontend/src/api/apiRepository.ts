@@ -7,6 +7,7 @@ import type {
   AnalysisResult,
   VaspAttribution,
   AnalysisResponse,
+  AnalysisTriggerResponse,
   AttributionResponse,
   ReportMetadata,
   EvidenceMetadata,
@@ -97,7 +98,7 @@ export class ApiCaseRepository implements CaseRepository {
   }
 
   async getAnalysis(caseId: string): Promise<AnalysisResult | null> {
-    const data = await apiGet<AnalysisResponse>(`/cases/${caseId}/analysis`);
+    const data = await this.getAnalysisStatus(caseId);
     if (data.status === 'complete' && data.analysis) {
       return data.analysis;
     }
@@ -108,23 +109,14 @@ export class ApiCaseRepository implements CaseRepository {
     return null;
   }
 
-  async analyzeCase(caseId: string): Promise<AnalysisResult> {
-    // 1. Post async analysis job
-    await apiPost<{ message: string; caseId: string; status: string }>(`/cases/${caseId}/analyze`);
+  async getAnalysisStatus(caseId: string): Promise<AnalysisResponse> {
+    return apiGet<AnalysisResponse>(`/cases/${caseId}/analysis`);
+  }
 
-    // 2. Poll GET /cases/:id/analysis until status === 'complete'
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const res = await apiGet<AnalysisResponse>(`/cases/${caseId}/analysis`);
-      if (res.status === 'complete' && res.analysis) {
-        return res.analysis;
-      }
-      if ((res as any).analysisId && (res as any).riskScore !== undefined) {
-        return res as unknown as AnalysisResult;
-      }
-    }
-
-    throw new Error('Analysis processing timed out. Please retry in a few moments.');
+  async analyzeCase(caseId: string): Promise<AnalysisTriggerResponse> {
+    // Enqueue only. Completion, failure, and results are exposed by the
+    // analysis-status endpoint and polled by the UI.
+    return apiPost<AnalysisTriggerResponse>(`/cases/${caseId}/analyze`);
   }
 
   async getAttribution(caseId: string): Promise<VaspAttribution | null> {

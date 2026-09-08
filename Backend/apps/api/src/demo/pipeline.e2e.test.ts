@@ -13,6 +13,7 @@ import { hashBuffer } from "../modules/evidence/hash.service.js";
 import { evidenceRoutes } from "../modules/evidence/evidence.routes.js";
 import { analysisRoutes } from "../modules/analysis/analysis.routes.js";
 import { attributionRoutes } from "../modules/attribution/attribution.routes.js";
+import { riskRoutes } from "../modules/risk/risk.routes.js";
 import seededCase from "../../datasets/seeded-case.json" with { type: "json" };
 import defaultAddressLabels from "../../datasets/address-labels.json" with {
   type: "json",
@@ -133,7 +134,17 @@ test("Demo Safety Net: Full seeded end-to-end pipeline runs with zero external c
     },
     riskFinding: {
       findMany: async ({ where }: any) => {
-        return db.findings.filter((f) => f.caseId === where.caseId);
+        return db.findings
+          .filter(
+            (f) => f.caseId === where.caseId && (!where.source || f.source === where.source)
+          )
+          .map((f) => ({
+            ...f,
+            relatedNodeIdsJson: JSON.stringify(f.relatedNodeIds),
+            relatedEdgeIdsJson: JSON.stringify(f.relatedEdgeIds),
+            signalsJson: JSON.stringify(f.signals),
+            createdAt: new Date(f.createdAt),
+          }));
       },
     },
     analysisResult: {
@@ -192,7 +203,14 @@ test("Demo Safety Net: Full seeded end-to-end pipeline runs with zero external c
   };
 
   const app = Fastify();
+  const enqueuedAnalysisJobs: any[] = [];
   app.decorate("prisma", mockPrisma);
+  app.decorate("analyzeQueue", {
+    add: async (name: string, data: unknown, options: unknown) => {
+      enqueuedAnalysisJobs.push({ name, data, options });
+      return {};
+    },
+  } as any);
   app.decorate("config", {
     PORT: 3000,
     DATABASE_URL: "postgresql://localhost/mock",
@@ -204,6 +222,7 @@ test("Demo Safety Net: Full seeded end-to-end pipeline runs with zero external c
   await app.register(evidenceRoutes);
   await app.register(analysisRoutes);
   await app.register(attributionRoutes);
+  await app.register(riskRoutes);
   await app.ready();
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -310,6 +329,55 @@ test("Demo Safety Net: Full seeded end-to-end pipeline runs with zero external c
   assert.ok(db.nodes.length > 0, "Graph nodes built");
   assert.ok(db.edges.length > 0, "Graph edges built");
   assert.ok(db.findings.length > 0, "Risk findings detected");
+
+  // The frontend's historic `source=engine` filter must resolve to the
+  // persisted `basic-risk` source so mixer findings remain visible.
+  const basicFindingsRes = await app.inject({
+    method: "GET",
+    url: `/cases/${caseId}/findings?source=engine`,
+  });
+  assert.equal(basicFindingsRes.statusCode, 200);
+  const basicFindingsJson = JSON.parse(basicFindingsRes.payload);
+  assert.equal(
+    basicFindingsJson.findings.length,
+    db.findings.filter((finding) => finding.source === "basic-risk").length,
+    "The engine alias returns every persisted basic-risk finding"
+  );
+
+  // Failed work is visible to polling clients and can be queued again.
+  await mockPrisma.case.update({
+    where: { id: caseId },
+    data: { status: "failed", errorMessage: "Intelligence service unavailable" },
+  });
+  const failedAnalysisRes = await app.inject({
+    method: "GET",
+    url: `/cases/${caseId}/analysis`,
+  });
+  assert.equal(JSON.parse(failedAnalysisRes.payload).status, "failed");
+
+  const retryAnalysisRes = await app.inject({
+    method: "POST",
+    url: `/cases/${caseId}/analyze`,
+    payload: {},
+  });
+  assert.equal(retryAnalysisRes.statusCode, 202);
+  assert.equal(enqueuedAnalysisJobs.length, 1);
+  currentCase = await mockPrisma.case.findUnique({ where: { id: caseId } });
+  assert.equal(currentCase.status, "analyzing");
+  assert.equal(currentCase.errorMessage, null);
+
+  const runningAnalysisRes = await app.inject({
+    method: "GET",
+    url: `/cases/${caseId}/analysis`,
+  });
+  assert.equal(JSON.parse(runningAnalysisRes.payload).status, "analyzing");
+
+  // Continue the deterministic fixture pipeline below as if the retried job
+  // reached the intelligence service successfully.
+  await mockPrisma.case.update({
+    where: { id: caseId },
+    data: { status: "graph_ready" },
+  });
 
   // ───────────────────────────────────────────────────────────────────────────
   // STEP 4: Analysis Engine Execution -> analyzed

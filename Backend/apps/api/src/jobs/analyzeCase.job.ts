@@ -265,6 +265,27 @@ export function createAnalyzeWorker(
 
   worker.on("failed", (job, err) => {
     console.error(`Analysis failed for case ${job?.data.caseId}:`, err.message);
+
+    // BullMQ emits this event for retryable failures too. Only use it as a
+    // fallback after the final attempt; the processor catch keeps the normal
+    // lifecycle state accurate during exponential backoff.
+    const attempts = job?.opts.attempts ?? 1;
+    if (!job?.data.caseId || job.attemptsMade < attempts) {
+      return;
+    }
+
+    void prisma
+      .case
+      .update({
+        where: { id: job.data.caseId },
+        data: {
+          status: "failed",
+          errorMessage: err.message || "Analysis failed after retries",
+        },
+      })
+      .catch((updateErr) => {
+        console.error("Failed to update case status on job failure:", updateErr);
+      });
   });
 
   worker.on("error", (err) => {
