@@ -18,21 +18,7 @@ import { useCreateCase } from '@/hooks/useCreateCase';
 import { useUiStore } from '@/store/uiStore';
 import { isValidEvmAddress } from '@/utils/address';
 import type { CaseMode } from '@/types';
-
-// ── Seeded wallet fixture (imported directly so it stays in sync) ──────────────
-import seededCaseData from '@/data/seeded-case.json';
-
-interface SeededCase {
-  caseId: string;
-  rootAddress: string;
-  chainId: number;
-  mode: string;
-  status: string;
-  riskScore: number;
-  riskLevel: string;
-}
-
-const SEEDED_CASES = seededCaseData.cases as SeededCase[];
+import { useDemoSeededCase } from '@/hooks/useDemoSeededCase';
 
 /** Truncate an address for display: 0x1234...abcd */
 function truncateAddress(addr: string): string {
@@ -60,21 +46,29 @@ function humanStatus(status: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// ── Seeded Address Hint Panel ──────────────────────────────────────────────────
+// ── Seeded Address Hint Panel (Fetched live from Backend) ──────────────────────
 interface SeededHintPanelProps {
   visible: boolean;
+  onSelectAddress: (addr: string) => void;
 }
 
-const SeededHintPanel: React.FC<SeededHintPanelProps> = ({ visible }) => {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+const SeededHintPanel: React.FC<SeededHintPanelProps> = ({ visible, onSelectAddress }) => {
+  const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const { data: seededData, isLoading, isError } = useDemoSeededCase();
 
   if (!visible) return null;
 
-  const handleCopy = (caseItem: SeededCase) => {
-    navigator.clipboard.writeText(caseItem.rootAddress).then(() => {
-      setCopiedId(caseItem.caseId);
-      setTimeout(() => setCopiedId(null), 2000);
+  const rootAddress = seededData?.case?.rootAddress || '';
+  const riskScore = seededData?.case?.riskScore ?? 78;
+  const riskLevel = seededData?.case?.riskLevel || 'high';
+  const status = seededData?.case?.status || 'analyzed';
+
+  const handleCopy = () => {
+    if (!rootAddress) return;
+    navigator.clipboard.writeText(rootAddress).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -84,15 +78,15 @@ const SeededHintPanel: React.FC<SeededHintPanelProps> = ({ visible }) => {
       <button
         type="button"
         onClick={() => setExpanded((e) => !e)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-purple-50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-purple-50 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <Sparkles className="h-3.5 w-3.5 text-purple-600" />
           <span className="text-xs font-bold text-purple-800 uppercase tracking-wider font-mono">
-            Demo Wallet Addresses (Seeded Fixtures)
+            Backend Seeded Demo Address
           </span>
-          <span className="text-[10px] font-mono text-purple-500 bg-purple-100 px-1.5 py-0.5 rounded-full">
-            {SEEDED_CASES.length} available
+          <span className="text-[10px] font-mono text-purple-600 bg-purple-100 px-1.5 py-0.5 rounded-full border border-purple-200">
+            Live from Fastify API
           </span>
         </div>
         {expanded ? (
@@ -102,71 +96,78 @@ const SeededHintPanel: React.FC<SeededHintPanelProps> = ({ visible }) => {
         )}
       </button>
 
-      {/* Address Rows */}
+      {/* Address Row */}
       {expanded && (
-        <div className="border-t border-purple-200/70 divide-y divide-purple-100">
-          {SEEDED_CASES.map((c, index) => {
-            const isCopied = copiedId === c.caseId;
-            return (
-              <div
-                key={c.caseId}
-                className="flex items-center gap-3 px-4 py-2.5 group hover:bg-purple-50/80 transition-colors"
-              >
-                {/* Risk badge */}
+        <div className="border-t border-purple-200/70 p-3 bg-white/70">
+          {isLoading ? (
+            <div className="py-2 text-xs font-mono text-purple-600 animate-pulse">
+              Fetching backend seeded fixture...
+            </div>
+          ) : isError || !seededData?.case ? (
+            <div className="py-2 text-xs font-mono text-amber-700">
+              Unable to load seeded address from backend. Fastify server may be offline.
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
                 <span
-                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${riskBadgeClass(c.riskLevel)}`}
+                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${riskBadgeClass(riskLevel)}`}
                 >
-                  {c.riskScore > 0 ? `${c.riskScore}` : '—'}
+                  Score: {riskScore}
                 </span>
 
-                {/* Address + label */}
-                <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-slate-800 font-medium select-all truncate">
-                      {truncateAddress(c.rootAddress)}
+                    <span className="font-mono text-xs text-slate-900 font-semibold select-all truncate">
+                      {truncateAddress(rootAddress)}
                     </span>
-                    {index === 0 && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-purple-200 text-purple-800 shrink-0">
-                        Primary Backend Seed
-                      </span>
-                    )}
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 shrink-0 border border-purple-200">
+                      Backend Seeded Root
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono truncate">
-                    {humanStatus(c.status)}
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    Status: {humanStatus(status)} • Polygon Amoy #80002
                   </span>
                 </div>
+              </div>
 
-                {/* Copy button */}
+              <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleCopy(c)}
-                  title={`Copy ${c.rootAddress}`}
-                  className={`flex items-center gap-1.5 text-[11px] font-semibold font-mono px-2.5 py-1 rounded-xl border transition-all shrink-0 cursor-pointer ${
-                    isCopied
+                  onClick={() => onSelectAddress(rootAddress)}
+                  className="flex items-center gap-1 text-[11px] font-semibold font-mono px-2.5 py-1 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-all cursor-pointer shadow-xs"
+                >
+                  <span>Auto-fill</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  title={`Copy ${rootAddress}`}
+                  className={`flex items-center gap-1 text-[11px] font-semibold font-mono px-2.5 py-1 rounded-xl border transition-all cursor-pointer ${
+                    copied
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                       : 'bg-white border-slate-200 text-slate-600 hover:border-purple-300 hover:text-purple-700'
                   }`}
                 >
-                  {isCopied ? (
+                  {copied ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                      <span>Copied!</span>
+                      <Check className="h-3 w-3 text-emerald-600" />
+                      <span>Copied</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="h-3.5 w-3.5" />
+                      <Copy className="h-3 w-3" />
                       <span>Copy</span>
                     </>
                   )}
                 </button>
               </div>
-            );
-          })}
+            </div>
+          )}
 
-          <div className="px-4 py-2 bg-purple-50/40">
-            <p className="text-[10px] text-purple-500 font-mono">
-              Copy the primary backend seed (0x1234...5678) → paste above → run through Fastify or offline demo
-            </p>
+          <div className="mt-2.5 pt-2 border-t border-purple-100 text-[10px] text-purple-600 font-mono">
+            Source: <code className="bg-purple-100/60 px-1 py-0.5 rounded">GET /demo/seeded-case</code> on Fastify Backend
           </div>
         </div>
       )}
@@ -204,17 +205,6 @@ export const CreateCasePage: React.FC = () => {
       return;
     }
     setError(null);
-
-    // In demo mode, if the address matches a seeded case → navigate directly
-    if (mode === 'demo') {
-      const seededMatch = SEEDED_CASES.find(
-        (c) => c.rootAddress.toLowerCase() === trimmed.toLowerCase()
-      );
-      if (seededMatch) {
-        navigate(`/cases/${seededMatch.caseId}`);
-        return;
-      }
-    }
 
     createCase.mutate({ rootAddress: trimmed, chainId, mode });
   };
@@ -267,7 +257,14 @@ export const CreateCasePage: React.FC = () => {
             </p>
 
             {/* Seeded hint panel — only in demo mode */}
-            <SeededHintPanel visible={mode === 'demo'} />
+            <SeededHintPanel
+              visible={mode === 'demo'}
+              onSelectAddress={(selectedAddr) => {
+                setAddress(selectedAddr);
+                setMode('demo');
+                if (error) setError(null);
+              }}
+            />
           </div>
 
           {/* Target Chain */}
