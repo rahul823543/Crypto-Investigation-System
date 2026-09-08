@@ -13,7 +13,9 @@
  *   3. true  → MATCH  — report has not been tampered with.
  *   4. false → MISMATCH — report has been altered or version is wrong.
  */
-import { ethers } from "hardhat";
+import { network } from "hardhat";
+
+const { ethers } = await network.create();
 
 async function main() {
   // TODO Phase 4 — implement verification

@@ -1,8 +1,46 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import net from "node:net";
 import { buildApp } from "../app.js";
 
+function isPortOpen(port: number, host = "127.0.0.1"): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    socket.setTimeout(400);
+    socket.on("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.on("error", () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on("timeout", () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.connect(port, host);
+  });
+}
+
 test("API Full End-to-End Test with real local DB and fastify.inject()", async (t) => {
+  const [pgOpen, redisOpen] = await Promise.all([
+    isPortOpen(5432),
+    isPortOpen(6379),
+  ]);
+
+  if (!pgOpen || !redisOpen) {
+    console.warn("Skipping real DB test: local Postgres (5432) or Redis (6379) not reachable");
+    return;
+  }
+
+  process.env.DATABASE_URL =
+    process.env.DATABASE_URL ||
+    "postgresql://sih:sih_password@localhost:5432/sih_forensic";
+  process.env.REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+  process.env.ALCHEMY_API_URL =
+    process.env.ALCHEMY_API_URL || "https://polygon-amoy.g.alchemy.com/v2/mock";
+
   let app: any;
 
   try {
@@ -11,6 +49,9 @@ test("API Full End-to-End Test with real local DB and fastify.inject()", async (
   } catch (err) {
     // If local DB or Redis is unavailable in CI/restricted env, skip gracefully
     console.warn("Skipping real DB test: local DB/Redis not reachable:", err);
+    if (app) {
+      await app.close();
+    }
     return;
   }
 

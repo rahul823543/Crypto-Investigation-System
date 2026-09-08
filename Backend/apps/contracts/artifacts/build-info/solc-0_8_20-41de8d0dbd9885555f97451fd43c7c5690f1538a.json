@@ -1,0 +1,46 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_20-41de8d0dbd9885555f97451fd43c7c5690f1538a",
+  "solcVersion": "0.8.20",
+  "solcLongVersion": "0.8.20+commit.a1b79de6",
+  "compilerType": "solc",
+  "userSourceNameMap": {
+    "contracts/EvidenceRegistry.sol": "project/contracts/EvidenceRegistry.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/EvidenceRegistry.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n/**\n * @title EvidenceRegistry\n * @notice Stores tamper-evident SHA-256 report hashes for forensic investigation cases.\n *\n * Design decisions:\n * - Only cryptographic hashes are stored — never case data, wallet addresses,\n *   victim information, or officer notes. This keeps sensitive investigation\n *   data off public infrastructure.\n * - An investigator allowlist (managed by the contract owner) prevents\n *   unauthorised submissions for real case IDs.\n * - Evidence is versioned: corrected or expanded reports can be appended\n *   without overwriting the original hash record.\n * - The contract is intentionally minimal — it acts only as a timestamped\n *   integrity layer, not a case management system.\n *\n * Verification flow (off-chain):\n *   1. Recompute SHA-256 of the report PDF bytes.\n *   2. Call getEvidence(caseId, version - 1) or verifyReportHash(caseId, version, hash).\n *   3. Compare on-chain hash with computed hash — match proves integrity.\n */\ncontract EvidenceRegistry {\n    // ─── Data Structures ────────────────────────────────────────────────────\n\n    struct Evidence {\n        string  caseId;\n        uint256 version;\n        bytes32 reportHash;   // SHA-256 hash of the finalised PDF report\n        uint256 timestamp;    // block.timestamp at submission\n        address submittedBy;  // authorised investigator who submitted\n    }\n\n    // ─── State ───────────────────────────────────────────────────────────────\n\n    address public owner;\n\n    /// @notice Tracks which addresses are authorised to submit evidence.\n    mapping(address => bool) public authorizedInvestigators;\n\n    /// @notice caseId → array of versioned evidence records (index 0 = version 1).\n    mapping(string => Evidence[]) private evidenceVersions;\n\n    // ─── Events ──────────────────────────────────────────────────────────────\n\n    event EvidenceStored(\n        string  indexed caseId,\n        uint256         version,\n        bytes32         reportHash,\n        uint256         timestamp,\n        address indexed submittedBy\n    );\n\n    event InvestigatorUpdated(\n        address indexed investigator,\n        bool            allowed\n    );\n\n    event OwnershipTransferred(\n        address indexed previousOwner,\n        address indexed newOwner\n    );\n\n    // ─── Modifiers ────────────────────────────────────────────────────────────\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"EvidenceRegistry: caller is not the owner\");\n        _;\n    }\n\n    modifier onlyAuthorized() {\n        require(\n            authorizedInvestigators[msg.sender],\n            \"EvidenceRegistry: caller is not an authorized investigator\"\n        );\n        _;\n    }\n\n    // ─── Constructor ──────────────────────────────────────────────────────────\n\n    constructor() {\n        owner = msg.sender;\n        authorizedInvestigators[msg.sender] = true;\n        emit InvestigatorUpdated(msg.sender, true);\n    }\n\n    // ─── Admin Functions ─────────────────────────────────────────────────────\n\n    /**\n     * @notice Grant or revoke investigator authorisation.\n     * @param investigator Address to update.\n     * @param allowed      True to authorise, false to revoke.\n     */\n    function setInvestigator(address investigator, bool allowed) external onlyOwner {\n        require(investigator != address(0), \"EvidenceRegistry: zero address\");\n        authorizedInvestigators[investigator] = allowed;\n        emit InvestigatorUpdated(investigator, allowed);\n    }\n\n    /**\n     * @notice Transfer contract ownership. New owner is NOT auto-authorised as\n     *         an investigator — call setInvestigator separately if needed.\n     */\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(newOwner != address(0), \"EvidenceRegistry: zero address\");\n        emit OwnershipTransferred(owner, newOwner);\n        owner = newOwner;\n    }\n\n    // ─── Evidence Write ───────────────────────────────────────────────────────\n\n    /**\n     * @notice Store a new evidence hash for a case.\n     *         Version is auto-incremented (starts at 1).\n     * @param caseId     Opaque case identifier (e.g. \"case_abc123\").\n     * @param reportHash SHA-256 hash of the finalised PDF report (bytes32).\n     */\n    function storeEvidence(\n        string memory caseId,\n        bytes32       reportHash\n    ) external onlyAuthorized {\n        require(bytes(caseId).length > 0,    \"EvidenceRegistry: empty caseId\");\n        require(reportHash != bytes32(0),    \"EvidenceRegistry: zero reportHash\");\n\n        uint256 version = evidenceVersions[caseId].length + 1;\n\n        evidenceVersions[caseId].push(Evidence({\n            caseId:      caseId,\n            version:     version,\n            reportHash:  reportHash,\n            timestamp:   block.timestamp,\n            submittedBy: msg.sender\n        }));\n\n        emit EvidenceStored(caseId, version, reportHash, block.timestamp, msg.sender);\n    }\n\n    // ─── Evidence Read ────────────────────────────────────────────────────────\n\n    /**\n     * @notice Returns the total number of evidence records for a case.\n     */\n    function getEvidenceCount(string memory caseId)\n        external\n        view\n        returns (uint256)\n    {\n        return evidenceVersions[caseId].length;\n    }\n\n    /**\n     * @notice Returns the evidence record at a specific array index (0-based).\n     *         index 0 corresponds to version 1.\n     */\n    function getEvidence(string memory caseId, uint256 index)\n        external\n        view\n        returns (Evidence memory)\n    {\n        require(\n            index < evidenceVersions[caseId].length,\n            \"EvidenceRegistry: index out of bounds\"\n        );\n        return evidenceVersions[caseId][index];\n    }\n\n    /**\n     * @notice Returns the most recent evidence record for a case.\n     */\n    function getLatestEvidence(string memory caseId)\n        external\n        view\n        returns (Evidence memory)\n    {\n        uint256 count = evidenceVersions[caseId].length;\n        require(count > 0, \"EvidenceRegistry: no evidence for this case\");\n        return evidenceVersions[caseId][count - 1];\n    }\n\n    /**\n     * @notice Verify whether a given hash matches the stored hash for a\n     *         specific case version. Used by the off-chain verification flow.\n     * @param caseId     The case identifier.\n     * @param version    1-based version number.\n     * @param reportHash The hash to compare against.\n     * @return           True if the hashes match, false otherwise.\n     */\n    function verifyReportHash(\n        string  memory caseId,\n        uint256        version,\n        bytes32        reportHash\n    ) external view returns (bool) {\n        require(version > 0, \"EvidenceRegistry: version must be >= 1\");\n        require(\n            version <= evidenceVersions[caseId].length,\n            \"EvidenceRegistry: version does not exist\"\n        );\n        return evidenceVersions[caseId][version - 1].reportHash == reportHash;\n    }\n}\n"
+      }
+    }
+  }
+}

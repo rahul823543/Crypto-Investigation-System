@@ -1,6 +1,7 @@
 {
   "name": "contracts",
   "version": "0.1.0",
+  "type": "module",
   "description": "EvidenceRegistry smart contract — On-Chain Forensic Triage Engine",
   "scripts": {
     "compile": "hardhat compile",

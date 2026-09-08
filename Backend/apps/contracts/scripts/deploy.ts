@@ -10,7 +10,9 @@
  *   EVIDENCE_CONTRACT_ADDRESS=<deployed address>
  *   EVIDENCE_CHAIN_ID=80002
  */
-import { ethers } from "hardhat";
+import { network } from "hardhat";
+
+const { ethers } = await network.create();
 
 async function main() {
   // TODO Phase 4 — implement deployment

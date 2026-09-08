@@ -14,8 +14,10 @@
  *   Multi-version       — versioned records are independent
  */
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import type { EvidenceRegistry } from "../typechain-types";
+import { network } from "hardhat";
+import type { EvidenceRegistry } from "../typechain-types/index.js";
+
+const { ethers } = await network.create();
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -235,7 +237,7 @@ describe("EvidenceRegistry", function () {
       // Must be able to store without reverting
       await expect(
         registry.connect(newInvestigator).storeEvidence(CASE_A, fakeHash("by-new"))
-      ).to.not.be.reverted;
+      ).not.to.revert(ethers);
     });
 
     it("owner can revoke an investigator", async function () {
