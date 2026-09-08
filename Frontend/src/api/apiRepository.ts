@@ -16,24 +16,55 @@ import type {
 import type { CaseRepository } from './repository';
 import { apiGet, apiPost } from './client';
 
+function normalizeCase(c: any): CaseDetail {
+  return {
+    caseId: c.caseId ?? c.id,
+    rootAddress: c.rootAddress,
+    chainId: c.chainId,
+    mode: c.mode,
+    status: c.status,
+    riskScore: c.riskScore ?? 0,
+    riskLevel: c.riskLevel ?? 'low',
+    errorMessage: c.errorMessage ?? null,
+    createdAt: c.createdAt,
+    updatedAt: c.updatedAt ?? c.createdAt,
+    steps: c.steps ?? {
+      ingestion: c.status === 'created' ? 'pending' : 'complete',
+      graph: ['created', 'ingesting', 'ingested'].includes(c.status) ? 'pending' : 'complete',
+      analysis: ['analyzed', 'analysis_complete', 'report_ready', 'completed'].includes(c.status) ? 'complete' : 'pending',
+      report: 'not_started',
+      evidence: 'not_started',
+    },
+  };
+}
+
 /**
  * ApiCaseRepository — calls live Fastify endpoints.
  * Handles queue job triggering, polling, and data fetching for live mode.
  */
 export class ApiCaseRepository implements CaseRepository {
   async listCases(): Promise<CaseSummary[]> {
-    const data = await apiGet<{ cases: CaseSummary[] }>('/cases');
-    return data.cases;
+    const data = await apiGet<{ cases: any[] }>('/cases');
+    return (data.cases || []).map((c) => ({
+      caseId: c.caseId ?? c.id,
+      rootAddress: c.rootAddress,
+      chainId: c.chainId,
+      mode: c.mode,
+      status: c.status,
+      riskScore: c.riskScore ?? 0,
+      riskLevel: c.riskLevel ?? 'low',
+      createdAt: c.createdAt,
+    }));
   }
 
   async createCase(input: CreateCaseInput): Promise<CaseDetail> {
-    const res = await apiPost<{ case?: CaseDetail } & CaseDetail>('/cases', input);
-    return res.case || res;
+    const res = await apiPost<{ case?: any } & any>('/cases', input);
+    return normalizeCase(res.case || res);
   }
 
   async getCase(caseId: string): Promise<CaseDetail> {
-    const res = await apiGet<{ case?: CaseDetail } & CaseDetail>(`/cases/${caseId}`);
-    return res.case || res;
+    const res = await apiGet<{ case?: any } & any>(`/cases/${caseId}`);
+    return normalizeCase(res.case || res);
   }
 
   async getGraph(caseId: string): Promise<CaseGraph> {
