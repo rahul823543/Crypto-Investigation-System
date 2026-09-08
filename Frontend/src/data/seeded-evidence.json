@@ -1,0 +1,32 @@
+{
+  "report": {
+    "caseId": "case_demo_001",
+    "reportId": "report_demo_001",
+    "status": "ready",
+    "computedHash": "0x8a3b9f2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    "generatedAt": "2026-08-21T10:30:00.000Z"
+  },
+  "evidence": {
+    "caseId": "case_demo_001",
+    "reportId": "report_demo_001",
+    "computedHash": "0x8a3b9f2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    "transactionHash": "0xf1e2d3c4b5a6978869504132faebdc0b1a2b3c4d5e6f708192a3b4c5d6e7f809",
+    "contractAddress": "0x1234567890abcdef1234567890abcdef12345678",
+    "chainId": 80002,
+    "version": 1,
+    "storedAt": "2026-08-21T10:32:00.000Z",
+    "status": "stored"
+  },
+  "verification": {
+    "caseId": "case_demo_001",
+    "reportId": "report_demo_001",
+    "computedHash": "0x8a3b9f2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    "onChainHash": "0x8a3b9f2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    "verified": true,
+    "contractAddress": "0x1234567890abcdef1234567890abcdef12345678",
+    "transactionHash": "0xf1e2d3c4b5a6978869504132faebdc0b1a2b3c4d5e6f708192a3b4c5d6e7f809",
+    "chainId": 80002,
+    "version": 1,
+    "storedAt": "2026-08-21T10:32:00.000Z"
+  }
+}
