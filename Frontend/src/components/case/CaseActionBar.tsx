@@ -14,16 +14,21 @@ import { useRunAnalysis } from '@/hooks/useAnalysis';
 export interface CaseActionBarProps {
   caseId: string;
   onAnalysisTriggered?: () => void;
+  isAnalysisRunning?: boolean;
+  analysisError?: string | null;
   className?: string;
 }
 
 export const CaseActionBar: React.FC<CaseActionBarProps> = ({
   caseId,
   onAnalysisTriggered,
+  isAnalysisRunning = false,
+  analysisError = null,
   className = '',
 }) => {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [reportReady, setReportReady] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const runAnalysisMutation = useRunAnalysis(caseId);
@@ -38,9 +43,17 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
 
   const handleGenerateReport = async () => {
     setGeneratingReport(true);
+    setReportError(null);
     try {
       await caseRepository.generateReport(caseId);
       setReportReady(true);
+    } catch (err) {
+      setReportError(
+        err instanceof Error
+          ? err.message
+          : 'Report generation failed. Please retry.'
+      );
+      setReportReady(false);
     } finally {
       setGeneratingReport(false);
     }
@@ -88,10 +101,12 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
           size="sm"
           variant="outline"
           onClick={handleRunAnalysis}
-          isLoading={runAnalysisMutation.isPending}
+          isLoading={runAnalysisMutation.isPending || isAnalysisRunning}
           leftIcon={<Zap className="h-4 w-4 text-[#7E22CE]" />}
         >
-          {runAnalysisMutation.isPending ? 'Analyzing Graph...' : 'Re-Analyze Topology'}
+          {runAnalysisMutation.isPending || isAnalysisRunning
+            ? 'Analyzing Graph...'
+            : 'Re-Analyze Topology'}
         </Button>
 
         <Button
@@ -133,6 +148,18 @@ export const CaseActionBar: React.FC<CaseActionBarProps> = ({
           Export Case JSON
         </Button>
       </div>
+
+      {/* Error feedback for report generation failure */}
+      {reportError && (
+        <p className="w-full text-xs text-red-600 font-mono mt-1 pl-1">
+          ⚠ {reportError}
+        </p>
+      )}
+      {analysisError && (
+        <p className="w-full text-xs text-red-600 font-mono mt-1 pl-1">
+          ⚠ Analysis failed: {analysisError}
+        </p>
+      )}
     </div>
   );
 };

@@ -44,24 +44,47 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    if (caseRecord.status !== "graph_ready" && caseRecord.status !== "analyzed") {
+    if (
+      caseRecord.status !== "graph_ready" &&
+      caseRecord.status !== "analyzed" &&
+      caseRecord.status !== "failed"
+    ) {
       return reply.status(409).send({
-        error: `Case must be in 'graph_ready' or 'analyzed' state to analyze (current: ${caseRecord.status})`,
+        error: `Case must be in 'graph_ready', 'analyzed', or 'failed' state to analyze (current: ${caseRecord.status})`,
         statusCode: 409,
       });
     }
 
-    await app.analyzeQueue.add(
-      "analyze-case",
-      { caseId, minConfidence, decayFactor, hardCeilingDepth },
-      {
-        attempts: 3,
-        backoff: {
-          type: "exponential",
-          delay: 2000,
+    // Update the visible lifecycle state before queueing so the frontend can
+    // begin polling immediately. If BullMQ rejects the job, make that failure
+    // visible instead of leaving the case in an ambiguous state.
+    await app.prisma.case.update({
+      where: { id: caseId },
+      data: { status: "analyzing", errorMessage: null },
+    });
+
+    try {
+      await app.analyzeQueue.add(
+        "analyze-case",
+        { caseId, minConfidence, decayFactor, hardCeilingDepth },
+        {
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 2000,
+          },
         },
-      }
-    );
+      );
+    } catch (err) {
+      await app.prisma.case.update({
+        where: { id: caseId },
+        data: {
+          status: "failed",
+          errorMessage: "Failed to enqueue analysis job",
+        },
+      });
+      throw err;
+    }
 
     return reply.status(202).send({
       message: "Analysis job enqueued successfully",
@@ -88,10 +111,35 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const latestAnalysis = await app.prisma.analysisResult.findFirst({
-      where: { caseId },
-      orderBy: { createdAt: "desc" },
-    });
+    // A re-run can have a previous result. Prioritize the Case lifecycle over
+    // that stale result so callers know the new run is still in progress.
+    if (caseRecord.status === "failed") {
+      return reply.status(200).send({
+        status: "failed",
+        analysis: null,
+        error: caseRecord.errorMessage ?? "Analysis failed",
+        message: caseRecord.errorMessage ?? "Analysis failed",
+      });
+    }
+
+    if (caseRecord.status === "analyzing") {
+      return reply.status(200).send({
+        status: "analyzing",
+        analysis: null,
+        message: "Analysis is currently running",
+      });
+    }
+
+    const [latestAnalysis, advancedFindings] = await Promise.all([
+      app.prisma.analysisResult.findFirst({
+        where: { caseId },
+        orderBy: { createdAt: "desc" },
+      }),
+      app.prisma.riskFinding.findMany({
+        where: { caseId, source: "python-intelligence" },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
     if (!latestAnalysis) {
       return reply.status(200).send({
@@ -107,6 +155,20 @@ export const analysisRoutes: FastifyPluginAsync = async (app) => {
       analysisRequestId: latestAnalysis.analysisRequestId,
       riskScore: latestAnalysis.riskScore,
       riskLevel: latestAnalysis.riskLevel,
+      findings: advancedFindings.map((finding) => ({
+        id: finding.id,
+        caseId: finding.caseId,
+        source: "python-intelligence",
+        type: finding.type,
+        severity: finding.severity,
+        confidence: finding.confidence,
+        title: finding.title,
+        description: finding.description,
+        relatedNodeIds: JSON.parse(finding.relatedNodeIdsJson || "[]"),
+        relatedEdgeIds: JSON.parse(finding.relatedEdgeIdsJson || "[]"),
+        signals: JSON.parse(finding.signalsJson || "[]"),
+        createdAt: finding.createdAt.toISOString(),
+      })),
       suspiciousPaths: JSON.parse(latestAnalysis.suspiciousPathsJson || "[]"),
       circularFlows: JSON.parse(latestAnalysis.circularFlowsJson || "[]"),
       vaspAttribution: latestAnalysis.attributedVaspJson

@@ -5,6 +5,8 @@ import type {
   CaseGraph,
   GraphFinding,
   AnalysisResult,
+  AnalysisResponse,
+  AnalysisTriggerResponse,
   VaspAttribution,
   ReportMetadata,
   EvidenceMetadata,
@@ -208,9 +210,13 @@ export class MockCaseRepository implements CaseRepository {
     return seededFindingsData.findings as GraphFinding[];
   }
 
-  async analyzeCase(_caseId: string): Promise<AnalysisResult> {
+  async analyzeCase(caseId: string): Promise<AnalysisTriggerResponse> {
     await mockDelay(800, 1500);
-    return seededAnalysisData as AnalysisResult;
+    return {
+      caseId,
+      status: 'analyzing',
+      message: 'Analysis job enqueued successfully',
+    };
   }
 
   async getAttribution(caseId: string): Promise<VaspAttribution | null> {
@@ -227,6 +233,13 @@ export class MockCaseRepository implements CaseRepository {
     return {
       ...(seededAnalysisData as AnalysisResult),
       caseId,
+    };
+  }
+
+  async getAnalysisStatus(caseId: string): Promise<AnalysisResponse> {
+    return {
+      status: 'complete',
+      analysis: await this.getAnalysis(caseId),
     };
   }
 

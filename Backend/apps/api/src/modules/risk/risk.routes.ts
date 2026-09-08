@@ -7,7 +7,13 @@ import type {
 } from "@sih/shared-types";
 
 const listFindingsQuerySchema = z.object({
-  source: z.string().optional(),
+  // "engine" was used by the original client for rule-engine findings.
+  // Persisted findings use the shared-type value "basic-risk", so normalize
+  // the legacy client alias before it reaches Prisma.
+  source: z
+    .enum(["basic-risk", "python-intelligence", "engine"])
+    .optional()
+    .transform((value) => (value === "engine" ? "basic-risk" : value)),
 });
 
 export async function riskRoutes(app: FastifyInstance) {
