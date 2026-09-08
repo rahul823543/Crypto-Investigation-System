@@ -31,4 +31,5 @@ export interface CaseRepository {
   listEvidence(caseId: string): Promise<EvidenceMetadata[]>;
   anchorEvidence(caseId: string, reportId: string): Promise<EvidenceMetadata>;
   verifyEvidence(input: VerifyEvidenceInput): Promise<EvidenceVerificationResult>;
+  getSeededCase?(): Promise<any>;
 }

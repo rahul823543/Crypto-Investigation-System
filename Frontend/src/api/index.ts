@@ -1,28 +1,23 @@
 import type { CaseRepository } from './repository';
-import { MockCaseRepository } from './mockRepository';
 import { ApiCaseRepository } from './apiRepository';
 
 export type { CaseRepository } from './repository';
 
 /**
- * Named singletons — both are always instantiated at boot.
- * Hooks choose which one to use based on the case's mode field.
+ * Named singletons — ApiCaseRepository connects to live Fastify backend.
  */
-export const mockRepository: CaseRepository = new MockCaseRepository();
 export const apiRepository: CaseRepository = new ApiCaseRepository();
+export const mockRepository: CaseRepository = apiRepository;
 
 /**
- * Returns the correct repository for a given mode string.
- * 'live' or 'api' → ApiCaseRepository (calls Fastify)
- * 'demo' or 'mock' (or anything else) → MockCaseRepository
+ * Returns the repository for a given mode string (delegates to apiRepository).
  */
-export function getRepository(mode: string): CaseRepository {
-  return mode === 'live' || mode === 'api' ? apiRepository : mockRepository;
+export function getRepository(_mode?: string): CaseRepository {
+  return apiRepository;
 }
 
 /**
- * Default singleton — used by hooks that don't have per-case mode context.
- * Defaults to mock (seeded) mode; override with VITE_DATA_MODE=api env var.
+ * Default singleton — uses live Fastify backend.
  */
-export const caseRepository: CaseRepository =
-  import.meta.env.VITE_DATA_MODE === 'api' ? apiRepository : mockRepository;
+export const caseRepository: CaseRepository = apiRepository;
+
