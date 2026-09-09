@@ -10,6 +10,11 @@ export function useCaseGraph(caseId: string | undefined) {
     queryKey: ['graph', caseId],
     queryFn: () => caseRepository.getGraph(caseId!),
     enabled: !!caseId,
-    staleTime: 60_000,
+    // A newly created case exists before the worker has built its graph.
+    // Keep polling the empty response so the visualization fills in as soon
+    // as the graph job persists its first nodes.
+    staleTime: 1_000,
+    refetchInterval: (query) =>
+      query.state.data?.nodes.length ? false : 2_000,
   });
 }

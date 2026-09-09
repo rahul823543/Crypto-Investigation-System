@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import cytoscape, { type Core, type LayoutOptions } from 'cytoscape';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { mapGraphToCytoscapeElements } from '@/utils/graphMapping';
 import { graphStyles } from '@/utils/graphStyles';
 import { useInvestigationStore } from '@/store/investigationStore';
@@ -23,6 +24,7 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
   const [layoutType, setLayoutType] = useState<GraphLayoutType>('breadthfirst');
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const {
     selectedNodeId,
@@ -33,6 +35,39 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
     selectEdge,
     clearSelection,
   } = useInvestigationStore();
+
+  // Re-render and resize Cytoscape whenever fullscreen toggles (after transition)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (cyRef.current) {
+        cyRef.current.resize();
+        cyRef.current.fit(undefined, 40);
+      }
+    }, 100);
+
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
+
+  // Support ESC key to collapse fullscreen
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
   // Get layout config based on type
   const getLayoutOptions = useCallback((type: GraphLayoutType): LayoutOptions => {
@@ -233,32 +268,78 @@ export const TransactionGraph: React.FC<TransactionGraphProps> = ({
 
   return (
     <div
-      className={`relative w-full rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col ${className}`}
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-50 w-screen h-screen bg-slate-950/40 backdrop-blur-sm flex flex-col p-3 sm:p-5'
+          : `relative w-full rounded-3xl bg-white border border-slate-200/80 shadow-[0_10px_35px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col ${className || ''}`
+      }
     >
-      {/* Top Floating Toolbar */}
-      <div className="absolute top-4 left-4 right-4 z-20 pointer-events-none">
-        <div className="pointer-events-auto">
-          <GraphToolbar
-            layout={layoutType}
-            onLayoutChange={handleLayoutChange}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onFit={handleFit}
-            onReset={handleReset}
-          />
-        </div>
-      </div>
-
-      {/* Cytoscape Canvas Viewport */}
       <div
-        ref={containerRef}
-        className="w-full h-[540px] sm:h-[620px] bg-gradient-to-b from-[#FAFAFD] via-white to-purple-50/20 cursor-grab active:cursor-grabbing"
-      />
+        className={
+          isFullscreen
+            ? 'relative w-full h-full rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col'
+            : 'contents'
+        }
+      >
+        {/* Top Floating Toolbar & Maximize/Collapse Controls */}
+        <div className="absolute top-4 left-4 right-4 z-20 pointer-events-none flex items-center justify-between gap-3">
+          <div className="pointer-events-auto">
+            <GraphToolbar
+              layout={layoutType}
+              onLayoutChange={handleLayoutChange}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onFit={handleFit}
+              onReset={handleReset}
+              isFullscreen={isFullscreen}
+              onToggleFullscreen={() => setIsFullscreen((prev) => !prev)}
+            />
+          </div>
 
-      {/* Bottom Floating Legend */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-        <div className="pointer-events-auto flex justify-between items-center">
-          <GraphLegend />
+          {/* Corner Expand/Collapse Toggle Button */}
+          <div className="pointer-events-auto hidden sm:flex items-center gap-2">
+            {isFullscreen ? (
+              <button
+                onClick={() => setIsFullscreen(false)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-lg transition-all cursor-pointer border border-slate-700"
+                title="Exit Fullscreen (Esc)"
+              >
+                <Minimize2 className="h-4 w-4 text-slate-300" />
+                <span>Exit Fullscreen</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-400 font-mono">ESC</kbd>
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="flex items-center gap-1.5 p-2 rounded-2xl bg-white/95 hover:bg-white text-slate-600 hover:text-slate-900 text-xs font-medium backdrop-blur-md shadow-md transition-all cursor-pointer border border-slate-200/80"
+                title="Expand Graph Fullscreen"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Cytoscape Canvas Viewport */}
+        <div
+          ref={containerRef}
+          className={
+            isFullscreen
+              ? 'w-full flex-1 h-full min-h-0 bg-gradient-to-b from-[#FAFAFD] via-white to-purple-50/20 cursor-grab active:cursor-grabbing'
+              : 'w-full h-[540px] sm:h-[620px] bg-gradient-to-b from-[#FAFAFD] via-white to-purple-50/20 cursor-grab active:cursor-grabbing'
+          }
+        />
+
+        {/* Bottom Floating Legend */}
+        <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
+          <div className="pointer-events-auto flex justify-between items-center">
+            <GraphLegend />
+            {isFullscreen && (
+              <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-slate-300 text-xs font-mono">
+                <span>Fullscreen Mode</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

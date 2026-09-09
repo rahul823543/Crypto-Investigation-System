@@ -18,8 +18,7 @@ export function useCasePolling(caseId: string | undefined) {
         data.status === 'analysis_complete' ||
         data.status === 'analyzed' ||
         data.status === 'completed' ||
-        data.status === 'failed' ||
-        data.status === 'demo_fallback_used'
+        data.status === 'failed'
       ) {
         return false;
       }

@@ -30,6 +30,7 @@ export interface CaseRepository {
   getAttribution(caseId: string): Promise<VaspAttribution | null>;
   generateReport(caseId: string): Promise<ReportMetadata>;
   listReports(caseId: string): Promise<ReportMetadata[]>;
+  downloadReport(caseId: string, reportId: string): Promise<Blob>;
   getEvidence(caseId: string): Promise<EvidenceMetadata>;
   listEvidence(caseId: string): Promise<EvidenceMetadata[]>;
   anchorEvidence(caseId: string, reportId: string): Promise<EvidenceMetadata>;

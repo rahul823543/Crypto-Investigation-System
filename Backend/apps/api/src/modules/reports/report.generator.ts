@@ -10,6 +10,8 @@ export async function generateReportPdf(
   caseId: string,
   prisma: PrismaClient
 ): Promise<Buffer> {
+  console.log(`[pdf:generate] caseId=${caseId} timestamp=${new Date().toISOString()} stage=start`);
+
   // Load core case data (always present)
   const caseRecord = await prisma.case.findUnique({
     where: { id: caseId },
@@ -24,8 +26,17 @@ export async function generateReportPdf(
   });
 
   if (!caseRecord) {
+    console.error(`[pdf:generate] caseId=${caseId} stage=case_fetch status=not_found`);
     throw new Error(`Case not found: ${caseId}`);
   }
+
+  console.log(
+    `[pdf:generate] caseId=${caseId} stage=case_fetch status=ok` +
+    ` txCount=${caseRecord.transactions.length}` +
+    ` nodes=${caseRecord.graphNodes.length}` +
+    ` edges=${caseRecord.graphEdges.length}` +
+    ` findings=${caseRecord.riskFindings.length}`
+  );
 
   // Optionally load AnalysisResult if the model exists and data is present.
   // This is a separate query so a missing AnalysisResult never crashes the PDF.
@@ -45,8 +56,16 @@ export async function generateReportPdf(
       orderBy: { createdAt: "desc" as const },
     });
     latestAnalysis = result ?? null;
-  } catch {
+    console.log(
+      `[pdf:generate] caseId=${caseId} stage=analysis_fetch status=${
+        latestAnalysis ? "found" : "not_found"
+      }`
+    );
+  } catch (err) {
     // Model not yet populated or query error — continue without analysis
+    console.warn(
+      `[pdf:generate] caseId=${caseId} stage=analysis_fetch status=error err=${err instanceof Error ? err.message : String(err)}`
+    );
     latestAnalysis = null;
   }
 
@@ -209,7 +228,7 @@ export async function generateReportPdf(
 
       // Collect mixer dead-ends for Section 4b
       if (
-        (node as any).isTraceableDeadEnd &&
+        node.isTraceableDeadEnd &&
         (type === "mixer" || parsedLabels.includes("mixer"))
       ) {
         deadEndNodes.push(
@@ -468,6 +487,7 @@ export async function generateReportPdf(
           "to the bytes of this PDF file."
       );
 
+    console.log(`[pdf:generate] caseId=${caseId} stage=doc_end status=ok timestamp=${new Date().toISOString()}`);
     doc.end();
   });
 }

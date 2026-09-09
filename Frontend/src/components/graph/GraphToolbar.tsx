@@ -1,8 +1,9 @@
-import React from 'react';
 import {
   ZoomIn,
   ZoomOut,
-  Maximize2,
+  Maximize,
+  Minimize2,
+  Scan,
   RotateCcw,
   GitFork,
   Compass,
@@ -19,6 +20,8 @@ export interface GraphToolbarProps {
   onZoomOut: () => void;
   onFit: () => void;
   onReset: () => void;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
   className?: string;
 }
 
@@ -29,6 +32,8 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
   onZoomOut,
   onFit,
   onReset,
+  isFullscreen = false,
+  onToggleFullscreen,
   className,
 }) => {
   const layouts: Array<{ id: GraphLayoutType; label: string; icon: React.ElementType }> = [
@@ -88,7 +93,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
           className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
           title="Fit Viewport"
         >
-          <Maximize2 className="h-4 w-4" />
+          <Scan className="h-4 w-4" />
         </button>
 
         <div className="w-px h-5 bg-slate-200 mx-0.5" />
@@ -100,6 +105,27 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
         >
           <RotateCcw className="h-4 w-4" />
         </button>
+
+        {onToggleFullscreen && (
+          <>
+            <div className="w-px h-5 bg-slate-200 mx-0.5" />
+            <button
+              onClick={onToggleFullscreen}
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isFullscreen
+                  ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                  : 'hover:bg-slate-100 text-slate-600 hover:text-slate-900'
+              }`}
+              title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Expand Fullscreen'}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize className="h-4 w-4" />
+              )}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

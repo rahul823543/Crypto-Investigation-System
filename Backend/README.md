@@ -39,6 +39,17 @@ cp Backend/.env.sample Backend/apps/api/.env
 
 ## 3. Infrastructure & Migrations
 
+### One-click Windows startup
+
+From the repository root, run `START_ALL.bat`. It starts Docker (PostgreSQL +
+Redis), applies migrations, installs Python dependencies when needed, and opens
+separate windows for intelligence, API, workers, and frontend. Then open
+http://127.0.0.1:5173.
+
+The launcher uses `Backend/.env` as the source of truth for Postgres
+credentials, so Docker and the API cannot accidentally use different users or
+passwords.
+
 ### 3.1 Start Local Databases (PostgreSQL & Redis)
 
 From the `Backend/` root directory:
