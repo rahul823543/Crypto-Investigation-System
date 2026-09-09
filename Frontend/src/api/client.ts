@@ -9,11 +9,14 @@ export async function apiClient<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const hasJsonBody = options.body !== undefined && options.body !== null;
 
   const response = await fetch(url, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      // Fastify rejects a request with application/json and no payload. Some
+      // endpoints (such as report generation) are intentionally bodyless POSTs.
+      ...(hasJsonBody ? { 'Content-Type': 'application/json' } : {}),
       ...options.headers,
     },
   });
@@ -35,7 +38,8 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
 export async function apiPost<T>(endpoint: string, body?: unknown): Promise<T> {
   return apiClient<T>(endpoint, {
     method: 'POST',
-    body: body ? JSON.stringify(body) : undefined,
+    // Preserve valid falsy JSON values too; only omit a body when none was supplied.
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
 

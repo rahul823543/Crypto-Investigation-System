@@ -18,6 +18,7 @@ import { CaseActionBar } from '@/components/case/CaseActionBar';
 import { SuspiciousPathsPanel } from '@/components/case/SuspiciousPathsPanel';
 import { AttributionPanel } from '@/components/case/AttributionPanel';
 import { EvidenceStatusPanel } from '@/components/evidence/EvidenceStatusPanel';
+import { ReportHashPanel } from '@/components/report/ReportHashPanel';
 import { TransactionGraph } from '@/components/graph/TransactionGraph';
 import { GraphTableView } from '@/components/graph/GraphTableView';
 import { GraphInspectorPanel } from '@/components/graph/GraphInspectorPanel';
@@ -312,12 +313,15 @@ export const CaseInvestigationPage: React.FC = () => {
 
         {/* Tab 5: Evidence Attestation */}
         {activeWorkspaceTab === 'evidence' && (
-          <EvidenceStatusPanel
-            evidence={evidenceData}
-            isLoading={evidenceLoading}
-            isError={evidenceError}
-            onRetry={() => refetchEvidence()}
-          />
+          <div className="space-y-6">
+            <ReportHashPanel caseId={caseDetail.caseId} />
+            <EvidenceStatusPanel
+              evidence={evidenceData}
+              isLoading={evidenceLoading}
+              isError={evidenceError}
+              onRetry={() => refetchEvidence()}
+            />
+          </div>
         )}
       </div>
     </div>

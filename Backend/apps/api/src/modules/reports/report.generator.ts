@@ -473,7 +473,7 @@ export async function generateReportPdf(
     doc.fontSize(10).fillColor(primaryColor);
     doc.text("• Report Status: Generated");
     doc.text(
-      "• Evidence Cryptographic Hash (SHA-256): Hash: pending — computed upon PDF finalization and stored in Report record"
+      "• Evidence Cryptographic Hash (SHA-256): computed from finalized PDF bytes and stored in this report's record"
     );
     doc.text("• Smart Contract Registry: Pending on-chain notarization");
     doc
