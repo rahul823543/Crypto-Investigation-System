@@ -15,6 +15,8 @@ export async function reportsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { caseId } = request.params;
 
+      app.log.info({ caseId }, "[report:generate] Starting report generation");
+
       try {
         const caseRecord = await app.prisma.case.findUnique({
           where: { id: caseId },
@@ -27,11 +29,32 @@ export async function reportsRoutes(app: FastifyInstance) {
           });
         }
 
+        app.log.info(
+          { caseId, status: caseRecord.status },
+          "[report:generate] Case found, invoking PDF generator"
+        );
+
         // Generate PDF Buffer
         const pdfBuffer = await generateReportPdf(caseId, app.prisma);
 
+        app.log.info(
+          { caseId, bytes: pdfBuffer.length },
+          "[report:generate] PDF buffer produced"
+        );
+
+        if (pdfBuffer.length === 0) {
+          throw new Error(
+            "PDF generation produced an empty buffer — pdfkit emitted no data chunks"
+          );
+        }
+
         // Compute SHA-256 Hash
         const sha256Hash = hashBuffer(pdfBuffer);
+
+        app.log.info(
+          { caseId, sha256Hash },
+          "[report:generate] SHA-256 hash computed"
+        );
 
         // Determine version number
         const existingCount = await app.prisma.report.count({
@@ -50,6 +73,11 @@ export async function reportsRoutes(app: FastifyInstance) {
         // Write PDF file to disk
         await fs.writeFile(absoluteFilePath, pdfBuffer);
 
+        app.log.info(
+          { caseId, absoluteFilePath, bytes: pdfBuffer.length },
+          "[report:generate] PDF written to disk"
+        );
+
         // Persist Report record
         const report = await app.prisma.report.create({
           data: {
@@ -60,6 +88,11 @@ export async function reportsRoutes(app: FastifyInstance) {
             version,
           },
         });
+
+        app.log.info(
+          { caseId, reportId: report.id, version },
+          "[report:generate] Report record persisted"
+        );
 
         return reply.status(201).send({
           report: {
@@ -73,7 +106,30 @@ export async function reportsRoutes(app: FastifyInstance) {
           },
         });
       } catch (err) {
-        app.log.error(err, `Failed to generate report for case ${caseId}`);
+        app.log.error(
+          { err, caseId },
+          `[report:generate] Failed to generate report for case ${caseId}`
+        );
+
+        // Mark case as report_failed so the pipeline never silently stalls
+        try {
+          await app.prisma.case.update({
+            where: { id: caseId },
+            data: {
+              status: "report_failed",
+              errorMessage:
+                err instanceof Error
+                  ? err.message
+                  : "Report generation failed",
+            },
+          });
+        } catch (updateErr) {
+          app.log.error(
+            { updateErr, caseId },
+            "[report:generate] Could not update case status to report_failed"
+          );
+        }
+
         return reply.status(500).send({
           error: "Failed to generate report",
           message: err instanceof Error ? err.message : String(err),
@@ -108,4 +164,94 @@ export async function reportsRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  /**
+   * GET /cases/:caseId/reports/:reportId/file
+   * Downloads the generated PDF file for a specific report.
+   * Returns the raw binary with Content-Type: application/pdf.
+   */
+  app.get<{ Params: { caseId: string; reportId: string } }>(
+    "/cases/:caseId/reports/:reportId/file",
+    async (request, reply) => {
+      const { caseId, reportId } = request.params;
+
+      app.log.info(
+        { caseId, reportId },
+        "[report:download] PDF download requested"
+      );
+
+      try {
+        const report = await app.prisma.report.findFirst({
+          where: { id: reportId, caseId },
+        });
+
+        if (!report) {
+          return reply.status(404).send({
+            error: "Report not found",
+            message: `No report with id ${reportId} exists for case ${caseId}`,
+            statusCode: 404,
+          });
+        }
+
+        if (!report.filePath) {
+          return reply.status(404).send({
+            error: "Report file not available",
+            message: "Report record exists but no file path was recorded",
+            statusCode: 404,
+          });
+        }
+
+        // filePath is stored relative to cwd (e.g. "storage/reports/<name>.pdf")
+        const absoluteFilePath = path.resolve(process.cwd(), report.filePath);
+
+        app.log.info(
+          { caseId, reportId, absoluteFilePath },
+          "[report:download] Resolved absolute file path"
+        );
+
+        // Guard: confirm the file is actually present on disk
+        try {
+          await fs.access(absoluteFilePath);
+        } catch {
+          app.log.error(
+            { caseId, reportId, absoluteFilePath },
+            "[report:download] PDF file is missing from disk"
+          );
+          return reply.status(404).send({
+            error: "Report file missing",
+            message:
+              "The PDF exists in the database but is no longer on disk — regenerate the report",
+            statusCode: 404,
+          });
+        }
+
+        const fileBuffer = await fs.readFile(absoluteFilePath);
+        const fileName = path.basename(absoluteFilePath);
+
+        app.log.info(
+          { caseId, reportId, bytes: fileBuffer.length },
+          "[report:download] Serving PDF to client"
+        );
+
+        return reply
+          .status(200)
+          .header("Content-Type", "application/pdf")
+          .header("Content-Disposition", `attachment; filename="${fileName}"`)
+          .header("Content-Length", fileBuffer.length.toString())
+          .header("X-SHA256", report.sha256Hash ?? "")
+          .send(fileBuffer);
+      } catch (err) {
+        app.log.error(
+          { err, caseId, reportId },
+          "[report:download] Failed to serve report file"
+        );
+        return reply.status(500).send({
+          error: "Failed to serve report file",
+          message: err instanceof Error ? err.message : String(err),
+          statusCode: 500,
+        });
+      }
+    }
+  );
 }
+

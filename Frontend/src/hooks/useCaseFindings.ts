@@ -10,6 +10,9 @@ export function useCaseFindings(caseId: string | undefined) {
     queryKey: ['findings', caseId],
     queryFn: () => caseRepository.getFindings(caseId!),
     enabled: !!caseId,
-    staleTime: 60_000,
+    // Detectors run in the graph worker after this screen can already be open.
+    staleTime: 1_000,
+    refetchInterval: (query) =>
+      query.state.data?.length ? false : 2_000,
   });
 }

@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   AlertTriangle,
+  Network,
+  Table2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tabs } from '@/components/ui/Tabs';
@@ -17,6 +19,7 @@ import { SuspiciousPathsPanel } from '@/components/case/SuspiciousPathsPanel';
 import { AttributionPanel } from '@/components/case/AttributionPanel';
 import { EvidenceStatusPanel } from '@/components/evidence/EvidenceStatusPanel';
 import { TransactionGraph } from '@/components/graph/TransactionGraph';
+import { GraphTableView } from '@/components/graph/GraphTableView';
 import { GraphInspectorPanel } from '@/components/graph/GraphInspectorPanel';
 import { RiskFindingsPanel } from '@/components/graph/RiskFindingsPanel';
 import { useCasePolling } from '@/hooks/useCasePolling';
@@ -51,6 +54,7 @@ export const CaseInvestigationPage: React.FC = () => {
 
   const { selectFinding } = useInvestigationStore();
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('graph');
+  const [topologyViewMode, setTopologyViewMode] = useState<'graph' | 'table'>('graph');
 
   React.useEffect(() => {
     if (caseDetail?.chainId) {
@@ -170,26 +174,88 @@ export const CaseInvestigationPage: React.FC = () => {
           />
         </div>
 
-        {/* Tab 1: Interactive Cytoscape Topology Graph */}
+        {/* Tab 1: Interactive Cytoscape Topology Graph & Table View */}
         {activeWorkspaceTab === 'graph' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Cytoscape Canvas */}
-            <div className="lg:col-span-8">
-              <TransactionGraph graph={graphData} />
+          <div className="space-y-4">
+            {/* View Mode Toggle: Graph View / Table View */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+                <button
+                  onClick={() => setTopologyViewMode('graph')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    topologyViewMode === 'graph'
+                      ? 'bg-white text-indigo-700 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Network className="h-4 w-4" />
+                  <span>Graph View</span>
+                </button>
+
+                <button
+                  onClick={() => setTopologyViewMode('table')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    topologyViewMode === 'table'
+                      ? 'bg-white text-indigo-700 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Table2 className="h-4 w-4" />
+                  <span>Table View</span>
+                  <span className="px-1.5 py-0.5 rounded-full bg-slate-200/70 text-[10px] text-slate-700 font-mono">
+                    {graphData.nodes.length + graphData.edges.length}
+                  </span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
+                <span>
+                  Nodes: <strong className="text-slate-900">{graphData.nodes.length}</strong>
+                </span>
+                <span>•</span>
+                <span>
+                  Edges: <strong className="text-slate-900">{graphData.edges.length}</strong>
+                </span>
+                <span>•</span>
+                <span>
+                  Max Depth: <strong className="text-slate-900">{graphData.metadata.maxHopDepth}</strong>
+                </span>
+              </div>
             </div>
 
-            {/* Dynamic Inspector Panel */}
-            <div className="lg:col-span-4">
-              <GraphInspectorPanel
+            {/* View Render */}
+            {topologyViewMode === 'graph' ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Cytoscape Canvas */}
+                <div className="lg:col-span-8">
+                  <TransactionGraph graph={graphData} />
+                </div>
+
+                {/* Dynamic Inspector Panel */}
+                <div className="lg:col-span-4">
+                  <GraphInspectorPanel
+                    nodes={graphData.nodes}
+                    edges={graphData.edges}
+                    findings={findingsData || []}
+                    paths={analysisData?.suspiciousPaths || []}
+                    circularFlows={analysisData?.circularFlows || []}
+                    onHighlightFinding={handleHighlightFinding}
+                    className="sticky top-20"
+                  />
+                </div>
+              </div>
+            ) : (
+              <GraphTableView
                 nodes={graphData.nodes}
                 edges={graphData.edges}
-                findings={findingsData || []}
-                paths={analysisData?.suspiciousPaths || []}
-                circularFlows={analysisData?.circularFlows || []}
-                onHighlightFinding={handleHighlightFinding}
-                className="sticky top-20"
+                onSelectNode={(node) => {
+                  useInvestigationStore.getState().selectNode(node.id);
+                }}
+                onSelectEdge={(edge) => {
+                  useInvestigationStore.getState().selectEdge(edge.id);
+                }}
               />
-            </div>
+            )}
           </div>
         )}
 

@@ -11,9 +11,10 @@ import {
   ShieldCheck,
   AlertTriangle,
   RotateCw,
+  Download,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { useCaseReports, useGenerateReport } from '@/hooks/useReports';
+import { useCaseReports, useGenerateReport, downloadReportFile } from '@/hooks/useReports';
 import { useNavigate } from 'react-router-dom';
 import type { ReportMetadata } from '@/types';
 
@@ -190,23 +191,41 @@ export const ReportHashPanel: React.FC<ReportHashPanelProps> = ({
                 <code className="font-mono text-xs text-indigo-300 break-all select-all font-semibold">
                   {activeReport.computedHash || activeReport.sha256Hash}
                 </code>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    handleCopyHash(activeReport.computedHash || activeReport.sha256Hash || '')
-                  }
-                  className="bg-slate-800/80 hover:bg-slate-700 text-white border-slate-700 shrink-0 text-xs"
-                  leftIcon={
-                    copiedHash ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )
-                  }
-                >
-                  {copiedHash ? 'Copied Hash' : 'Copy Hash'}
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      handleCopyHash(activeReport.computedHash || activeReport.sha256Hash || '')
+                    }
+                    className="bg-slate-800/80 hover:bg-slate-700 text-white border-slate-700 text-xs"
+                    leftIcon={
+                      copiedHash ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" />
+                      )
+                    }
+                  >
+                    {copiedHash ? 'Copied Hash' : 'Copy Hash'}
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() =>
+                      downloadReportFile(
+                        caseId,
+                        activeReport.reportId || activeReport.id || '',
+                        `case-${caseId}-v${activeReport.version || 1}.pdf`
+                      )
+                    }
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs shadow-sm"
+                    leftIcon={<Download className="h-3.5 w-3.5" />}
+                  >
+                    Download PDF
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -281,6 +300,19 @@ export const ReportHashPanel: React.FC<ReportHashPanelProps> = ({
                             {new Date(r.generatedAt).toLocaleDateString()}
                           </td>
                           <td className="py-3 px-3 text-right">
+                            <button
+                              onClick={() =>
+                                downloadReportFile(
+                                  caseId,
+                                  r.reportId || r.id || '',
+                                  `case-${caseId}-v${r.version || 1}.pdf`
+                                )
+                              }
+                              className="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer underline mr-2"
+                              title="Download PDF file"
+                            >
+                              Download
+                            </button>
                             <button
                               onClick={() => setSelectedReportId(r.reportId)}
                               className="text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer underline mr-2"

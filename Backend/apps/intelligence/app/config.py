@@ -15,7 +15,8 @@ class Settings(BaseSettings):
     )
 
     # Server
-    intelligence_port: int = 8001
+    # Fastify calls the intelligence service at localhost:8000 by default.
+    intelligence_port: int = 8000
 
     # Versioning — echoed in every API response so Fastify can validate presence
     engine_version: str = "0.1.0"

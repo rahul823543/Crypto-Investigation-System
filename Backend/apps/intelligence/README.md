@@ -7,7 +7,7 @@ Python FastAPI microservice for the On-Chain Forensic Triage Engine.
 ```bash
 cp .env.example .env
 poetry install
-poetry run uvicorn app.main:app --port 8001 --reload
+poetry run uvicorn app.main:app --port 8000 --reload
 ```
 
 ## Run Tests

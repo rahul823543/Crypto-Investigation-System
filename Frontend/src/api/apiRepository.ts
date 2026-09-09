@@ -13,11 +13,36 @@ import type {
   EvidenceMetadata,
   EvidenceVerificationResult,
   VerifyEvidenceInput,
+  CaseSteps,
 } from '@/types';
 import type { CaseRepository } from './repository';
-import { apiGet, apiPost } from './client';
+import { apiGet, apiPost, apiDownloadBlob } from './client';
 
 function normalizeCase(c: any): CaseDetail {
+  const steps: CaseSteps = {
+    ingestion: c.status === 'created' ? 'pending' : c.status === 'ingesting' ? 'running' : 'complete',
+    graph: ['created', 'ingesting', 'ingested', 'demo_fallback_used'].includes(c.status)
+      ? 'pending'
+      : c.status === 'graph_building'
+        ? 'running'
+        : 'complete',
+    analysis: ['analyzed', 'analysis_complete', 'report_ready', 'completed'].includes(c.status)
+      ? 'complete'
+      : c.status === 'analyzing'
+        ? 'running'
+        : c.status === 'failed'
+          ? 'failed'
+          : 'pending',
+    report: ['report_ready', 'completed'].includes(c.status)
+      ? 'ready'
+      : c.status === 'report_generating'
+        ? 'generating'
+        : c.status === 'report_failed'
+          ? 'failed'
+          : 'not_started',
+    evidence: 'not_started',
+  };
+
   return {
     caseId: c.caseId ?? c.id,
     rootAddress: c.rootAddress,
@@ -29,13 +54,7 @@ function normalizeCase(c: any): CaseDetail {
     errorMessage: c.errorMessage ?? null,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt ?? c.createdAt,
-    steps: c.steps ?? {
-      ingestion: c.status === 'created' ? 'pending' : 'complete',
-      graph: ['created', 'ingesting', 'ingested'].includes(c.status) ? 'pending' : 'complete',
-      analysis: ['analyzed', 'analysis_complete', 'report_ready', 'completed'].includes(c.status) ? 'complete' : 'pending',
-      report: 'not_started',
-      evidence: 'not_started',
-    },
+    steps: c.steps ?? steps,
   };
 }
 
@@ -100,9 +119,16 @@ export class ApiCaseRepository implements CaseRepository {
   async getAnalysis(caseId: string): Promise<AnalysisResult | null> {
     const data = await this.getAnalysisStatus(caseId);
     if (data.status === 'complete' && data.analysis) {
-      return data.analysis;
+      return {
+        ...data.analysis,
+        findings: data.analysis.findings ?? [],
+        analysisMetadata:
+          data.analysis.analysisMetadata ?? (data.analysis as any).metadata ?? {
+            engineVersion: 'unknown',
+            runtimeMs: 0,
+          },
+      };
     }
-    // In case the backend returns the raw completed analysis flattened
     if ((data as any).analysisId && (data as any).riskScore !== undefined) {
       return data as unknown as AnalysisResult;
     }
@@ -128,11 +154,15 @@ export class ApiCaseRepository implements CaseRepository {
     const data = await apiPost<{ report?: any } & ReportMetadata>(`/cases/${caseId}/reports`);
     if (data.report) {
       return {
+        id: data.report.id,
         caseId: data.report.caseId,
         reportId: data.report.id,
         status: data.report.status === 'generated' ? 'ready' : 'failed',
         computedHash: data.report.sha256Hash,
-        generatedAt: data.report.createdAt,
+        sha256Hash: data.report.sha256Hash,
+        filePath: data.report.filePath,
+        version: data.report.version ?? 1,
+        generatedAt: data.report.generatedAt || data.report.createdAt || new Date().toISOString(),
       };
     }
     return data;
@@ -151,6 +181,10 @@ export class ApiCaseRepository implements CaseRepository {
       version: r.version ?? 1,
       generatedAt: r.createdAt || r.generatedAt || new Date().toISOString(),
     }));
+  }
+
+  async downloadReport(caseId: string, reportId: string): Promise<Blob> {
+    return apiDownloadBlob(`/cases/${caseId}/reports/${reportId}/file`);
   }
 
   async getEvidence(caseId: string): Promise<EvidenceMetadata> {

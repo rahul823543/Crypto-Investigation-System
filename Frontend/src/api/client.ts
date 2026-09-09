@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 /**
  * Base API client for making HTTP requests to the Fastify backend.
@@ -38,3 +38,16 @@ export async function apiPost<T>(endpoint: string, body?: unknown): Promise<T> {
     body: body ? JSON.stringify(body) : undefined,
   });
 }
+
+export async function apiDownloadBlob(endpoint: string): Promise<Blob> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(
+      errorBody.message || `Download failed: ${response.status} ${response.statusText}`
+    );
+  }
+  return response.blob();
+}
+
